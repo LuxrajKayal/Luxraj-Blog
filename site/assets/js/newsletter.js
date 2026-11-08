@@ -392,6 +392,7 @@ export function initNewsletterPopup({ audioContext = null } = {}) {
 
     function updateSpeech(text) {
       speechText.textContent = text;
+      speechBubble.classList.remove('hidden');
       speechBubble.style.transform = 'scale(1.04)';
       setTimeout(() => {
         speechBubble.style.transform = 'scale(1)';
@@ -1028,25 +1029,15 @@ export function initNewsletterPopup({ audioContext = null } = {}) {
       }
     }
 
-    // Desktop: remember Luxy's current message before showing the porch warning.
-    let porchPreviousPointerSpeech = null;
-
+    // Desktop: show the warning while the pointer is over the porch.
     porchFooter.addEventListener('pointerenter', (event) => {
       if (event.pointerType === 'touch' || isSubscribed) return;
-      porchPreviousPointerSpeech = speechText.textContent;
       showPorchWarning();
     });
 
     porchFooter.addEventListener('pointerleave', () => {
-      // Restore the exact message from before the hover, unless another action
-      // has already replaced the warning with a newer message.
-      if (
-        speechText.textContent === porchWarningSpeech &&
-        porchPreviousPointerSpeech !== null
-      ) {
-        updateSpeech(porchPreviousPointerSpeech);
-      }
-      porchPreviousPointerSpeech = null;
+      // Hide the whole speech bubble when the pointer leaves the porch.
+      speechBubble.classList.add('hidden');
       propSadSign.setAttribute('opacity', '0');
     });
 
