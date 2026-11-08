@@ -1028,13 +1028,25 @@ export function initNewsletterPopup({ audioContext = null } = {}) {
       }
     }
 
-    // Desktop: hovering anywhere inside the porch footer triggers Luxy's reaction.
+    // Desktop: remember Luxy's current message before showing the porch warning.
+    let porchPreviousPointerSpeech = null;
+
     porchFooter.addEventListener('pointerenter', (event) => {
-      if (event.pointerType === 'touch') return;
+      if (event.pointerType === 'touch' || isSubscribed) return;
+      porchPreviousPointerSpeech = speechText.textContent;
       showPorchWarning();
     });
 
     porchFooter.addEventListener('pointerleave', () => {
+      // Restore the exact message from before the hover, unless another action
+      // has already replaced the warning with a newer message.
+      if (
+        speechText.textContent === porchWarningSpeech &&
+        porchPreviousPointerSpeech !== null
+      ) {
+        updateSpeech(porchPreviousPointerSpeech);
+      }
+      porchPreviousPointerSpeech = null;
       propSadSign.setAttribute('opacity', '0');
     });
 
