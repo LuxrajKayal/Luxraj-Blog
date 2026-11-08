@@ -1,4 +1,4 @@
-export function initNewsletterPopup(){
+export function initNewsletterPopup({ audioContext = null } = {}) {
   const root=document.getElementById('luxraj-newsletter');
   if(!root||root.dataset.initialized==='true')return;
   root.dataset.initialized='true';
@@ -11,9 +11,9 @@ export function initNewsletterPopup(){
      * 1. CUTE SYNTHESIZED SOUND ENGINE (Web Audio API - No External Files)
      ******************************************************************/
     class CuteSoundBox {
-      constructor() {
+      constructor(audioContext = null) {
         this.enabled = true;
-        this.ctx = null;
+        this.ctx = audioContext;
       }
 
       init() {
@@ -138,7 +138,7 @@ export function initNewsletterPopup(){
       }
     }
 
-    const sound = new CuteSoundBox();
+    const sound = new CuteSoundBox(audioContext);
 
     /******************************************************************
      * 2. BREVO CONFIGURATION & GAME STATE ("LUXY")

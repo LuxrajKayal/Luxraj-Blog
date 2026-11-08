@@ -58,16 +58,9 @@ export function createLazyLoader({ root = document } = {}) {
 
       if (eventName === "click") event.preventDefault();
 
-      const previousAriaBusy = trigger.getAttribute("aria-busy");
-      trigger.setAttribute("aria-busy", "true");
-      void activate(profile.id, trigger, event)
-        .catch((error) => {
-          console.error('[Luxraj Lazy Loader] Failed to activate "' + profile.id + '".', error);
-        })
-        .finally(() => {
-          if (previousAriaBusy === null) trigger.removeAttribute("aria-busy");
-          else trigger.setAttribute("aria-busy", previousAriaBusy);
-        });
+      void activate(profile.id, trigger, event).catch((error) => {
+        console.error('[Luxraj Lazy Loader] Failed to activate "' + profile.id + '".', error);
+      });
     };
 
     root.addEventListener(eventName, listener);
@@ -111,11 +104,31 @@ export function createLazyLoader({ root = document } = {}) {
     const profile = profiles.get(profileId);
     if (!profile) throw new Error('Unknown lazy-loading profile "' + profileId + '".');
 
-    const instance = await load(profileId, { trigger, event });
-    if (typeof profile.activate === "function") {
-      await profile.activate({ instance, trigger, event, root, loader: api });
+    // Run profile preparation synchronously while the originating user gesture
+    // is still active (for example, to unlock audio before downloading assets).
+    if (typeof profile.onTrigger === "function") {
+      try {
+        profile.onTrigger({ trigger, event, root, loader: api });
+      } catch (error) {
+        console.error('[Luxraj Lazy Loader] Trigger preparation failed for "' + profileId + '".', error);
+      }
     }
-    return instance;
+
+    const previousAriaBusy = trigger ? trigger.getAttribute("aria-busy") : null;
+    if (trigger) trigger.setAttribute("aria-busy", "true");
+
+    try {
+      const instance = await load(profileId, { trigger, event });
+      if (typeof profile.activate === "function") {
+        await profile.activate({ instance, trigger, event, root, loader: api });
+      }
+      return instance;
+    } finally {
+      if (trigger) {
+        if (previousAriaBusy === null) trigger.removeAttribute("aria-busy");
+        else trigger.setAttribute("aria-busy", previousAriaBusy);
+      }
+    }
   }
 
   function start() {

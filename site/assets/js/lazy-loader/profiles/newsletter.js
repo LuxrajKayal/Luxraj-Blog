@@ -6,6 +6,7 @@
  */
 
 let newsletterStylesheetPromise = null;
+let newsletterAudioContext = null;
 
 function ensureNewsletterStylesheet(stylesheetUrl) {
   const selector = 'link[data-luxraj-lazy-style="newsletter"]';
@@ -45,10 +46,21 @@ function ensureNewsletterStylesheet(stylesheetUrl) {
 
 export const newsletterProfile = {
   id: "newsletter",
-  trigger: {
-    type: "event",
-    event: "click",
-    selector: "[data-newsletter-open]"
+  onTrigger() {
+    // Resume audio during the click gesture, before network requests begin.
+    if (newsletterAudioContext) return;
+    const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextConstructor) return;
+
+    try {
+      newsletterAudioContext = new AudioContextConstructor();
+      const resumePromise = newsletterAudioContext.resume();
+      if (resumePromise && typeof resumePromise.catch === "function") {
+        resumePromise.catch(() => {});
+      }
+    } catch (error) {
+      // Audio is optional; newsletter loading must continue if unavailable.
+    }
   },
 
   async load() {
@@ -90,7 +102,7 @@ export const newsletterProfile = {
     placeholder.replaceWith(newsletterRoot);
 
     try {
-      const controller = initNewsletterPopup();
+      const controller = initNewsletterPopup({ audioContext: newsletterAudioContext });
       if (!controller || typeof controller.open !== "function") {
         throw new Error("The newsletter module did not return its controller.");
       }
