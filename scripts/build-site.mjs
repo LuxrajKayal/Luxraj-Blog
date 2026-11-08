@@ -165,18 +165,17 @@ function injectFooterStylesheet(html, rootPrefix, relativeFile) {
   return html.slice(0, headEnd) + link + html.slice(headEnd);
 }
 
-function injectNewsletterStylesheet(html,rootPrefix,relativeFile){
- if(/href\s*=\s*(['"])[^'"]*assets\/css\/newsletter\.css\1/i.test(html))return html;
- const headEnd=html.toLowerCase().lastIndexOf('</head>');
- if(headEnd<0)throw new Error(relativeFile+' uses newsletter popup but has no closing </head> tag.');
- const link='  <link rel="stylesheet" href="'+rootPrefix+'assets/css/newsletter.css">\n';
- return html.slice(0,headEnd)+link+html.slice(headEnd);
-}
-function injectNewsletterPopup(html,popupHtml,relativeFile){
- if(/id\s*=\s*(['"])luxraj-newsletter\1/i.test(html))throw new Error(relativeFile+' already contains newsletter feature root.');
- const bodyEnd=html.toLowerCase().lastIndexOf('</body>');
- if(bodyEnd<0)throw new Error(relativeFile+' uses newsletter popup but has no closing </body> tag.');
- return html.slice(0,bodyEnd)+'\n\n'+popupHtml.trim()+'\n\n'+html.slice(bodyEnd);
+function injectNewsletterPlaceholder(html, relativeFile) {
+  if (/id\s*=\s*(['"])house-popup-backdrop\1/i.test(html)) {
+    throw new Error(relativeFile + ' already contains the newsletter popup target.');
+  }
+  const bodyEnd = html.toLowerCase().lastIndexOf('</body>');
+  if (bodyEnd < 0) {
+    throw new Error(relativeFile + ' uses the newsletter trigger but has no closing </body> tag.');
+  }
+  const placeholder =
+    '<div id="house-popup-backdrop" data-newsletter-placeholder hidden aria-hidden="true"></div>';
+  return html.slice(0, bodyEnd) + '\n' + placeholder + '\n' + html.slice(bodyEnd);
 }
 
 
@@ -225,7 +224,7 @@ function validateStandalone404(html, relativeFile) {
   return html;
 }
 
-function expandSharedComponents(sourceHtml, relativeFile, partialContents, newsletterPopupHtml) {
+function expandSharedComponents(sourceHtml, relativeFile, partialContents) {
   const usesArticleLayout = sourceHtml.includes(markerFor('ARTICLE-LAYOUT'));
   let html = expandArticleLayout(sourceHtml, relativeFile, partialContents);
 
@@ -244,8 +243,7 @@ function expandSharedComponents(sourceHtml, relativeFile, partialContents, newsl
     throw new Error(relativeFile + ' contains an unresolved shared marker or root token after assembly.');
   }
   html = injectFooterStylesheet(html, rootPrefix, relativeFile);
-  html = injectNewsletterStylesheet(html, rootPrefix, relativeFile);
-  html = injectNewsletterPopup(html, newsletterPopupHtml.replaceAll('{{ROOT}}', rootPrefix), relativeFile);
+  html = injectNewsletterPlaceholder(html, relativeFile);
   validateBuiltPage(html, relativeFile, usesArticleLayout);
   return html;
 }
@@ -256,8 +254,7 @@ function validateBuiltPage(html, relativeFile, usesArticleLayout = false) {
     ['main header', /<header\b[^>]*class\s*=\s*(["'])[^"']*\bsite-header\b[^"']*\1/gi],
     ['search dialog', /<dialog\b[^>]*\bid\s*=\s*(["'])search-dialog\1/gi],
     ['footer', /<footer\b[^>]*class\s*=\s*(["'])[^"']*\bsite-footer\b[^"']*\1/gi],
-    ['newsletter feature root', /<div\b[^>]*\bid\s*=\s*(['"])luxraj-newsletter\1/gi],
-    ['newsletter popup dialog', /<div\b[^>]*\bid\s*=\s*(['"])house-popup-backdrop\1/gi]
+    ['newsletter popup placeholder', /<div\b[^>]*\bid\s*=\s*(['"])house-popup-backdrop\1[^>]*\bdata-newsletter-placeholder\b[^>]*>/gi]
   ];
   for (const [name, expression] of required) {
     const count = countMatches(html, expression);
@@ -282,7 +279,7 @@ function validateBuiltPage(html, relativeFile, usesArticleLayout = false) {
   }
 }
 
-async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents, newsletterPopupHtml, stats) {
+async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents, stats) {
   const entries = await readdir(sourceDirectory, { withFileTypes: true });
 
   for (const entry of entries) {
@@ -299,7 +296,7 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
 
     if (entry.isDirectory()) {
       await mkdir(outputPath, { recursive: true });
-      await walkAndBuild(sourcePath, relativePath, partialContents, newsletterPopupHtml, stats);
+      await walkAndBuild(sourcePath, relativePath, partialContents, stats);
       continue;
     }
 
@@ -340,7 +337,7 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
       continue;
     }
 
-    const builtHtml = expandSharedComponents(sourceHtml, normalizedRelativePath, partialContents, newsletterPopupHtml);
+    const builtHtml = expandSharedComponents(sourceHtml, normalizedRelativePath, partialContents);
     await writeFile(outputPath, builtHtml, 'utf8');
     stats.builtPages += 1;
   }
@@ -359,8 +356,19 @@ async function main() {
   await rm(OUTPUT_DIR, { recursive: true, force: true });
   await mkdir(OUTPUT_DIR, { recursive: true });
 
+  // Publish the newsletter markup as a shared resource. Pages retain only a
+  // lightweight trigger target; the full markup is fetched after a visitor clicks.
+  const newsletterAssetPath = path.join(
+    OUTPUT_DIR,
+    'assets',
+    'components',
+    'newsletter-popup.html'
+  );
+  await mkdir(path.dirname(newsletterAssetPath), { recursive: true });
+  await writeFile(newsletterAssetPath, newsletterPopupHtml, 'utf8');
+
   const stats = { builtPages: 0, emptyPlaceholders: 0, standalonePages: 0 };
-  await walkAndBuild(SITE_DIR, '', partialContents, newsletterPopupHtml, stats);
+  await walkAndBuild(SITE_DIR, '', partialContents, stats);
   await writeFile(path.join(OUTPUT_DIR, '.nojekyll'), '', 'utf8');
 
   console.log(
