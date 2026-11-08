@@ -335,12 +335,6 @@ export function initNewsletterPopup(){
         returnFocusTarget=null;
       },300);
     }
-    document.addEventListener('click',(event)=>{
-      const target=event.target instanceof Element?event.target:null;
-      const trigger=target&&target.closest('[data-newsletter-open]');
-      if(!trigger)return;
-      event.preventDefault(); openHousePopup(trigger);
-    });
     closeHousePopupBtn.addEventListener('click',closeHousePopup);
 
     // The first visitor input stops the idle tour before any feature dialogue can update the bubble.
@@ -1113,4 +1107,9 @@ export function initNewsletterPopup(){
     window.addEventListener('resize',resizeConfetti);
     resizeConfetti();
 
+    // The universal lazy loader opens and closes the existing newsletter UI.
+    return {
+      open: openHousePopup,
+      close: closeHousePopup
+    };
 }
