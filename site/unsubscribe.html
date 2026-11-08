@@ -264,6 +264,11 @@
       box-shadow: none;
     }
 
+
+    .lux-unsubscribe-page .sib-form-message-panel.sib-form-message-panel--active {
+      display: block;
+    }
+
     .lux-unsubscribe-page #error-message {
       border-color: rgb(248 113 113 / 0.55);
       background: rgb(127 29 29 / 0.22);
@@ -693,20 +698,6 @@
                     </span>
                   </div>
                 </div>
-
-                <div class="lux-unsubscribe-honeypot" aria-hidden="true">
-                  <label for="email_address_check">Leave this field empty</label>
-                  <input
-                    type="text"
-                    id="email_address_check"
-                    name="email_address_check"
-                    value=""
-                    tabindex="-1"
-                    autocomplete="off"
-                  >
-                </div>
-
-                <input type="hidden" name="locale" value="en">
 
                 <div class="sib-form-block">
                   <button
