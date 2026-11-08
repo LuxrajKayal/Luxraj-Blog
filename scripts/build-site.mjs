@@ -27,6 +27,9 @@ const NEWSLETTER_POPUP_PARTIAL = path.join(PARTIAL_DIR, 'newsletter-popup.html')
 const STANDALONE_NEWSLETTER_PAGES = new Set([
   'newsletter-thank-you.html'
 ]);
+const STANDALONE_UNSUBSCRIBE_PAGES = new Set([
+  'unsubscribe.html'
+]);
 const REQUIRED_MARKER_NAMES = ['TOPBAR', 'MAIN-HEADER', 'FOOTER'];
 const MARKER_NAMES = Object.keys(PARTIALS);
 const markerFor = name => '<!-- SHARED:' + name + ' -->';
@@ -202,6 +205,72 @@ function validateStandaloneNewsletterPage(html, relativeFile) {
   return html;
 }
 
+
+/*
+ * The unsubscribe page owns its complete visual layout and loads only Brevo's
+ * form assets. It bypasses the shared site shell and newsletter popup.
+ */
+function validateStandaloneUnsubscribePage(html, relativeFile) {
+  if (!/<html\b/i.test(html) || !/<head\b/i.test(html) ||
+      !/<body\b/i.test(html) || !html.toLowerCase().includes('</html>')) {
+    throw new Error(relativeFile + ' must be a complete standalone HTML document.');
+  }
+  if (/<!-- SHARED:|{{ROOT}}/.test(html)) {
+    throw new Error(relativeFile + ' must not contain shared-component markers or root tokens.');
+  }
+  if (/<div\b[^>]*\bid\s*=\s*["']house-popup-backdrop["']/i.test(html)) {
+    throw new Error(relativeFile + ' must not include the shared newsletter popup target.');
+  }
+
+  const stylesheetUrls = Array.from(
+    html.matchAll(/<link\b[^>]*\brel\s*=\s*["'][^"']*stylesheet[^"']*["'][^>]*\bhref\s*=\s*["']([^"']+)["'][^>]*>/gi),
+    match => match[1]
+  );
+  const allowedStylesheets = [
+    /^https:\/\/fonts\.googleapis\.com\//,
+    /^https:\/\/sibforms\.com\/forms\/end-form\/build\/sib-styles\.css$/
+  ];
+  if (stylesheetUrls.some(url => !allowedStylesheets.some(rule => rule.test(url)))) {
+    throw new Error(relativeFile + ' may load only its approved font and Brevo form stylesheets.');
+  }
+
+  const scriptUrls = Array.from(
+    html.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["'][^>]*>/gi),
+    match => match[1]
+  );
+  if (scriptUrls.length !== 1 ||
+      scriptUrls[0] !== 'https://sibforms.com/forms/end-form/build/main.js') {
+    throw new Error(relativeFile + ' must load only the official Brevo form script.');
+  }
+
+  if (!/<form\b[^>]*\bid\s*=\s*["']sib-form["'][^>]*\bdata-type\s*=\s*["']unsubscription["']/i.test(html)) {
+    throw new Error(relativeFile + ' must contain the Brevo unsubscription form.');
+  }
+  if (!/<form\b[^>]*\baction\s*=\s*["']https:\/\/[a-z0-9-]+\.sibforms\.com\/serve\/[^"']+["']/i.test(html)) {
+    throw new Error(relativeFile + ' must submit to a Brevo-hosted form endpoint.');
+  }
+  for (const field of ['EMAIL', 'email_address_check', 'locale']) {
+    const fieldPattern = new RegExp('<input\\\\b[^>]*\\\\bname\\\\s*=\\\\s*["\\\\\\']' + field + '["\\\\\\'][^>]*>', 'i');
+    if (!fieldPattern.test(html)) {
+      throw new Error(relativeFile + ' is missing the required Brevo field ' + field + '.');
+    }
+  }
+  if (!/id\s*=\s*["']error-message["']/i.test(html) ||
+      !/id\s*=\s*["']success-message["']/i.test(html)) {
+    throw new Error(relativeFile + ' must include branded success and error message panels.');
+  }
+  if (!/<style\b[\s\S]*?<\/style>/i.test(html)) {
+    throw new Error(relativeFile + ' must include its own page styles.');
+  }
+
+  // The page must not inherit the main application or shared component assets.
+  if (/assets\/css\/|assets\/js\/main\.js|assets\/js\/newsletter\.js/i.test(html)) {
+    throw new Error(relativeFile + ' must not load shared site styles or application scripts.');
+  }
+
+  return html;
+}
+
 function validateStandalone404(html, relativeFile) {
   if (!/<html\b/i.test(html) || !/<body\b/i.test(html) || !html.toLowerCase().includes("</html>")) {
     throw new Error(relativeFile + ' must be a complete standalone HTML document.');
@@ -324,6 +393,14 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
     // Newsletter callback pages are intentionally standalone: no site shell or popup injection.
     if (STANDALONE_NEWSLETTER_PAGES.has(normalizedRelativePath)) {
       const standaloneHtml = validateStandaloneNewsletterPage(sourceHtml, normalizedRelativePath);
+      await writeFile(outputPath, standaloneHtml, 'utf8');
+      stats.standalonePages += 1;
+      continue;
+    }
+
+    // The unsubscribe page is a branded standalone document with only Brevo assets.
+    if (STANDALONE_UNSUBSCRIBE_PAGES.has(normalizedRelativePath)) {
+      const standaloneHtml = validateStandaloneUnsubscribePage(sourceHtml, normalizedRelativePath);
       await writeFile(outputPath, standaloneHtml, 'utf8');
       stats.standalonePages += 1;
       continue;
