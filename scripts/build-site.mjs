@@ -249,11 +249,13 @@ function validateStandaloneUnsubscribePage(html, relativeFile) {
   if (!/<form\b[^>]*\baction\s*=\s*["']https:\/\/[a-z0-9-]+\.sibforms\.com\/serve\/[^"']+["']/i.test(html)) {
     throw new Error(relativeFile + ' must submit to a Brevo-hosted form endpoint.');
   }
-  for (const field of ['EMAIL', 'email_address_check', 'locale']) {
-    const fieldPattern = new RegExp('<input\\\\b[^>]*\\\\bname\\\\s*=\\\\s*["\\\\\\']' + field + '["\\\\\\'][^>]*>', 'i');
-    if (!fieldPattern.test(html)) {
-      throw new Error(relativeFile + ' is missing the required Brevo field ' + field + '.');
-    }
+  const requiredFields = [
+    /<input\b[^>]*\bname\s*=\s*["']EMAIL["'][^>]*>/i,
+    /<input\b[^>]*\bname\s*=\s*["']email_address_check["'][^>]*>/i,
+    /<input\b[^>]*\bname\s*=\s*["']locale["'][^>]*>/i
+  ];
+  if (requiredFields.some(pattern => !pattern.test(html))) {
+    throw new Error(relativeFile + ' is missing a required Brevo form field.');
   }
   if (!/id\s*=\s*["']error-message["']/i.test(html) ||
       !/id\s*=\s*["']success-message["']/i.test(html)) {
