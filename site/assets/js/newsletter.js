@@ -989,26 +989,68 @@ export function initNewsletterPopup({ audioContext = null } = {}) {
       get('submit-btn').disabled = false;
     });
 
-    // Playful "No thanks, I hate cute things (make Luxy cry)" link on the porch
+    // The whole porch footer is Luxy's playful "please don't leave" interaction area.
     const noThanksLink = get('no-thanks-link');
+    const porchFooter = root.querySelector('.porch-footer');
     const rssBox = get('rss-box');
+    const porchWarningSpeech = '"Wait! Don\'t go there! Luxy will be scared all alone in this lonely house! Try giving me 1 cookie first!?"';
+    let porchTouchTimeout = null;
+    let porchPreviousTouchSpeech = null;
 
-    noThanksLink.addEventListener('mouseenter', () => {
+    function showPorchWarning({ temporary = false } = {}) {
       stopIntroSequence();
       if (isSubscribed) return;
+
+      if (temporary) {
+        window.clearTimeout(porchTouchTimeout);
+        if (speechText.textContent !== porchWarningSpeech) {
+          porchPreviousTouchSpeech = speechText.textContent;
+        }
+      }
+
       sound.playPop(500, 320);
       puppyEyeLeft.setAttribute('opacity', '1');
       puppyEyeRight.setAttribute('opacity', '1');
       propSadSign.setAttribute('opacity', '1');
       luxyMouth.setAttribute('d', 'M 120 130 Q 130 120 140 130');
-      updateSpeech('"WAIT!! 🥺 Don\'t click that scary porch button! Try giving me 1 cookie first?!"');
+      updateSpeech(porchWarningSpeech);
+
+      // Touch devices have no hover state, so let the porch reaction fade naturally.
+      if (temporary) {
+        porchTouchTimeout = window.setTimeout(() => {
+          if (speechText.textContent === porchWarningSpeech && porchPreviousTouchSpeech !== null) {
+            updateSpeech(porchPreviousTouchSpeech);
+          }
+          propSadSign.setAttribute('opacity', '0');
+          porchTouchTimeout = null;
+          porchPreviousTouchSpeech = null;
+        }, 3200);
+      }
+    }
+
+    // Desktop: hovering anywhere inside the porch footer triggers Luxy's reaction.
+    porchFooter.addEventListener('pointerenter', (event) => {
+      if (event.pointerType === 'touch') return;
+      showPorchWarning();
     });
 
-    noThanksLink.addEventListener('mouseleave', () => {
+    porchFooter.addEventListener('pointerleave', () => {
       propSadSign.setAttribute('opacity', '0');
     });
 
+    // Mobile: touching the porch area triggers the same reaction briefly.
+    // The actual "No thanks" button is excluded so its RSS action remains unchanged.
+    porchFooter.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'touch') return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('#no-thanks-link')) return;
+      showPorchWarning({ temporary: true });
+    }, { passive: true });
+
     noThanksLink.addEventListener('click', () => {
+      window.clearTimeout(porchTouchTimeout);
+      porchTouchTimeout = null;
+      porchPreviousTouchSpeech = null;
       sound.playPop(380, 240);
       rssBox.classList.remove('hidden');
       updateSpeech('"Aw okay! I left our RSS feed link on the porch below in case you want to read anonymously!"');
