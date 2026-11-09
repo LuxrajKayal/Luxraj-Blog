@@ -138,7 +138,7 @@ function injectFaviconLinks(html, rootPrefix, relativeFile) {
     '<link rel="icon" type="image/svg+xml" href="' + rootPrefix + 'assets/images/brand/Luxraj-Blog-App-Icon.svg" sizes="any">',
     '<link rel="icon" type="image/png" href="' + rootPrefix + 'favicon-96x96.png" sizes="96x96">',
     '<link rel="icon" type="image/x-icon" href="' + rootPrefix + 'favicon.ico" sizes="96x96">',
-    '<link rel="apple-touch-icon" href="' + rootPrefix + 'apple-touch-icon.png" sizes="96x96">'
+    '<link rel="apple-touch-icon" href="' + rootPrefix + 'apple-touch-icon.png" sizes="180x180">'
   ].map(link => '  ' + link).join('\n') + '\n';
 
   const insertionPoint = withoutOldIcons.toLowerCase().lastIndexOf('</head>');
