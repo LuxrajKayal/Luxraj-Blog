@@ -80,41 +80,60 @@
   gap: var(--space-3);
   width: fit-content;
   max-width: 100%;
-  color: var(--footer-text);
-  background-color: var(--footer-background);
-  box-shadow: 0 0 0 3px var(--footer-background);
+  padding: var(--space-3) var(--space-4);
+  color: #DC2626;
+  background-color: #FFFFFF;
+  border: var(--border-width-default) solid #E5E5E5;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 3px 12px rgb(0 0 0 / 0.10);
   text-decoration: none;
 }
 
 .site-footer__brand:hover {
-  color: var(--footer-text);
+  color: #DC2626;
   text-decoration: none;
 }
 
-.site-footer__brand-mark {
-  display: grid;
+.site-footer__brand-emblem {
+  display: block;
   flex: 0 0 auto;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  padding: 2px;
-  background-color: var(--color-surface-raised);
-  border: var(--border-width-default) solid var(--footer-border);
-  border-radius: var(--radius-md);
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
 }
 
-.site-footer__brand-mark img {
-  width: 42px;
-  height: 42px;
-  object-fit: contain;
+.site-footer__brand-copy {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
 }
 
 .site-footer__brand-wordmark {
   display: block;
-  color: var(--footer-text);
-  font-size: clamp(1.5rem, 2vw, 1.9rem);
-  font-weight: 900;
-  letter-spacing: -0.075em;
+  width: auto;
+  height: 32px;
+  max-width: 100%;
+  flex: 0 1 auto;
+  object-fit: contain;
+}
+
+.site-footer__brand-publication {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: .14rem .36rem;
+  border: 1px solid #DC2626;
+  border-radius: 3px;
+  background: transparent;
+  color: #DC2626;
+  font-family: var(--font-ui);
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .12em;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -334,6 +353,24 @@
 
   .site-footer__brand-block {
     grid-column: auto;
+  }
+
+  .site-footer__brand {
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .site-footer__brand-emblem {
+    width: 50px;
+    height: 50px;
+  }
+
+  .site-footer__brand-wordmark {
+    height: 27px;
+  }
+
+  .site-footer__brand-copy {
+    gap: var(--space-1);
   }
 
   .site-footer__bottom {
