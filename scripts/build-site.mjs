@@ -123,6 +123,29 @@ function pageRootPrefix(html, relativeFile) {
   return '../'.repeat(directory.split('/').filter(Boolean).length);
 }
 
+function injectFaviconLinks(html, rootPrefix, relativeFile) {
+  const headEnd = html.toLowerCase().lastIndexOf('</head>');
+  if (headEnd < 0) {
+    throw new Error(relativeFile + ' has no closing </head> tag for the shared favicon links.');
+  }
+
+  // Replace any page-specific icon declarations so every page uses one brand icon set.
+  const withoutOldIcons = html.replace(
+    /<link\b(?=[^>]*\brel\s*=\s*(['"])[^'"]*\b(?:icon|apple-touch-icon)\b[^'"]*\1)[^>]*>\s*/gi,
+    ''
+  );
+  const links = [
+    '<link rel="icon" type="image/svg+xml" href="' + rootPrefix + 'assets/images/brand/Luxraj-Blog-App-Icon.svg" sizes="any">',
+    '<link rel="icon" type="image/png" href="' + rootPrefix + 'favicon-96x96.png" sizes="96x96">',
+    '<link rel="icon" type="image/x-icon" href="' + rootPrefix + 'favicon.ico" sizes="16x16 32x32 48x48">',
+    '<link rel="apple-touch-icon" href="' + rootPrefix + 'apple-touch-icon.png" sizes="180x180">'
+  ].map(link => '  ' + link).join('\n') + '\n';
+
+  const insertionPoint = withoutOldIcons.toLowerCase().lastIndexOf('</head>');
+  return withoutOldIcons.slice(0, insertionPoint) + '  <!-- Shared Luxraj Blog site icons -->\n' +
+    links + withoutOldIcons.slice(insertionPoint);
+}
+
 function countMatches(html, expression) {
   return Array.from(html.matchAll(expression)).length;
 }
@@ -379,7 +402,7 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
       continue;
     }
 
-    const sourceHtml = await readFile(sourcePath, 'utf8');
+    let sourceHtml = await readFile(sourcePath, 'utf8');
 
     // Empty placeholders are deliberately left empty until their own implementation.
     if (!sourceHtml.trim()) {
@@ -391,6 +414,11 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
     if (!/<body\b/i.test(sourceHtml)) {
       throw new Error(normalizedRelativePath + ' is non-empty HTML but has no <body> element.');
     }
+
+    // Inject one consistent icon set into every populated page, including standalone pages.
+    // pageRootPrefix keeps URLs correct from nested article/category routes.
+    const faviconRootPrefix = pageRootPrefix(sourceHtml, normalizedRelativePath);
+    sourceHtml = injectFaviconLinks(sourceHtml, faviconRootPrefix, normalizedRelativePath);
 
     // Newsletter callback pages are intentionally standalone: no site shell or popup injection.
     if (STANDALONE_NEWSLETTER_PAGES.has(normalizedRelativePath)) {
