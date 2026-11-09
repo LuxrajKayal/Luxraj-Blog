@@ -1,279 +1,1015 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <defs>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 512 512"
+   width="100%"
+   height="100%"
+   version="1.1"
+   id="svg98"
+   sodipodi:docname="luxraj-master-brand-app-icon.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title98">Luxraj.com – Master Brand Icon</title>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     borderopacity="0.25"
+     inkscape:zoom="0.98242188"
+     inkscape:cx="256"
+     inkscape:cy="337.43141"
+     inkscape:window-width="1366"
+     inkscape:window-height="705"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg98" />
+  <defs
+     id="defs68">
     <!-- BACKGROUND AND RIM GRADIENTS -->
-    <linearGradient id="rimBevel" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#DC2626" />
-      <stop offset="50%" stop-color="#881337" />
-      <stop offset="100%" stop-color="#6B0F2B" />
+    <linearGradient
+       id="rimBevel"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#DC2626"
+         id="stop1" />
+      <stop
+         offset="50%"
+         stop-color="#881337"
+         id="stop2" />
+      <stop
+         offset="100%"
+         stop-color="#6B0F2B"
+         id="stop3" />
     </linearGradient>
-
-    <radialGradient id="crimsonCanvas" cx="50%" cy="46%" r="62%">
-      <stop offset="0%" stop-color="#B91C1C" stop-opacity="0.55" />
-      <stop offset="45%" stop-color="#881337" />
-      <stop offset="100%" stop-color="#4C0519" />
+    <radialGradient
+       id="crimsonCanvas"
+       cx="50%"
+       cy="46%"
+       r="62%">
+      <stop
+         offset="0%"
+         stop-color="#B91C1C"
+         stop-opacity="0.55"
+         id="stop4" />
+      <stop
+         offset="45%"
+         stop-color="#881337"
+         id="stop5" />
+      <stop
+         offset="100%"
+         stop-color="#4C0519"
+         id="stop6" />
     </radialGradient>
-
-    <radialGradient id="ambientCoreGlow" cx="50%" cy="48%" r="42%">
-      <stop offset="0%" stop-color="#D97706" stop-opacity="0.65" />
-      <stop offset="45%" stop-color="#EA580C" stop-opacity="0.35" />
-      <stop offset="100%" stop-color="#881337" stop-opacity="0" />
+    <radialGradient
+       id="ambientCoreGlow"
+       cx="50%"
+       cy="48%"
+       r="42%">
+      <stop
+         offset="0%"
+         stop-color="#D97706"
+         stop-opacity="0.65"
+         id="stop7" />
+      <stop
+         offset="45%"
+         stop-color="#EA580C"
+         stop-opacity="0.35"
+         id="stop8" />
+      <stop
+         offset="100%"
+         stop-color="#881337"
+         stop-opacity="0"
+         id="stop9" />
     </radialGradient>
-
     <!-- BOTTOM LAYER GRADIENTS -->
-    <linearGradient id="botTopSurf" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#EA580C" stop-opacity="0.85" />
-      <stop offset="30%" stop-color="#DC2626" stop-opacity="0.92" />
-      <stop offset="100%" stop-color="#881337" stop-opacity="0.96" />
+    <linearGradient
+       id="botTopSurf"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#EA580C"
+         stop-opacity="0.85"
+         id="stop10" />
+      <stop
+         offset="30%"
+         stop-color="#DC2626"
+         stop-opacity="0.92"
+         id="stop11" />
+      <stop
+         offset="100%"
+         stop-color="#881337"
+         stop-opacity="0.96"
+         id="stop12" />
     </linearGradient>
-
-    <linearGradient id="botInnerRecess" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#DC2626" />
-      <stop offset="100%" stop-color="#7F1D1D" />
+    <linearGradient
+       id="botInnerRecess"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#DC2626"
+         id="stop13" />
+      <stop
+         offset="100%"
+         stop-color="#7F1D1D"
+         id="stop14" />
     </linearGradient>
-
-    <linearGradient id="botWallLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#881337" />
-      <stop offset="85%" stop-color="#991B1B" />
-      <stop offset="100%" stop-color="#DC2626" />
+    <linearGradient
+       id="botWallLeft"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0%"
+         stop-color="#881337"
+         id="stop15" />
+      <stop
+         offset="85%"
+         stop-color="#991B1B"
+         id="stop16" />
+      <stop
+         offset="100%"
+         stop-color="#DC2626"
+         id="stop17" />
     </linearGradient>
-
-    <linearGradient id="botWallRight" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#991B1B" />
-      <stop offset="100%" stop-color="#6B0F2B" />
+    <linearGradient
+       id="botWallRight"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0%"
+         stop-color="#991B1B"
+         id="stop18" />
+      <stop
+         offset="100%"
+         stop-color="#6B0F2B"
+         id="stop19" />
     </linearGradient>
-
     <!-- MIDDLE LAYER GRADIENTS (Translucent Glass so Column Shows Through) -->
-    <linearGradient id="midTopSurf" x1="15%" y1="0%" x2="85%" y2="100%">
-      <stop offset="0%" stop-color="#D97706" stop-opacity="0.72" />
-      <stop offset="50%" stop-color="#EA580C" stop-opacity="0.68" />
-      <stop offset="100%" stop-color="#DC2626" stop-opacity="0.72" />
+    <linearGradient
+       id="midTopSurf"
+       x1="15%"
+       y1="0%"
+       x2="85%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#D97706"
+         stop-opacity="0.72"
+         id="stop20" />
+      <stop
+         offset="50%"
+         stop-color="#EA580C"
+         stop-opacity="0.68"
+         id="stop21" />
+      <stop
+         offset="100%"
+         stop-color="#DC2626"
+         stop-opacity="0.72"
+         id="stop22" />
     </linearGradient>
-
-    <linearGradient id="midInnerTray" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#EA580C" stop-opacity="0.65" />
-      <stop offset="100%" stop-color="#B91C1C" stop-opacity="0.68" />
+    <linearGradient
+       id="midInnerTray"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#EA580C"
+         stop-opacity="0.65"
+         id="stop23" />
+      <stop
+         offset="100%"
+         stop-color="#B91C1C"
+         stop-opacity="0.68"
+         id="stop24" />
     </linearGradient>
-
-    <linearGradient id="midWallLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#EA580C" stop-opacity="0.85" />
-      <stop offset="90%" stop-color="#D97706" stop-opacity="0.9" />
-      <stop offset="100%" stop-color="#FBBF24" />
+    <linearGradient
+       id="midWallLeft"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0%"
+         stop-color="#EA580C"
+         stop-opacity="0.85"
+         id="stop25" />
+      <stop
+         offset="90%"
+         stop-color="#D97706"
+         stop-opacity="0.9"
+         id="stop26" />
+      <stop
+         offset="100%"
+         stop-color="#FBBF24"
+         id="stop27" />
     </linearGradient>
-
-    <linearGradient id="midWallRight" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#D97706" stop-opacity="0.85" />
-      <stop offset="100%" stop-color="#B45309" stop-opacity="0.85" />
+    <linearGradient
+       id="midWallRight"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0%"
+         stop-color="#D97706"
+         stop-opacity="0.85"
+         id="stop28" />
+      <stop
+         offset="100%"
+         stop-color="#B45309"
+         stop-opacity="0.85"
+         id="stop29" />
     </linearGradient>
-
     <!-- CENTRAL GLOWING PILLAR GRADIENTS -->
-    <linearGradient id="pillarLeftFace" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FEF08A" stop-opacity="1" />
-      <stop offset="45%" stop-color="#F59E0B" stop-opacity="0.95" />
-      <stop offset="85%" stop-color="#EA580C" stop-opacity="0.8" />
-      <stop offset="100%" stop-color="#DC2626" stop-opacity="0.3" />
+    <linearGradient
+       id="pillarLeftFace"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#FEF08A"
+         stop-opacity="1"
+         id="stop30" />
+      <stop
+         offset="45%"
+         stop-color="#F59E0B"
+         stop-opacity="0.95"
+         id="stop31" />
+      <stop
+         offset="85%"
+         stop-color="#EA580C"
+         stop-opacity="0.8"
+         id="stop32" />
+      <stop
+         offset="100%"
+         stop-color="#DC2626"
+         stop-opacity="0.3"
+         id="stop33" />
     </linearGradient>
-
-    <linearGradient id="pillarRightFace" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FDE047" stop-opacity="0.95" />
-      <stop offset="45%" stop-color="#EA580C" stop-opacity="0.9" />
-      <stop offset="85%" stop-color="#DC2626" stop-opacity="0.75" />
-      <stop offset="100%" stop-color="#881337" stop-opacity="0.25" />
+    <linearGradient
+       id="pillarRightFace"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#FDE047"
+         stop-opacity="0.95"
+         id="stop34" />
+      <stop
+         offset="45%"
+         stop-color="#EA580C"
+         stop-opacity="0.9"
+         id="stop35" />
+      <stop
+         offset="85%"
+         stop-color="#DC2626"
+         stop-opacity="0.75"
+         id="stop36" />
+      <stop
+         offset="100%"
+         stop-color="#881337"
+         stop-opacity="0.25"
+         id="stop37" />
     </linearGradient>
-
-    <linearGradient id="pillarCenterBeam" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFFBEB" stop-opacity="1" />
-      <stop offset="55%" stop-color="#FBBF24" stop-opacity="0.95" />
-      <stop offset="85%" stop-color="#EA580C" stop-opacity="0.7" />
-      <stop offset="100%" stop-color="#DC2626" stop-opacity="0" />
+    <linearGradient
+       id="pillarCenterBeam"
+       x1="0%"
+       y1="0%"
+       x2="0%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#FFFBEB"
+         stop-opacity="1"
+         id="stop38" />
+      <stop
+         offset="55%"
+         stop-color="#FBBF24"
+         stop-opacity="0.95"
+         id="stop39" />
+      <stop
+         offset="85%"
+         stop-color="#EA580C"
+         stop-opacity="0.7"
+         id="stop40" />
+      <stop
+         offset="100%"
+         stop-color="#DC2626"
+         stop-opacity="0"
+         id="stop41" />
     </linearGradient>
-
     <!-- TOP SPLIT LAYER GRADIENTS (Translucent Glass on Lower Arm) -->
-    <linearGradient id="topLeftWingGrad" x1="20%" y1="0%" x2="75%" y2="100%">
-      <stop offset="0%" stop-color="#FBBF24" stop-opacity="0.92" />
-      <stop offset="35%" stop-color="#D97706" stop-opacity="0.85" />
-      <stop offset="70%" stop-color="#EA580C" stop-opacity="0.75" />
-      <stop offset="100%" stop-color="#DC2626" stop-opacity="0.72" />
+    <linearGradient
+       id="topLeftWingGrad"
+       x1="20%"
+       y1="0%"
+       x2="75%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#FBBF24"
+         stop-opacity="0.92"
+         id="stop42" />
+      <stop
+         offset="35%"
+         stop-color="#D97706"
+         stop-opacity="0.85"
+         id="stop43" />
+      <stop
+         offset="70%"
+         stop-color="#EA580C"
+         stop-opacity="0.75"
+         id="stop44" />
+      <stop
+         offset="100%"
+         stop-color="#DC2626"
+         stop-opacity="0.72"
+         id="stop45" />
     </linearGradient>
-
-    <linearGradient id="topRightWingGrad" x1="10%" y1="0%" x2="90%" y2="100%">
-      <stop offset="0%" stop-color="#FDE68A" stop-opacity="0.95" />
-      <stop offset="45%" stop-color="#F59E0B" stop-opacity="0.9" />
-      <stop offset="100%" stop-color="#D97706" stop-opacity="0.92" />
+    <linearGradient
+       id="topRightWingGrad"
+       x1="10%"
+       y1="0%"
+       x2="90%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#FDE68A"
+         stop-opacity="0.95"
+         id="stop46" />
+      <stop
+         offset="45%"
+         stop-color="#F59E0B"
+         stop-opacity="0.9"
+         id="stop47" />
+      <stop
+         offset="100%"
+         stop-color="#D97706"
+         stop-opacity="0.92"
+         id="stop48" />
     </linearGradient>
-
-    <linearGradient id="topLeftWall" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#EA580C" stop-opacity="0.88" />
-      <stop offset="65%" stop-color="#DC2626" stop-opacity="0.82" />
-      <stop offset="100%" stop-color="#881337" stop-opacity="0.82" />
+    <linearGradient
+       id="topLeftWall"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0%"
+         stop-color="#EA580C"
+         stop-opacity="0.88"
+         id="stop49" />
+      <stop
+         offset="65%"
+         stop-color="#DC2626"
+         stop-opacity="0.82"
+         id="stop50" />
+      <stop
+         offset="100%"
+         stop-color="#881337"
+         stop-opacity="0.82"
+         id="stop51" />
     </linearGradient>
-
-    <linearGradient id="topRightWall" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#D97706" stop-opacity="0.85" />
-      <stop offset="50%" stop-color="#FBBF24" stop-opacity="0.95" />
-      <stop offset="100%" stop-color="#B45309" stop-opacity="0.85" />
+    <linearGradient
+       id="topRightWall"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0%"
+         stop-color="#D97706"
+         stop-opacity="0.85"
+         id="stop52" />
+      <stop
+         offset="50%"
+         stop-color="#FBBF24"
+         stop-opacity="0.95"
+         id="stop53" />
+      <stop
+         offset="100%"
+         stop-color="#B45309"
+         stop-opacity="0.85"
+         id="stop54" />
     </linearGradient>
-
-    <linearGradient id="glossSweep" x1="0%" y1="0%" x2="60%" y2="100%">
-      <stop offset="0%" stop-color="#FFFBEB" stop-opacity="0.62" />
-      <stop offset="50%" stop-color="#FDE68A" stop-opacity="0.28" />
-      <stop offset="100%" stop-color="#D97706" stop-opacity="0.0" />
+    <linearGradient
+       id="glossSweep"
+       x1="0%"
+       y1="0%"
+       x2="60%"
+       y2="100%">
+      <stop
+         offset="0%"
+         stop-color="#FFFBEB"
+         stop-opacity="0.62"
+         id="stop55" />
+      <stop
+         offset="50%"
+         stop-color="#FDE68A"
+         stop-opacity="0.28"
+         id="stop56" />
+      <stop
+         offset="100%"
+         stop-color="#D97706"
+         stop-opacity="0.0"
+         id="stop57" />
     </linearGradient>
-
-    <linearGradient id="amberRimLight" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#FDE68A" stop-opacity="0.9" />
-      <stop offset="50%" stop-color="#FFFBEB" stop-opacity="1" />
-      <stop offset="100%" stop-color="#FBBF24" stop-opacity="0.85" />
+    <linearGradient
+       id="amberRimLight"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0%"
+         stop-color="#FDE68A"
+         stop-opacity="0.9"
+         id="stop58" />
+      <stop
+         offset="50%"
+         stop-color="#FFFBEB"
+         stop-opacity="1"
+         id="stop59" />
+      <stop
+         offset="100%"
+         stop-color="#FBBF24"
+         stop-opacity="0.85"
+         id="stop60" />
     </linearGradient>
-
-    <linearGradient id="crimsonRimLight" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#FCA5A5" stop-opacity="0.8" />
-      <stop offset="50%" stop-color="#FECACA" stop-opacity="0.95" />
-      <stop offset="100%" stop-color="#EA580C" stop-opacity="0.75" />
+    <linearGradient
+       id="crimsonRimLight"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0%"
+         stop-color="#FCA5A5"
+         stop-opacity="0.8"
+         id="stop61" />
+      <stop
+         offset="50%"
+         stop-color="#FECACA"
+         stop-opacity="0.95"
+         id="stop62" />
+      <stop
+         offset="100%"
+         stop-color="#EA580C"
+         stop-opacity="0.75"
+         id="stop63" />
     </linearGradient>
-
     <!-- FILTERS -->
-    <filter id="deepCrimsonDrop" x="-20%" y="-20%" width="140%" height="150%">
-      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#4C0519" flood-opacity="0.9" />
-    </filter>
-
-    <filter id="midCrimsonDrop" x="-20%" y="-20%" width="140%" height="150%">
-      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#881337" flood-opacity="0.65" />
-    </filter>
-
-    <filter id="amberBloom" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="8" result="blur" />
-      <feMerge>
-        <feMergeNode in="blur" />
-        <feMergeNode in="SourceGraphic" />
+    <!-- Inkscape-compatible drop shadows built from standard SVG filter primitives. -->
+    <filter
+       id="deepCrimsonDrop"
+       x="-0.10203488"
+       y="-0.15"
+       width="1.2040698"
+       height="1.3714286"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="14"
+         result="shadowBlur"
+         id="feGaussianBlur63" />
+      <feOffset
+         in="shadowBlur"
+         dx="0"
+         dy="16"
+         result="shadowOffset"
+         id="feOffset63" />
+      <feFlood
+         flood-color="#4C0519"
+         flood-opacity="0.9"
+         result="shadowColor"
+         id="feFlood63" />
+      <feComposite
+         in="shadowColor"
+         in2="shadowOffset"
+         operator="in"
+         result="shadow"
+         id="feComposite63" />
+      <feMerge
+         id="feMerge64">
+        <feMergeNode
+           in="shadow"
+           id="feMergeNode63" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode64" />
       </feMerge>
     </filter>
-
-    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="16" />
+    <filter
+       id="midCrimsonDrop"
+       x="-0.16976745"
+       y="-0.1133186"
+       width="1.3395349"
+       height="1.3376005"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="10"
+         result="shadowBlur"
+         id="feGaussianBlur64" />
+      <feOffset
+         in="shadowBlur"
+         dx="0"
+         dy="12"
+         result="shadowOffset"
+         id="feOffset64" />
+      <feFlood
+         flood-color="#881337"
+         flood-opacity="0.65"
+         result="shadowColor"
+         id="feFlood64" />
+      <feComposite
+         in="shadowColor"
+         in2="shadowOffset"
+         operator="in"
+         result="shadow"
+         id="feComposite64" />
+      <feMerge
+         id="feMerge66">
+        <feMergeNode
+           in="shadow"
+           id="feMergeNode65" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode66" />
+      </feMerge>
     </filter>
-
-    <clipPath id="topWingsClip">
-      <path d="M 256 84 L 312 116.5 L 256 149 L 196 184 L 256 219 L 312 251.5 L 256 284 L 84 184 Z
-               M 326 124.7 L 428 184 L 326 243.3 L 270 210.8 L 316 184 L 270 157.2 Z" />
+    <filter
+       id="amberBloom"
+       x="-inf"
+       y="-0.35328836"
+       width="inf"
+       height="1.7111941">
+      <feGaussianBlur
+         stdDeviation="8"
+         result="blur"
+         id="feGaussianBlur66" />
+      <feMerge
+         id="feMerge68">
+        <feMergeNode
+           in="blur"
+           id="feMergeNode67" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode68" />
+      </feMerge>
+    </filter>
+    <filter
+       id="softGlow"
+       x="-0.68571429"
+       y="-0.3072"
+       width="2.3714286"
+       height="1.6144">
+      <feGaussianBlur
+         stdDeviation="16"
+         id="feGaussianBlur68" />
+    </filter>
+    <clipPath
+       id="topWingsClip">
+      <path
+         d="M 256 84 L 312 116.5 L 256 149 L 196 184 L 256 219 L 312 251.5 L 256 284 L 84 184 Z                M 326 124.7 L 428 184 L 326 243.3 L 270 210.8 L 316 184 L 270 157.2 Z"
+         id="path68" />
     </clipPath>
   </defs>
-
   <!-- 1. APP ICON SQUIRCLE BASE -->
-  <rect x="8" y="8" width="496" height="496" rx="112" fill="url(#rimBevel)" />
-  <rect x="16" y="16" width="480" height="480" rx="105" fill="url(#crimsonCanvas)" />
-  <rect x="16" y="16" width="480" height="480" rx="105" fill="none" stroke="#DC2626" stroke-width="2" stroke-opacity="0.4" />
-  <circle cx="256" cy="250" r="190" fill="url(#ambientCoreGlow)" />
-
+  <rect
+     x="8"
+     y="8"
+     width="496"
+     height="496"
+     rx="112"
+     fill="url(#rimBevel)"
+     id="rect68" />
+  <rect
+     x="16"
+     y="16"
+     width="480"
+     height="480"
+     rx="105"
+     fill="url(#crimsonCanvas)"
+     id="rect69" />
+  <rect
+     x="16"
+     y="16"
+     width="480"
+     height="480"
+     rx="105"
+     fill="none"
+     stroke="#DC2626"
+     stroke-width="2"
+     stroke-opacity="0.4"
+     id="rect70" />
+  <circle
+     cx="256"
+     cy="250"
+     r="190"
+     fill="url(#ambientCoreGlow)"
+     id="circle70" />
   <!-- 2. BOTTOM LAYER -->
-  <g filter="url(#deepCrimsonDrop)">
-    <polygon points="84,332 256,432 256,456 84,356" fill="url(#botWallLeft)" />
-    <polygon points="256,432 428,332 428,356 256,456" fill="url(#botWallRight)" />
-
-    <path fill="url(#botTopSurf)" fill-rule="evenodd" d="M 256 232 L 428 332 L 256 432 L 84 332 Z
-             M 256 299.5 L 312 332 L 256 364.5 L 200 332 Z" />
-
-    <path fill="url(#botInnerRecess)" fill-rule="evenodd" d="M 256 250 L 396 332 L 256 414 L 116 332 Z
-             M 256 299.5 L 312 332 L 256 364.5 L 200 332 Z" />
-
-    <polygon points="256,299.5 312,332 256,364.5 200,332" fill="#6B0F2B" fill-opacity="0.9" />
-    <polygon points="256,299.5 200,332 200,346 256,313.5" fill="#881337" />
-    <polygon points="256,299.5 312,332 312,346 256,313.5" fill="#991B1B" />
-
-    <polygon points="226,314.5 256,299.5 256,364.5 226,347" fill="#EA580C" fill-opacity="0.45" />
-    <polygon points="256,299.5 286,314.5 286,347 256,364.5" fill="#DC2626" fill-opacity="0.45" />
-
-    <polyline points="84,332 256,432 428,332" fill="none" stroke="url(#crimsonRimLight)" stroke-width="3" stroke-linecap="round" />
-    <line x1="256" y1="432" x2="256" y2="456" stroke="#FCA5A5" stroke-width="2" stroke-opacity="0.6" />
+  <g
+     filter="url(#deepCrimsonDrop)"
+     id="g76">
+    <polygon
+       points="84,332 256,432 256,456 84,356"
+       fill="url(#botWallLeft)"
+       id="polygon70" />
+    <polygon
+       points="256,432 428,332 428,356 256,456"
+       fill="url(#botWallRight)"
+       id="polygon71" />
+    <path
+       fill="url(#botTopSurf)"
+       fill-rule="evenodd"
+       d="M 256 232 L 428 332 L 256 432 L 84 332 Z              M 256 299.5 L 312 332 L 256 364.5 L 200 332 Z"
+       id="path71" />
+    <path
+       fill="url(#botInnerRecess)"
+       fill-rule="evenodd"
+       d="M 256 250 L 396 332 L 256 414 L 116 332 Z              M 256 299.5 L 312 332 L 256 364.5 L 200 332 Z"
+       id="path72" />
+    <polygon
+       points="256,299.5 312,332 256,364.5 200,332"
+       fill="#6B0F2B"
+       fill-opacity="0.9"
+       id="polygon72" />
+    <polygon
+       points="256,299.5 200,332 200,346 256,313.5"
+       fill="#881337"
+       id="polygon73" />
+    <polygon
+       points="256,299.5 312,332 312,346 256,313.5"
+       fill="#991B1B"
+       id="polygon74" />
+    <polygon
+       points="226,314.5 256,299.5 256,364.5 226,347"
+       fill="#EA580C"
+       fill-opacity="0.45"
+       id="polygon75" />
+    <polygon
+       points="256,299.5 286,314.5 286,347 256,364.5"
+       fill="#DC2626"
+       fill-opacity="0.45"
+       id="polygon76" />
+    <polyline
+       points="84,332 256,432 428,332"
+       fill="none"
+       stroke="url(#crimsonRimLight)"
+       stroke-width="3"
+       stroke-linecap="round"
+       id="polyline76" />
+    <line
+       x1="256"
+       y1="432"
+       x2="256"
+       y2="456"
+       stroke="#FCA5A5"
+       stroke-width="2"
+       stroke-opacity="0.6"
+       id="line76" />
   </g>
-
   <!-- 3. LOWER PILLAR SEGMENT (EXTENDED UP TO CONNECT SEAMLESSLY) -->
-  <g>
-    <rect x="228" y="225" width="56" height="125" fill="#EA580C" fill-opacity="0.45" filter="url(#softGlow)" />
-    <polygon points="226,225 256,242.5 256,360 226,342.5" fill="url(#pillarLeftFace)" fill-opacity="0.9" />
-    <polygon points="256,242.5 286,225 286,342.5 256,360" fill="url(#pillarRightFace)" fill-opacity="0.9" />
-    <line x1="256" y1="242.5" x2="256" y2="358" stroke="url(#pillarCenterBeam)" stroke-width="4" filter="url(#amberBloom)" />
+  <g
+     id="g78">
+    <rect
+       x="228"
+       y="225"
+       width="56"
+       height="125"
+       fill="#EA580C"
+       fill-opacity="0.45"
+       filter="url(#softGlow)"
+       id="rect76" />
+    <polygon
+       points="226,225 256,242.5 256,360 226,342.5"
+       fill="url(#pillarLeftFace)"
+       fill-opacity="0.9"
+       id="polygon77" />
+    <polygon
+       points="256,242.5 286,225 286,342.5 256,360"
+       fill="url(#pillarRightFace)"
+       fill-opacity="0.9"
+       id="polygon78" />
+    <line
+       x1="256"
+       y1="242.5"
+       x2="256"
+       y2="358"
+       stroke="url(#pillarCenterBeam)"
+       stroke-width="4"
+       filter="url(#amberBloom)"
+       id="line78" />
   </g>
-
   <!-- 4. MIDDLE LAYER (TRANSLUCENT GLASS SO PILLAR GLOWS THROUGH) -->
-  <g filter="url(#midCrimsonDrop)">
-    <polygon points="84,256 256,356 256,378 84,278" fill="url(#midWallLeft)" />
-    <polygon points="256,356 428,256 428,278 256,378" fill="url(#midWallRight)" />
-
-    <path fill="url(#midTopSurf)" fill-rule="evenodd" d="M 256 156 L 428 256 L 256 356 L 84 256 Z
-             M 256 223.5 L 312 256 L 256 288.5 L 200 256 Z" />
-
-    <path fill="url(#midInnerTray)" fill-rule="evenodd" d="M 256 174 L 396 256 L 256 338 L 116 256 Z
-             M 256 223.5 L 312 256 L 256 288.5 L 200 256 Z" />
-
-    <polygon points="256,223.5 200,256 200,270 256,237.5" fill="#991B1B" fill-opacity="0.65" />
-    <polygon points="256,223.5 312,256 312,270 256,237.5" fill="#B91C1C" fill-opacity="0.65" />
-    <polygon points="256,223.5 312,256 256,288.5 200,256" fill="none" stroke="#FBBF24" stroke-width="2" stroke-opacity="0.85" />
-
-    <polyline points="84,256 256,156 428,256" fill="none" stroke="#FDE68A" stroke-width="2" stroke-opacity="0.6" />
-    <polyline points="84,256 256,356 428,256" fill="none" stroke="url(#amberRimLight)" stroke-width="3.5" stroke-linecap="round" filter="url(#amberBloom)" />
-    <line x1="256" y1="356" x2="256" y2="378" stroke="#FFFBEB" stroke-width="2.5" stroke-opacity="0.9" />
+  <g
+     filter="url(#midCrimsonDrop)"
+     id="g84">
+    <polygon
+       points="84,256 256,356 256,378 84,278"
+       fill="url(#midWallLeft)"
+       id="polygon79" />
+    <polygon
+       points="256,356 428,256 428,278 256,378"
+       fill="url(#midWallRight)"
+       id="polygon80" />
+    <path
+       fill="url(#midTopSurf)"
+       fill-rule="evenodd"
+       d="M 256 156 L 428 256 L 256 356 L 84 256 Z              M 256 223.5 L 312 256 L 256 288.5 L 200 256 Z"
+       id="path80" />
+    <path
+       fill="url(#midInnerTray)"
+       fill-rule="evenodd"
+       d="M 256 174 L 396 256 L 256 338 L 116 256 Z              M 256 223.5 L 312 256 L 256 288.5 L 200 256 Z"
+       id="path81" />
+    <polygon
+       points="256,223.5 200,256 200,270 256,237.5"
+       fill="#991B1B"
+       fill-opacity="0.65"
+       id="polygon81" />
+    <polygon
+       points="256,223.5 312,256 312,270 256,237.5"
+       fill="#B91C1C"
+       fill-opacity="0.65"
+       id="polygon82" />
+    <polygon
+       points="256,223.5 312,256 256,288.5 200,256"
+       fill="none"
+       stroke="#FBBF24"
+       stroke-width="2"
+       stroke-opacity="0.85"
+       id="polygon83" />
+    <polyline
+       points="84,256 256,156 428,256"
+       fill="none"
+       stroke="#FDE68A"
+       stroke-width="2"
+       stroke-opacity="0.6"
+       id="polyline83" />
+    <polyline
+       points="84,256 256,356 428,256"
+       fill="none"
+       stroke="url(#amberRimLight)"
+       stroke-width="3.5"
+       stroke-linecap="round"
+       filter="url(#amberBloom)"
+       id="polyline84" />
+    <line
+       x1="256"
+       y1="356"
+       x2="256"
+       y2="378"
+       stroke="#FFFBEB"
+       stroke-width="2.5"
+       stroke-opacity="0.9"
+       id="line84" />
   </g>
-
   <!-- 5. UPPER CENTRAL GLOWING PILLAR -->
-  <g>
-    <rect x="228" y="135" width="56" height="145" fill="#F59E0B" fill-opacity="0.55" filter="url(#softGlow)" />
-    <polygon points="226,144 256,161.5 256,288 226,270.5" fill="url(#pillarLeftFace)" />
-    <polygon points="256,161.5 286,144 286,270.5 256,288" fill="url(#pillarRightFace)" />
-    <polygon points="256,126.5 286,144 256,161.5 226,144" fill="#FDE68A" stroke="#FFFBEB" stroke-width="1.5" />
-    <polygon points="256,131 278,144 256,157 234,144" fill="#D97706" fill-opacity="0.7" />
-    <line x1="256" y1="161.5" x2="256" y2="288" stroke="url(#pillarCenterBeam)" stroke-width="4.5" filter="url(#amberBloom)" />
+  <g
+     id="g87">
+    <rect
+       x="228"
+       y="135"
+       width="56"
+       height="145"
+       fill="#F59E0B"
+       fill-opacity="0.55"
+       filter="url(#softGlow)"
+       id="rect84" />
+    <polygon
+       points="226,144 256,161.5 256,288 226,270.5"
+       fill="url(#pillarLeftFace)"
+       id="polygon84" />
+    <polygon
+       points="256,161.5 286,144 286,270.5 256,288"
+       fill="url(#pillarRightFace)"
+       id="polygon85" />
+    <polygon
+       points="256,126.5 286,144 256,161.5 226,144"
+       fill="#FDE68A"
+       stroke="#FFFBEB"
+       stroke-width="1.5"
+       id="polygon86" />
+    <polygon
+       points="256,131 278,144 256,157 234,144"
+       fill="#D97706"
+       fill-opacity="0.7"
+       id="polygon87" />
+    <line
+       x1="256"
+       y1="161.5"
+       x2="256"
+       y2="288"
+       stroke="url(#pillarCenterBeam)"
+       stroke-width="4.5"
+       filter="url(#amberBloom)"
+       id="line87" />
   </g>
-
   <!-- 6. TOP SPLIT LAYER -->
-  <g filter="url(#midCrimsonDrop)">
+  <g
+     filter="url(#midCrimsonDrop)"
+     id="g98">
     <!-- Right Split Chevron Wing -->
-    <polygon points="270,210.8 326,243.3 326,263.3 270,230.8" fill="#D97706" fill-opacity="0.55" stroke="#FBBF24" stroke-width="1" stroke-opacity="0.5" />
-    <polygon points="326,243.3 428,184 428,204 326,263.3" fill="url(#topRightWall)" />
-    <polygon points="270,157.2 316,184 316,198 270,171.2" fill="#B45309" fill-opacity="0.85" />
-
-    <path fill="url(#topRightWingGrad)" d="M 326 124.7
-             L 428 184
-             L 326 243.3
-             L 270 210.8
-             L 316 184
-             L 270 157.2
-             Z" />
-
-    <polyline points="270,157.2 326,124.7 428,184" fill="none" stroke="#FFFBEB" stroke-width="2.5" stroke-opacity="0.85" />
-    <polyline points="270,210.8 326,243.3 428,184" fill="none" stroke="url(#amberRimLight)" stroke-width="3.5" stroke-linecap="round" filter="url(#amberBloom)" />
-    <line x1="326" y1="243.3" x2="326" y2="263.3" stroke="#FFFBEB" stroke-width="2" stroke-opacity="0.85" />
-
+    <polygon
+       points="270,210.8 326,243.3 326,263.3 270,230.8"
+       fill="#D97706"
+       fill-opacity="0.55"
+       stroke="#FBBF24"
+       stroke-width="1"
+       stroke-opacity="0.5"
+       id="polygon88" />
+    <polygon
+       points="326,243.3 428,184 428,204 326,263.3"
+       fill="url(#topRightWall)"
+       id="polygon89" />
+    <polygon
+       points="270,157.2 316,184 316,198 270,171.2"
+       fill="#B45309"
+       fill-opacity="0.85"
+       id="polygon90" />
+    <path
+       fill="url(#topRightWingGrad)"
+       d="M 326 124.7              L 428 184              L 326 243.3              L 270 210.8              L 316 184              L 270 157.2              Z"
+       id="path90" />
+    <polyline
+       points="270,157.2 326,124.7 428,184"
+       fill="none"
+       stroke="#FFFBEB"
+       stroke-width="2.5"
+       stroke-opacity="0.85"
+       id="polyline90" />
+    <polyline
+       points="270,210.8 326,243.3 428,184"
+       fill="none"
+       stroke="url(#amberRimLight)"
+       stroke-width="3.5"
+       stroke-linecap="round"
+       filter="url(#amberBloom)"
+       id="polyline91" />
+    <line
+       x1="326"
+       y1="243.3"
+       x2="326"
+       y2="263.3"
+       stroke="#FFFBEB"
+       stroke-width="2"
+       stroke-opacity="0.85"
+       id="line91" />
     <!-- Left C-Shape Wing -->
-    <polygon points="196,184 256,149 256,163 196,198" fill="#991B1B" fill-opacity="0.7" />
-    <polygon points="256,149 312,116.5 312,130.5 256,163" fill="#B45309" fill-opacity="0.7" />
-
-    <polygon points="84,184 256,284 256,300 84,200" fill="url(#topLeftWall)" />
-    <polygon points="256,284 312,251.5 312,267.5 256,300" fill="#881337" fill-opacity="0.82" />
-
-    <path fill="url(#topLeftWingGrad)" d="M 256 84
-             L 312 116.5
-             L 256 149
-             L 196 184
-             L 256 219
-             L 312 251.5
-             L 256 284
-             L 84 184
-             Z" />
-
+    <polygon
+       points="196,184 256,149 256,163 196,198"
+       fill="#991B1B"
+       fill-opacity="0.7"
+       id="polygon91" />
+    <polygon
+       points="256,149 312,116.5 312,130.5 256,163"
+       fill="#B45309"
+       fill-opacity="0.7"
+       id="polygon92" />
+    <polygon
+       points="84,184 256,284 256,300 84,200"
+       fill="url(#topLeftWall)"
+       id="polygon93" />
+    <polygon
+       points="256,284 312,251.5 312,267.5 256,300"
+       fill="#881337"
+       fill-opacity="0.82"
+       id="polygon94" />
+    <path
+       fill="url(#topLeftWingGrad)"
+       d="M 256 84              L 312 116.5              L 256 149              L 196 184              L 256 219              L 312 251.5              L 256 284              L 84 184              Z"
+       id="path94" />
     <!-- Curved Specular Glass Reflection -->
-    <g clip-path="url(#topWingsClip)">
-      <path fill="url(#glossSweep)" d="M 60 60
-               L 450 60
-               L 450 190
-               Q 260 215 80 186
-               Z" />
-      <path fill="none" stroke="#FFFBEB" stroke-width="1.5" stroke-opacity="0.45" d="M 80 186 Q 260 215 450 190" />
+    <g
+       clip-path="url(#topWingsClip)"
+       id="g96">
+      <path
+         fill="url(#glossSweep)"
+         d="M 60 60                L 450 60                L 450 190                Q 260 215 80 186                Z"
+         id="path95" />
+      <path
+         fill="none"
+         stroke="#FFFBEB"
+         stroke-width="1.5"
+         stroke-opacity="0.45"
+         d="M 80 186 Q 260 215 450 190"
+         id="path96" />
     </g>
-
     <!-- Left Wing Chamfered Rim Highlights -->
-    <polyline points="84,184 256,84 312,116.5" fill="none" stroke="url(#amberRimLight)" stroke-width="3" stroke-linecap="round" />
-    <polyline points="312,116.5 256,149 196,184 256,219 312,251.5" fill="none" stroke="#FDE68A" stroke-width="2" stroke-opacity="0.7" />
-    <polyline points="84,184 256,284 312,251.5" fill="none" stroke="url(#crimsonRimLight)" stroke-width="3" stroke-linecap="round" />
-    <line x1="256" y1="284" x2="256" y2="300" stroke="#FCA5A5" stroke-width="2" stroke-opacity="0.85" />
+    <polyline
+       points="84,184 256,84 312,116.5"
+       fill="none"
+       stroke="url(#amberRimLight)"
+       stroke-width="3"
+       stroke-linecap="round"
+       id="polyline96" />
+    <polyline
+       points="312,116.5 256,149 196,184 256,219 312,251.5"
+       fill="none"
+       stroke="#FDE68A"
+       stroke-width="2"
+       stroke-opacity="0.7"
+       id="polyline97" />
+    <polyline
+       points="84,184 256,284 312,251.5"
+       fill="none"
+       stroke="url(#crimsonRimLight)"
+       stroke-width="3"
+       stroke-linecap="round"
+       id="polyline98" />
+    <line
+       x1="256"
+       y1="284"
+       x2="256"
+       y2="300"
+       stroke="#FCA5A5"
+       stroke-width="2"
+       stroke-opacity="0.85"
+       id="line98" />
   </g>
+  <metadata
+     id="metadata98">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Luxraj.com – Master Brand Icon</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Luxraj Kayal (Subrata Kayal)</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:date>2026-11-09</dc:date>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>See copyright notice below</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>Luxraj.com</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:identifier>https://luxraj.com/brand-assets/luxraj-master-brand-app-icon.svg</dc:identifier>
+        <dc:source>Original artwork created by Luxraj Kayal (Subrata Kayal) for Luxraj.com.</dc:source>
+        <dc:relation>Luxraj.com master brand identity; shared across all sub-brands.</dc:relation>
+        <dc:language>en</dc:language>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>Luxraj</rdf:li>
+            <rdf:li>Luxraj.com</rdf:li>
+            <rdf:li>Master Brand</rdf:li>
+            <rdf:li>Brand Identity</rdf:li>
+            <rdf:li>Master Logo</rdf:li>
+            <rdf:li>App Icon</rdf:li>
+            <rdf:li>Shared Brand Asset</rdf:li>
+            <rdf:li>Vector Artwork</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <cc:license
+           rdf:resource="https://luxraj.com/brand-assets/license.html" />
+        <dc:description>Copyright © 2026 Subrata Kayal. All rights reserved.
+
+Original artwork created and owned by Subrata Kayal, professionally known as Luxraj Kayal.
+
+This artwork forms part of the Luxraj.com master brand identity and is shared across its sub-brands, websites, applications, and associated products.
+
+Unauthorized reproduction, redistribution, modification, or use as another brand identity is prohibited without prior written authorization from the copyright holder.
+
+Official master brand application icon of Luxraj.com. This original visual identity represents the parent brand and is shared across all Luxraj.com sub-brands, websites, applications, and associated digital products. Individual sub-brands maintain their own separate wordmarks while retaining the shared Luxraj.com master brand identity.</dc:description>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
 </svg>
