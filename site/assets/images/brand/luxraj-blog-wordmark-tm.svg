@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1912" height="477" viewBox="-4 -32 1912 477" version="1.1">
-  <title>LUXRAJ™ — upper-right trademark website wordmark</title>
-  <desc>Website variant of the approved LUXRAJ wordmark. The original letterforms, geometry, and positions are unchanged. A small separate vector trademark symbol is positioned at the upper-right of the wordmark, adjacent to the top-right of the J. All artwork is vector paths.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" width="1912" height="477" viewBox="-4 -32 1912 477" version="1.1">
+  <title>blog.Luxraj.com: Blog Brand Wordmark</title>
+  <desc>Official Blog sub-brand wordmark for blog.luxraj.com. This website variant uses the approved LUXRAJ wordmark with a separate vector trademark symbol positioned at the upper-right, adjacent to the top-right of the letter J. Original letterforms, geometry and positioning are preserved. All artwork consists of vector paths.</desc>
   <g id="main-glyphs-wide-fit" transform="scale(1.12 1)"><g id="glyph-L" transform="translate(0.000000,0.000000) scale(1.000000000) translate(-0.295229,-0.590457)">
     <path d="M 0.295229,0.590457 L 72.331015,0.590457 L 72.331015,199.27932 L 263.34393,199.27932 L 222.60238,263.63916 L 0.295229,263.63916 Z" fill="#DC2626" stroke="none" id="path-L" />
   </g>
@@ -20,4 +20,41 @@
   </g><g id="custom-J-positioned-after-wide-A" transform="translate(180.266767,0)"><g id="glyph-J" transform="translate(1162.148513,-50.484095) scale(0.531411521)">
     <path d="           M 655,95           L 945,95           L 900,165           L 900,590           C 900,725 865,815 790,870           C 715,925 610,928 505,895           C 425,870 350,835 262,835           C 172,835 95,870 32,925           C 82,850 154,790 239,753           C 318,719 405,725 486,756           C 557,783 634,790 690,756           C 742,725 770,675 770,603           L 770,165           Z" fill="#DC2626" stroke="none" fill-rule="nonzero" id="path-J" />
   </g>
-</g><g id="trademark-symbol-upper-right" aria-label="trademark symbol" opacity="0.88" transform="translate(59,-425.5)"><path d="M1815.7015570934257 401.5 1821.2707612456747 409.6937716262976 1826.5198961937717 401.5H1831.9610726643598V420.0H1828.3442906574394V404.50865051903116 L1822.1029411764707 414.2067474048443H1820.3425605536333L1813.8451557093426 404.50865051903116V420.0H1810.1963667820069V401.5ZM1806.5795847750865 401.5V404.50865051903116H1800.082179930796V420.0H1796.4333910034602V404.50865051903116 H1790.0V401.5Z" fill="#DC2626" stroke="none" /></g></svg>
+</g><g id="trademark-symbol-upper-right" aria-label="trademark symbol" opacity="0.88" transform="translate(59,-425.5)"><path d="M1815.7015570934257 401.5 1821.2707612456747 409.6937716262976 1826.5198961937717 401.5H1831.9610726643598V420.0H1828.3442906574394V404.50865051903116 L1822.1029411764707 414.2067474048443H1820.3425605536333L1813.8451557093426 404.50865051903116V420.0H1810.1963667820069V401.5ZM1806.5795847750865 401.5V404.50865051903116H1800.082179930796V420.0H1796.4333910034602V404.50865051903116 H1790.0V401.5Z" fill="#DC2626" stroke="none" /></g>
+  <metadata id="luxraj-brand-metadata">
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+        <dc:title>blog.Luxraj.com: Blog Brand Wordmark</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Luxraj Kayal (Subrata)</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>Copyright © 2026 Subrata Kayal. All rights reserved.</dc:rights>
+        <dcterms:rightsHolder>Subrata Kayal</dcterms:rightsHolder>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>blog.luxraj.com</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:identifier>https://blog.luxraj.com/assets/images/brand/luxraj-blog-wordmark-tm.svg</dc:identifier>
+        <dcterms:isPartOf>Luxraj.com</dcterms:isPartOf>
+        <dc:relation>Luxraj.com parent brand; official Blog sub-brand identity.</dc:relation>
+        <dc:language>en</dc:language>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>Luxraj.com</rdf:li>
+            <rdf:li>Luxraj Blog</rdf:li>
+            <rdf:li>Blog Wordmark</rdf:li>
+            <rdf:li>Sub-brand Identity</rdf:li>
+            <rdf:li>LUXRAJ</rdf:li>
+            <rdf:li>Trademark Symbol</rdf:li>
+            <rdf:li>Vector Artwork</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <dcterms:license rdf:resource="https://luxraj.com/brand-assets/license.html" />
+        <dc:description>Official Blog sub-brand wordmark for blog.luxraj.com. This website variant uses the approved LUXRAJ wordmark with a separate vector trademark symbol positioned at the upper-right, adjacent to the top-right of the letter J. Original letterforms, geometry and positioning are preserved. All artwork consists of vector paths.</dc:description>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

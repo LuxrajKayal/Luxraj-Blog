@@ -13,7 +13,8 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:dc="http://purl.org/dc/elements/1.1/">
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:dcterms="http://purl.org/dc/terms/">
   <title
      id="title98">Luxraj.com – Master Brand Icon</title>
   <sodipodi:namedview
@@ -973,10 +974,9 @@
         </dc:creator>
         <dc:date>2026-11-09</dc:date>
         <dc:rights>
-          <cc:Agent>
-            <dc:title>See copyright notice below</dc:title>
-          </cc:Agent>
+          Copyright © 2026 Subrata Kayal. All rights reserved.
         </dc:rights>
+        <dcterms:rightsHolder>Subrata Kayal</dcterms:rightsHolder>
         <dc:publisher>
           <cc:Agent>
             <dc:title>Luxraj.com</dc:title>
@@ -999,6 +999,8 @@
           </rdf:Bag>
         </dc:subject>
         <cc:license
+           rdf:resource="https://luxraj.com/brand-assets/license.html" />
+        <dcterms:license
            rdf:resource="https://luxraj.com/brand-assets/license.html" />
         <dc:description>Copyright © 2026 Subrata Kayal. All rights reserved.
 
