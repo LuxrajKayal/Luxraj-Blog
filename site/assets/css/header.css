@@ -1,10 +1,10 @@
 /* Primary editorial header; LUXRAJ stays crimson in both themes. */
 .site-header{position:sticky;top:0;z-index:var(--layer-header);width:100%;background:var(--color-surface-raised);color:var(--color-text-primary);border-bottom:1px solid var(--color-border)}
 .site-header__inner{display:flex;align-items:center;gap:clamp(.65rem,1.25vw,1.25rem);width:min(100%,var(--content-width-wide));min-height:72px;margin-inline:auto;padding-inline:var(--page-gutter)}
-.site-brand{display:inline-flex;flex:0 0 auto;align-items:center;gap:.48rem;color:var(--brand-crimson);text-decoration:none;white-space:nowrap}
+.site-brand{display:inline-flex;flex:0 0 auto;align-items:center;gap:.55rem;color:var(--brand-crimson);text-decoration:none;white-space:nowrap}
 .site-brand:hover{color:var(--brand-crimson);text-decoration:none}
-.site-brand__symbol{display:block;width:36px;height:36px;flex:0 0 auto;object-fit:contain}
-.site-brand__wordmark{color:var(--brand-crimson);font-family:var(--font-ui);font-size:clamp(1.35rem,2vw,1.85rem);font-weight:900;letter-spacing:-.075em;line-height:1;text-transform:uppercase}
+.site-brand__wordmark{display:block;width:auto;height:32px;max-width:none;flex:0 0 auto;object-fit:contain}
+.site-brand__publication{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;padding:.22rem .42rem;border:1px solid currentColor;border-radius:3px;color:var(--brand-crimson);font-family:var(--font-ui);font-size:.62rem;font-weight:800;letter-spacing:.12em;line-height:1;text-transform:uppercase}
 .site-header__nav{flex:1 1 auto;min-width:0;margin-inline-start:auto}
 .site-header__nav-list{display:flex;align-items:center;justify-content:flex-end;gap:clamp(.15rem,.5vw,.6rem);min-width:0}
 .nav-item{position:relative;display:flex;flex:0 0 auto;align-items:center;min-height:72px}
