@@ -4,6 +4,7 @@
 .site-brand{display:inline-flex;flex:0 0 auto;align-items:center;gap:.55rem;color:var(--brand-crimson);text-decoration:none;white-space:nowrap}
 .site-brand:hover{color:var(--brand-crimson);text-decoration:none}
 .site-brand__wordmark{display:block;width:auto;height:32px;max-width:none;flex:0 0 auto;object-fit:contain}
+.site-brand__publication{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;padding:.22rem .42rem;border:1px solid #DC2626;border-radius:3px;background:transparent;color:#DC2626;font-family:var(--font-ui);font-size:.62rem;font-weight:800;letter-spacing:.12em;line-height:1;text-transform:uppercase}
 
 .site-header__nav{flex:1 1 auto;min-width:0;margin-inline-start:auto}
 .site-header__nav-list{display:flex;align-items:center;justify-content:flex-end;gap:clamp(.15rem,.5vw,.6rem);min-width:0}
