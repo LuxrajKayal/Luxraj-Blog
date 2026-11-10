@@ -1,5 +1,5 @@
-<!-- Shared footer: brand identity, six navigation groups, social profiles and copyright. -->
-<footer class="site-footer" data-site-footer>
+<!-- Shared footer: publication identity, author profile, discovery links and copyright. -->
+<footer class="site-footer">
   <div class="site-footer__inner">
     <div class="site-footer__grid">
       <section class="site-footer__brand-block" aria-labelledby="site-footer-brand">
@@ -12,14 +12,10 @@
         </a>
 
         <p class="site-footer__tagline">Technology. Without the noise.</p>
-        <p class="site-footer__description">
-          Luxraj Blog covers technology news, software and hardware, product reviews, engineering,
-          and practical how-to guides. We focus on clear explanations that help readers understand
-          how technology works and make informed decisions.
-        </p>
+        <p class="site-footer__description">Luxraj Blog covers technology news, software and hardware, product reviews, engineering, and practical how-to guides. We focus on clear explanations that help readers understand how technology works and make informed decisions.</p>
 
-        <a class="site-footer__author" href="https://example.com/author/luxraj-kayal" data-footer-placeholder="author-profile" aria-label="Open Luxraj Kayal's author profile">
-          <img class="site-footer__author-avatar" src="https://avatars.githubusercontent.com/u/321472419?v=4" alt="" width="56" height="56" loading="lazy" decoding="async">
+        <a class="site-footer__author" href="https://example.com" aria-label="Open Luxraj Kayal's author profile">
+          <img class="site-footer__author-avatar" src="https://avatars.githubusercontent.com/u/321472419?v=4" alt="Luxraj Kayal profile picture" width="56" height="56" loading="lazy" decoding="async">
           <span class="site-footer__author-copy">
             <span class="site-footer__author-role">AUTHOR &amp; MAINTAINER</span>
             <span class="site-footer__author-name">Luxraj Kayal</span>
@@ -28,152 +24,33 @@
         </a>
       </section>
 
-      <nav class="site-footer__navigation" aria-label="Footer navigation">
-        <section class="site-footer__link-group" aria-labelledby="site-footer-explore-heading">
-          <h2 class="site-footer__heading" id="site-footer-explore-heading">
-            <span>01. Explore</span>
-            <button class="site-footer__accordion-toggle" type="button" hidden data-footer-toggle aria-expanded="true" aria-controls="site-footer-explore-links" aria-label="Toggle Explore links">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </h2>
-          <ul class="site-footer__link-list" id="site-footer-explore-links">
-            <li><a class="site-footer__link" href="{{ROOT}}index.html">Home</a></li>
-            <li><a class="site-footer__link" href="{{ROOT}}categories/tech-news/tech-news-index.html">Tech News</a></li>
-            <li><a class="site-footer__link" href="{{ROOT}}categories/engineering/engineering-index.html">Engineering</a></li>
-            <li><a class="site-footer__link" href="{{ROOT}}categories/reviews/reviews-index.html">Reviews</a></li>
-            <li><a class="site-footer__link" href="{{ROOT}}categories/how-to/how-to-index.html">How To</a></li>
-            <li><a class="site-footer__link" href="{{ROOT}}categories/hardware/hardware-index.html">Hardware</a></li>
-            <li><a class="site-footer__link" href="{{ROOT}}categories/software/software-index.html">Software</a></li>
-            <li><a class="site-footer__link" href="{{ROOT}}categories/buying-advice/buying-advice-index.html">Buying Advice</a></li>
-          </ul>
-        </section>
-
-        <section class="site-footer__link-group" aria-labelledby="site-footer-discover-heading">
-          <h2 class="site-footer__heading" id="site-footer-discover-heading">
-            <span>02. Discover</span>
-            <button class="site-footer__accordion-toggle" type="button" hidden data-footer-toggle aria-expanded="true" aria-controls="site-footer-discover-links" aria-label="Toggle Discover links">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </h2>
-          <ul class="site-footer__link-list" id="site-footer-discover-links">
-            <li>
-              <button class="site-footer__action-trigger" type="button" data-search-open aria-haspopup="dialog">
-                Search Articles
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <circle cx="10.8" cy="10.8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
-                  <path d="m15.5 15.5 4.3 4.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
-                </svg>
-              </button>
-            </li>
-            <li><a class="site-footer__link" href="https://example.com/articles" data-footer-placeholder="all-articles">All Articles</a></li>
-            <li><a class="site-footer__link" href="https://example.com/latest" data-footer-placeholder="latest-articles">Latest Articles</a></li>
-            <li><a class="site-footer__link" href="https://example.com/archive" data-footer-placeholder="archive">Archive</a></li>
-            <li><a class="site-footer__link" href="https://example.com/tags" data-footer-placeholder="browse-tags">Browse Tags</a></li>
-            <li><a class="site-footer__link" href="https://example.com/popular" data-footer-placeholder="popular-articles">Popular Articles</a></li>
-          </ul>
-        </section>
-
-        <section class="site-footer__link-group" aria-labelledby="site-footer-luxraj-heading">
-          <h2 class="site-footer__heading" id="site-footer-luxraj-heading">
-            <span>03. Luxraj</span>
-            <button class="site-footer__accordion-toggle" type="button" hidden data-footer-toggle aria-expanded="true" aria-controls="site-footer-luxraj-links" aria-label="Toggle Luxraj links">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </h2>
-          <ul class="site-footer__link-list" id="site-footer-luxraj-links">
-            <li><a class="site-footer__link" href="{{ROOT}}pages/about.html">About Luxraj Blog</a></li>
-            <li><a class="site-footer__link" href="https://example.com/about-luxraj" data-footer-placeholder="about-luxraj">About Luxraj</a></li>
-            <li><a class="site-footer__link" href="https://luxraj.com" target="_blank" rel="noopener noreferrer">Main Luxraj Website <span aria-hidden="true">↗</span></a></li>
-            <li><a class="site-footer__link" href="https://example.com/author/luxraj-kayal" data-footer-placeholder="author-profile-link">Author Profile</a></li>
-            <li><a class="site-footer__link" href="https://example.com/editorial-policy" data-footer-placeholder="editorial-policy">Editorial Policy</a></li>
-            <li><a class="site-footer__link" href="https://example.com/portfolio" data-footer-placeholder="personal-portfolio">Personal Portfolio</a></li>
-          </ul>
-        </section>
-
-        <section class="site-footer__link-group" aria-labelledby="site-footer-connect-heading">
-          <h2 class="site-footer__heading" id="site-footer-connect-heading">
-            <span>04. Connect</span>
-            <button class="site-footer__accordion-toggle" type="button" hidden data-footer-toggle aria-expanded="true" aria-controls="site-footer-connect-links" aria-label="Toggle Connect links">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </h2>
-          <ul class="site-footer__link-list" id="site-footer-connect-links">
-            <li><a class="site-footer__link" href="https://example.com/contact" data-footer-placeholder="contact">Contact</a></li>
-            <li><a class="site-footer__link" href="https://example.com/editorial-enquiries" data-footer-placeholder="editorial-enquiries">Editorial Enquiries</a></li>
-            <li>
-              <button class="site-footer__action-trigger" type="button" data-newsletter-open="footer" aria-haspopup="dialog" aria-controls="house-popup-backdrop">
-                Newsletter
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <path d="M3.5 6.5h17v11h-17z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
-                  <path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
-                </svg>
-              </button>
-            </li>
-          </ul>
-          <ul class="site-footer__social-list" aria-label="Official Luxraj social profiles">
-            <li><a class="site-footer__social-link" href="https://www.facebook.com/LuxrajOfficial/" target="_blank" rel="noopener noreferrer" aria-label="Luxraj on Facebook" title="Facebook">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13.5 8.2h2V5.3c-.35-.05-1.55-.15-2.95-.15-2.9 0-4.9 1.77-4.9 5.02V13H4.8v3.25h2.85V24h3.5v-7.75h2.9l.46-3.25h-3.36v-2.5c0-.94.25-1.58 1.7-1.58Z" fill="currentColor"></path></svg>
-            </a></li>
-            <li><a class="site-footer__social-link" href="https://www.instagram.com/Luxrajofficial/" target="_blank" rel="noopener noreferrer" aria-label="Luxraj on Instagram" title="Instagram">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"></rect><circle cx="12" cy="12" r="4.1" fill="none" stroke="currentColor" stroke-width="1.8"></circle><circle cx="17.7" cy="6.5" r="1.1" fill="currentColor"></circle></svg>
-            </a></li>
-            <li><a class="site-footer__social-link" href="https://x.com/Luxraj" target="_blank" rel="noopener noreferrer" aria-label="Luxraj on X" title="X">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3L12 14.6 5.6 22H2.4l7.3-8.4L1.9 2h6.5l4.5 6.8L18.9 2Zm-1.1 18h1.7L7.4 3.9H5.6L17.8 20Z" fill="currentColor"></path></svg>
-            </a></li>
-            <li><a class="site-footer__social-link" href="https://www.youtube.com/@LuxrajOfficial" target="_blank" rel="noopener noreferrer" aria-label="Luxraj on YouTube" title="YouTube">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2a31 31 0 0 0-.5 4.8 31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8Z" fill="currentColor"></path><path d="m10 15.5 5.5-3.5L10 8.5v7Z" fill="var(--footer-background)"></path></svg>
-            </a></li>
-            <li><a class="site-footer__social-link" href="https://github.com/LuxrajKayal" target="_blank" rel="noopener noreferrer" aria-label="Luxraj on GitHub" title="GitHub">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 .9a11.1 11.1 0 0 0-3.5 21.6c.55.1.75-.24.75-.53v-2.03c-3.08.67-3.73-1.3-3.73-1.3-.5-1.28-1.23-1.62-1.23-1.62-1-.68.08-.67.08-.67 1.1.08 1.68 1.13 1.68 1.13.98 1.67 2.57 1.19 3.2.91.1-.71.38-1.19.7-1.46-2.46-.28-5.05-1.23-5.05-5.48 0-1.21.43-2.2 1.13-2.98-.12-.28-.5-1.41.1-2.94 0 0 .92-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.12-1.44 3.04-1.14 3.04-1.14.61 1.53.23 2.66.12 2.94.7.78 1.12 1.77 1.12 2.98 0 4.26-2.6 5.2-5.08 5.47.4.35.75 1.02.75 2.06v3.04c0 .3.2.64.76.53A11.1 11.1 0 0 0 12 .9Z" fill="currentColor"></path></svg>
-            </a></li>
-          </ul>
-        </section>
-
-        <section class="site-footer__link-group" aria-labelledby="site-footer-resources-heading">
-          <h2 class="site-footer__heading" id="site-footer-resources-heading">
-            <span>05. Resources</span>
-            <button class="site-footer__accordion-toggle" type="button" hidden data-footer-toggle aria-expanded="true" aria-controls="site-footer-resources-links" aria-label="Toggle Resources links">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </h2>
-          <ul class="site-footer__link-list" id="site-footer-resources-links">
-            <li><a class="site-footer__link" href="https://example.com/feed.xml" data-footer-placeholder="rss-feed">RSS Feed</a></li>
-            <li><a class="site-footer__link" href="{{ROOT}}sitemap.xml">Sitemap</a></li>
-            <li><a class="site-footer__link" href="https://example.com/help" data-footer-placeholder="help-centre">Help Centre</a></li>
-            <li><a class="site-footer__link" href="https://example.com/accessibility" data-footer-placeholder="accessibility">Accessibility</a></li>
-            <li><a class="site-footer__link" href="https://example.com/resources" data-footer-placeholder="reader-resources">Reader Resources</a></li>
-          </ul>
-        </section>
-
-        <section class="site-footer__link-group" aria-labelledby="site-footer-legal-heading">
-          <h2 class="site-footer__heading" id="site-footer-legal-heading">
-            <span>06. Legal &amp; Business</span>
-            <button class="site-footer__accordion-toggle" type="button" hidden data-footer-toggle aria-expanded="true" aria-controls="site-footer-legal-links" aria-label="Toggle Legal and Business links">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </h2>
-          <ul class="site-footer__link-list" id="site-footer-legal-links">
-            <li><a class="site-footer__link" href="{{ROOT}}pages/privacy.html">Privacy Policy</a></li>
-            <li><a class="site-footer__link" href="https://example.com/terms" data-footer-placeholder="terms-of-use">Terms of Use</a></li>
-            <li><a class="site-footer__link" href="https://example.com/disclaimer" data-footer-placeholder="disclaimer">Disclaimer</a></li>
-            <li><a class="site-footer__link" href="https://example.com/advertising" data-footer-placeholder="advertising">Advertising</a></li>
-            <li><a class="site-footer__link" href="https://example.com/affiliate-disclosure" data-footer-placeholder="affiliate-disclosure">Affiliate Disclosure</a></li>
-            <li><a class="site-footer__link" href="https://example.com/copyright" data-footer-placeholder="copyright">Copyright</a></li>
-          </ul>
-        </section>
+      <nav class="site-footer__link-group" aria-labelledby="site-footer-explore-heading">
+        <h2 class="site-footer__heading" id="site-footer-explore-heading">Explore</h2>
+        <ul class="site-footer__link-list">
+          <li><a class="site-footer__link" href="{{ROOT}}categories/tech-news/tech-news-index.html">Tech News</a></li>
+          <li><a class="site-footer__link" href="{{ROOT}}categories/engineering/engineering-index.html">Engineering</a></li>
+          <li><a class="site-footer__link" href="{{ROOT}}categories/reviews/reviews-index.html">Reviews</a></li>
+          <li><a class="site-footer__link" href="{{ROOT}}categories/how-to/how-to-index.html">How To</a></li>
+          <li><a class="site-footer__link" href="{{ROOT}}categories/hardware/hardware-index.html">Hardware</a></li>
+          <li><a class="site-footer__link" href="{{ROOT}}categories/software/software-index.html">Software</a></li>
+          <li><a class="site-footer__link" href="{{ROOT}}categories/buying-advice/buying-advice-index.html">Buying Advice</a></li>
+        </ul>
       </nav>
+
+      <section class="site-footer__link-group" aria-labelledby="site-footer-quick-links-heading">
+        <h2 class="site-footer__heading" id="site-footer-quick-links-heading">Quick Links</h2>
+        <ul class="site-footer__link-list">
+          <li>
+            <button class="site-footer__search-trigger" type="button" data-search-open aria-haspopup="dialog">
+              Search Articles
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="10.8" cy="10.8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+                <path d="m15.5 15.5 4.3 4.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+              </svg>
+            </button>
+          </li>
+        </ul>
+      </section>
     </div>
 
     <div class="site-footer__bottom">
@@ -181,6 +58,4 @@
       <a class="site-footer__back-to-top" href="#">Back to Top <span aria-hidden="true">↑</span></a>
     </div>
   </div>
-
-  <script type="module" src="{{ROOT}}assets/js/footer.js"></script>
 </footer>
