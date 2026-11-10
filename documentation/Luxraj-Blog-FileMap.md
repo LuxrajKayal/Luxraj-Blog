@@ -12,7 +12,7 @@ This map separates public-site source (`site/`), build tooling (`scripts/`), and
 
 The repository separates public-site source, build tooling, and planning materials. `site/` contains authored HTML/CSS/JS and source-only partials; `scripts/build-site.mjs` produces `_site/`, which is the directory deployed to GitHub Pages. Source partials and planning documents are not published. The existing root `README.md` remains untouched.
 
-The shared footer in `site/partials/footer.html` places the brand and author block beside six navigation groups: Explore, Discover, Luxraj, Connect, Resources, and Legal & Business. `site/assets/css/footer.css` provides the desktop six-column navigation area, tablet three-column/two-row layout, mobile accordion styling, and the existing circuit motif. `site/assets/js/footer.js` activates independently expandable mobile navigation; footer links remain visible when JavaScript is unavailable. The footer reuses the existing shared search and newsletter triggers and uses icon-only links for the official social profiles. Future destinations use labelled `https://example.com/...` placeholders documented in `documentation/Footer.md`.
+The shared footer includes the Luxraj brand summary, author profile link, category navigation, article search trigger, copyright, and Back to Top. The author-page destination is a temporary `https://example.com` placeholder.
 
 ```text
 Luxraj-Blog/
@@ -31,7 +31,7 @@ Luxraj-Blog/
 │   ├── partials/                 # Source-only shared HTML components
 │   │   ├── topbar.html            # Shared top information bar
 │   │   ├── main-header.html       # Shared navigation header and search dialog
-│   │   ├── footer.html            # Shared brand block and six-section footer navigation
+│   │   ├── footer.html            # Shared footer content and layout
 │   │   └── article-layout.html    # Optional shared article frame with full-width header and empty sidebar rail
 │   ├── categories/               # Category/subcategory pages and their articles
 │   ├── pages/                    # Standalone utility/legal pages, when present
@@ -66,7 +66,7 @@ site/
 ├── assets/
 │   ├── css/                      # Shared stylesheets, including shared-h1.css, eyebrows.css, breadcrumbs.css, tokens.css, article-layout.css and reusable author-bar.css
 │   ├── images/
-│   └── js/                       # Shared scripts, including footer.js, author-bar.js, author-library.js and article-share.js
+│   └── js/                       # Shared scripts, including author-bar.js, author-library.js and article-share.js
 ├── sitemap.xml                   # Canonical URLs only
 └── 404.html
 ```
