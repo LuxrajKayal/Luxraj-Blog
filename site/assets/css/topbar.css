@@ -145,6 +145,47 @@
 .topbar__email,
 .topbar__about { white-space: nowrap; }
 
+/* The mobile email disclosure is enabled only at the phone breakpoint. */
+.topbar__email-disclosure {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.topbar__email-disclosure summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 28px;
+  flex: 0 0 auto;
+  cursor: pointer;
+  list-style: none;
+}
+
+.topbar__email-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.topbar__email-disclosure summary svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+}
+
+.topbar__email-disclosure > a {
+  white-space: nowrap;
+}
+
+.topbar__email-disclosure summary:focus-visible,
+.topbar__email-disclosure > a:focus-visible {
+  outline: var(--focus-ring-width) solid var(--topbar-focus);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
 .topbar__socials { gap: var(--space-2); }
 
 .topbar__social-link {
@@ -213,10 +254,18 @@
   }
 
   .topbar__newsletter,
-  .topbar__email,
   .topbar__about {
     flex: 0 0 auto;
     white-space: nowrap;
+  }
+
+  .topbar__email {
+    display: none;
+  }
+
+  .topbar__email-disclosure {
+    display: inline-flex;
+    flex: 0 0 auto;
   }
 }
 
