@@ -6,7 +6,7 @@
 const rotatingWord = document.querySelector("[data-about-hero-word]");
 
 if (rotatingWord && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  const words = ["see", "touch", "verify"];
+  const words = ["see.", "touch.", "verify."];
   let wordIndex = 0;
 
   window.setInterval(() => {
