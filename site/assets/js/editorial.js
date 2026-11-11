@@ -174,7 +174,6 @@ if (root) {
         title: String(meta.title).trim(),
         image,
         imageAlt: String(meta.image_alt || meta.title).trim(),
-        imageCredit: String(meta.image_credit || "").trim(),
         imageSource,
         body
       };
@@ -194,21 +193,19 @@ if (root) {
       el.credit.textContent = "Original illustration by Luxraj Blog";
       return;
     }
-    if (!entry.imageCredit) {
+
+    if (!entry.imageSource) {
       el.credit.textContent = "Reference image";
       return;
     }
-    el.credit.append(document.createTextNode("Photo by "));
-    if (entry.imageSource) {
-      const link = document.createElement("a");
-      link.href = entry.imageSource;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.textContent = entry.imageCredit;
-      el.credit.append(link);
-    } else {
-      el.credit.append(document.createTextNode(entry.imageCredit));
-    }
+
+    el.credit.append(document.createTextNode("Image source: "));
+    const link = document.createElement("a");
+    link.href = entry.imageSource;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "View original";
+    el.credit.append(link);
   }
 
   function renderEntry(index) {

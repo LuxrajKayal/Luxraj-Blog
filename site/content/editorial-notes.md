@@ -4,7 +4,7 @@
 # The byline is fixed in editorial.html; do not add an author field here.
 # Supported types: Daily, Weekly, Monthly.
 # Unsplash reference images are free to use under the Unsplash License.
-# Image credits and source-page links are retained as a courtesy.
+# Each source link points directly to its Unsplash-hosted reference image.
 # License: https://unsplash.com/license
 
 <!-- ENTRY -->
@@ -14,8 +14,7 @@ type: "Daily"
 title: "Start with the problem, not the product."
 image: "https://images.unsplash.com/photo-1764755932155-dabbee87df7e?auto=format&fit=crop&w=1400&q=82"
 image_alt: "A quiet, sunlit desk with a laptop, keyboard and mouse."
-image_credit: "ReyLabs Studio"
-image_source: "https://unsplash.com/photos/laptop-keyboard-and-mouse-on-a-desk-with-sunlight-ohxs8oPgQ9k"
+image_source: "https://images.unsplash.com/photo-1764755932155-dabbee87df7e?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 A technology story becomes more useful when it begins with a problem someone is actually trying to solve. A launch, a new specification or a product announcement may be the event, but it is rarely the whole story.
 
@@ -31,8 +30,7 @@ type: "Daily"
 title: "A specification sheet is a starting point, not a verdict."
 image: "https://images.unsplash.com/photo-1592659762303-90081d34b277?auto=format&fit=crop&w=1400&q=82"
 image_alt: "A close view of a printed circuit board and its electronic connections."
-image_credit: "Vishnu Mohanan"
-image_source: "https://unsplash.com/photos/close-up-of-dark-blue-circuit-board-pfR18JNEMv8"
+image_source: "https://images.unsplash.com/photo-1592659762303-90081d34b277?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 Specifications matter. They help us compare devices, understand constraints and identify compatibility. But a number on a product page does not tell the entire story.
 
@@ -48,8 +46,7 @@ type: "Weekly"
 title: "Reliability lives in the details we rarely see."
 image: "https://images.unsplash.com/photo-1762163516269-3c143e04175c?auto=format&fit=crop&w=1400&q=82"
 image_alt: "A row of server equipment with status lights inside a data centre."
-image_credit: "Domaintechnik"
-image_source: "https://www.domaintechnik.at/"
+image_source: "https://images.unsplash.com/photo-1762163516269-3c143e04175c?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 A product can look impressive in a photograph and still disappoint in everyday use. Reliability is usually built from less glamorous decisions: component quality, thermal design, power delivery, connectors, firmware and serviceability.
 
@@ -70,8 +67,7 @@ type: "Daily"
 title: "A good workspace should reduce decisions."
 image: "https://images.unsplash.com/photo-1761322572550-967ea8c0bfd9?auto=format&fit=crop&w=1400&q=82"
 image_alt: "An open notebook and pencils arranged on a wooden desk."
-image_credit: "Clay Banks"
-image_source: "https://unsplash.com/photos/open-notebook-with-pen-and-pencils-on-desk-n9AaeihA9HI"
+image_source: "https://images.unsplash.com/photo-1761322572550-967ea8c0bfd9?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 A useful workspace does not need to look complicated. It needs to make the next action obvious.
 
@@ -87,8 +83,7 @@ type: "Monthly"
 title: "Repairability deserves a place in product design."
 image: "https://images.unsplash.com/photo-1759159091682-3b98f4759367?auto=format&fit=crop&w=1400&q=82"
 image_alt: "A close-up of a mechanical instrument with gears, dials and adjustment controls."
-image_credit: "Hans Westbeek"
-image_source: "https://unsplash.com/photos/close-up-of-industrial-machinery-with-gears-and-dials-td2Qd8nrPLE"
+image_source: "https://images.unsplash.com/photo-1759159091682-3b98f4759367?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 Repairability is not only a question of whether a device can be opened. It is also about whether the parts, information and tools needed to restore it are reasonably available.
 
@@ -104,8 +99,7 @@ type: "Daily"
 title: "A prototype is a question you can hold."
 image: "https://images.unsplash.com/photo-1577962144759-8dec6b55c952?auto=format&fit=crop&w=1400&q=82"
 image_alt: "Electronic components arranged on a work surface for prototyping."
-image_credit: "Robin Glauser"
-image_source: "https://unsplash.com/photos/a-group-of-electronic-components-laid-out-on-a-table-aSvBypuXGkc"
+image_source: "https://images.unsplash.com/photo-1577962144759-8dec6b55c952?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 A prototype does not need to prove that an entire idea is finished. It needs to help answer one important question.
 
@@ -121,8 +115,7 @@ type: "Weekly"
 title: "AI becomes more useful when its limits are visible."
 image: "https://images.unsplash.com/photo-1762279388979-6a430989284c?auto=format&fit=crop&w=1400&q=82"
 image_alt: "An abstract data visualisation made from intersecting green and blue lines."
-image_credit: "Logan Voss"
-image_source: "https://unsplash.com/photos/abstract-lines-and-graphs-with-glowing-green-and-blue-effects-zMvcimtZWuU"
+image_source: "https://images.unsplash.com/photo-1762279388979-6a430989284c?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 An AI feature should not be judged only by how impressive its best answer looks. We should also ask when it is likely to be wrong, what information it can access and how a person can check its work.
 
@@ -138,8 +131,7 @@ type: "Daily"
 title: "Efficiency is an engineering decision."
 image: "https://images.unsplash.com/photo-1745187946672-2c1d8cf26a2b?auto=format&fit=crop&w=1400&q=82"
 image_alt: "Rows of solar panels installed across a rooftop."
-image_credit: "Rafael Moreno"
-image_source: "https://unsplash.com/photos/solar-panels-are-installed-on-a-rooftop-73JOOymZQTQ"
+image_source: "https://images.unsplash.com/photo-1745187946672-2c1d8cf26a2b?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 Efficiency is often treated as a single number, but real systems involve trade-offs. Power use, heat, performance, material choice, operating conditions and maintenance all influence the result.
 
@@ -155,8 +147,7 @@ type: "Weekly"
 title: "The best interface is not always the most animated."
 image: "https://images.unsplash.com/photo-1770899621442-24237af4c8b4?auto=format&fit=crop&w=1400&q=82"
 image_alt: "A computer desk with a laptop and monitor displaying bright abstract colours."
-image_credit: "Alim"
-image_source: "https://unsplash.com/photos/modern-desktop-setup-with-laptop-and-monitor-3ncm8VhcDiM"
+image_source: "https://images.unsplash.com/photo-1770899621442-24237af4c8b4?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 Motion can explain a change, connect two states or give feedback after an action. It can also slow down a page, distract from the task and make an older device work harder.
 
@@ -172,8 +163,7 @@ type: "Daily"
 title: "A network is only as useful as its weakest connection."
 image: "https://images.unsplash.com/photo-1778146476147-5f8d4bd03c79?auto=format&fit=crop&w=1400&q=82"
 image_alt: "A laptop displaying source code on a blue-lit work surface."
-image_credit: "Bayu Syaits"
-image_source: "https://unsplash.com/photos/laptop-and-phone-on-a-desk-with-coding-software-open-oYzjGQ7LCVE"
+image_source: "https://images.unsplash.com/photo-1778146476147-5f8d4bd03c79?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 A fast router cannot fix every connection problem. The result also depends on interference, placement, walls, client hardware, network congestion and the service behind the connection.
 
@@ -189,8 +179,7 @@ type: "Monthly"
 title: "Learning becomes durable when theory meets a working object."
 image: "https://images.unsplash.com/photo-1736825389145-d462246f0bb4?auto=format&fit=crop&w=1400&q=82"
 image_alt: "An aerial view of cultivated agricultural fields under a cloudy sky."
-image_credit: "Oport Store"
-image_source: "https://unsplash.com/photos/an-aerial-view-of-a-field-of-crops-under-a-cloudy-sky-f6mUr1kkQPo"
+image_source: "https://images.unsplash.com/photo-1736825389145-d462246f0bb4?auto=format&fit=crop&w=1400&q=82"
 <!-- BODY -->
 Reading gives us language for an idea. Building, testing or measuring gives us a chance to discover where our understanding is incomplete.
 

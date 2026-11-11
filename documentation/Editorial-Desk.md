@@ -40,11 +40,11 @@ The author byline is fixed in the page template. Do not add an author or designa
 
 ## Images
 
-Each entry may have its own image URL. Describe the actual image in `image_alt`, and retain photographer/source credit in `image_credit` and `image_source`.
+Each entry may have its own image URL. Describe the actual image in `image_alt`, and keep `image_source` pointed at the exact source image.
 
 If an image URL is blank or fails to load, the page uses `site/assets/images/editorial/editorial-default.svg`.
 
-The current image references are from Unsplash. The Unsplash License permits free personal and commercial use, but does not automatically clear separate rights in trademarks, identifiable people or third-party artwork shown in an image. Check the source page and current terms before using production imagery. Attribution is not generally required by the license, but it is included here as a courtesy. One sample server-rack photo asks for a specific credit to Domaintechnik; that credit is included in its entry.
+The current image references are from Unsplash. The Unsplash License permits free personal and commercial use, but does not automatically clear separate rights in trademarks, identifiable people or third-party artwork shown in an image. Check the source page and current terms before using production imagery. These demonstration entries do not claim photographer attribution. Each image-source link opens the exact Unsplash-hosted image used in the preview. This avoids publishing unverified photographer names while retaining a direct reference to each image.
 
 - [Unsplash License](https://unsplash.com/license)
 - [Unsplash guidance on brands and identifiable people](https://help.unsplash.com/en/articles/2646379-what-if-there-s-a-brand-or-identifiable-person-depicted-in-an-image-that-i-download)
