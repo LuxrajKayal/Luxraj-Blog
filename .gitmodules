@@ -1,4 +1,0 @@
-[submodule "research/pagefind-upstream"]
-	path = research/pagefind-upstream
-	url = https://github.com/Pagefind/pagefind.git
-	branch = main
