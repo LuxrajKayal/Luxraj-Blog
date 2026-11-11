@@ -42,7 +42,7 @@ Luxraj-Blog/
 
 ## About page intro
 
-The About page reuses the existing animated SVG at `site/assets/images/ui/luxraj-blog-loader.svg`. Its full-screen, theme-aware opening overlay is defined in `site/assets/css/about.css`, and `site/assets/js/about-intro.js` handles temporary scroll locking and releases the page after the CSS intro animation. These assets are referenced only by `site/pages/about.html`; the homepage and other pages do not load them. The SVG source is reused unchanged and retains its own reduced-motion behavior.
+The About page reuses the existing animated SVG at `site/assets/images/ui/luxraj-blog-loader.svg`. Its full-screen, theme-aware opening overlay is defined in `site/assets/css/about.css`, and `site/assets/js/about-intro.js` handles temporary scroll locking and releases the page after the CSS intro animation. The About hero uses the same page-only stylesheet for its fixed headline styling and rotating crimson final word; `site/assets/js/about-hero.js` cycles through “see”, “touch” and “verify” every two seconds with a fade-and-slide entrance, while respecting reduced-motion preferences. These assets are referenced only by `site/pages/about.html`; the homepage and other pages do not load them. The SVG source is reused unchanged and retains its own reduced-motion behavior.
 
 ## Contact page
 
