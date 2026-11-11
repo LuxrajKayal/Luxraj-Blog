@@ -111,6 +111,12 @@ if (recipientSelect && providerRoot && composeButton) {
     }
   });
 
+  providerRoot.addEventListener("focusout", (event) => {
+    if (!providerRoot.contains(event.relatedTarget) && !providerMenu.hidden) {
+      closeProviderMenu(false);
+    }
+  });
+
   recipientSelect.addEventListener("change", () => setFeedback(""));
 
   function createComposeUrl(recipient, subject) {
@@ -136,7 +142,7 @@ if (recipientSelect && providerRoot && composeButton) {
       return "https://compose.mail.yahoo.com/?" + params.toString();
     }
 
-    return "mailto:" + encodeURIComponent(recipient) + "?subject=" + encodeURIComponent(subject);
+    return "mailto:" + recipient + "?subject=" + encodeURIComponent(subject);
   }
 
   composeButton.addEventListener("click", () => {
