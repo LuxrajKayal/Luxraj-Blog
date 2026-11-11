@@ -40,6 +40,17 @@ Luxraj-Blog/
 │   └── 404.html
 ```
 
+## Contact page
+
+The publication Contact page is implemented at `site/pages/contact.html`. It uses the shared topbar, main navigation header and footer. Its page-only stylesheet is `site/assets/css/contact.css`, and its page-only interactions are in `site/assets/js/contact.js`; neither Contact asset is loaded by the homepage. The page provides a recipient selector, an icon-bearing email-provider dropdown, a Proceed action, five detailed email contact cards with individual copy controls, and the official social links. The shared footer links to the Contact page, and the canonical page URL is included in `site/sitemap.xml`. The parent-brand address `official@luxraj.com` is intentionally not listed among publication contacts.
+
+```text
+site/pages/contact.html
+site/assets/css/contact.css
+site/assets/js/contact.js
+documentation/Contact.md
+```
+
 ## 1. Public Website — GitHub Pages
 
 The active workflow builds `site/` into `_site/` and deploys only `_site/`. The homepage is the **only file named `index.html`** in the public website. Category and subcategory landing pages use descriptive, unique names ending in `-index.html`; articles use descriptive filenames in each subcategory's `articles/` directory. Do not add nested `index.html` files.
