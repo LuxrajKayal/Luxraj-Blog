@@ -1,0 +1,61 @@
+/*
+ * Luxraj Blog — About page intro overlay
+ * This stylesheet is loaded only by site/pages/about.html.
+ */
+
+.about-intro {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.5rem;
+  overflow: hidden;
+  background: var(--color-page);
+  color: var(--color-text-primary);
+  opacity: 1;
+  visibility: visible;
+  animation: about-intro-dismiss .4s ease 2.8s forwards;
+}
+
+.about-intro__loader {
+  display: block;
+  width: clamp(11rem, 27vw, 15rem);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.about-intro__slogan {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+  font-size: clamp(1.15rem, 2.5vw, 1.55rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -.035em;
+  line-height: var(--line-height-heading);
+  text-align: center;
+  text-wrap: balance;
+}
+
+html.about-intro-active {
+  overflow: hidden;
+}
+
+@keyframes about-intro-dismiss {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Keep the branded hold, but remove the overlay fade for reduced-motion users.
+   The loader SVG also disables its internal movement for this preference. */
+@media (prefers-reduced-motion: reduce) {
+  .about-intro {
+    animation-duration: .01ms;
+  }
+}
