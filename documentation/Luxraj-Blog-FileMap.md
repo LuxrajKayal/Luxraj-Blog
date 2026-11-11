@@ -40,6 +40,10 @@ Luxraj-Blog/
 │   └── 404.html
 ```
 
+## About page intro
+
+The About page reuses the existing animated SVG at `site/assets/images/ui/luxraj-blog-loader.svg`. Its full-screen, theme-aware opening overlay is defined in `site/assets/css/about.css`, and `site/assets/js/about-intro.js` handles temporary scroll locking and releases the page after the CSS intro animation. These assets are referenced only by `site/pages/about.html`; the homepage and other pages do not load them. The SVG source is reused unchanged and retains its own reduced-motion behavior.
+
 ## Contact page
 
 The publication Contact page is implemented at `site/pages/contact.html`. It uses the shared topbar, main navigation header and footer. Its page-only stylesheet is `site/assets/css/contact.css`, and its page-only interactions are in `site/assets/js/contact.js`; neither Contact asset is loaded by the homepage. The page provides a recipient selector, an icon-bearing email-provider dropdown, a Proceed action, five detailed email contact cards with individual copy controls, and the official social links. The shared footer links to the Contact page, and the canonical page URL is included in `site/sitemap.xml`. The parent-brand address `official@luxraj.com` is intentionally not listed among publication contacts.
