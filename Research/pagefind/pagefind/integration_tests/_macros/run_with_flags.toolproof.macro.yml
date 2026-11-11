@@ -1,3 +1,0 @@
-macro: I run Pagefind with {flags}
-steps:
-  - I run "%toolproof_process_directory%/target/%pagefind_mode%/pagefind %flags%"

@@ -1,3 +1,0 @@
-ignore = [
-    "pagefind_stem/src/snowball/**",
-]

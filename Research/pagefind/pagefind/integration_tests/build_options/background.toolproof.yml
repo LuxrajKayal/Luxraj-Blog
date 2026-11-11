@@ -1,4 +1,0 @@
-name: build_options > Build Options > Background
-type: reference
-steps:
-  - step: I have the environment variable "PAGEFIND_SITE" set to "public"
