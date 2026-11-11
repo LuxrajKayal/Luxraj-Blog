@@ -19,7 +19,7 @@ if (recipientSelect && providerRoot && composeButton) {
     gmail: "Gmail",
     outlook: "Outlook",
     yahoo: "Yahoo Mail",
-    default: "your default email application"
+    default: "Default email app"
   };
 
   let selectedProvider = "gmail";
@@ -205,6 +205,7 @@ document.addEventListener("click", async (event) => {
 
     if (label) label.textContent = "Copied!";
     button.setAttribute("aria-label", "Copied " + email);
+    if (feedback) feedback.textContent = "Copied " + email + " to the clipboard.";
     button.classList.add("is-copied");
   } catch (error) {
     if (label) label.textContent = "Select address";
@@ -217,6 +218,9 @@ document.addEventListener("click", async (event) => {
       if (label) label.textContent = originalLabel;
       button.setAttribute("aria-label", "Copy " + email);
       button.classList.remove("is-copied");
+      if (feedback && feedback.textContent === "Copied " + email + " to the clipboard.") {
+        feedback.textContent = "";
+      }
     }, 1800);
   }
 });
