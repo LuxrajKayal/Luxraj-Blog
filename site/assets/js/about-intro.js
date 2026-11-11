@@ -14,28 +14,28 @@ if (intro) {
 
     if (slogan) {
       const fullText = slogan.textContent.trim();
-      const sentenceEnd = fullText.indexOf(".");
-      const firstLine = sentenceEnd >= 0 ? fullText.slice(0, sentenceEnd + 1) : fullText;
-      const secondLine = sentenceEnd >= 0 ? fullText.slice(sentenceEnd + 1).trim() : "";
+      const words = fullText.split(/\s+/);
+      const brandName = words.shift() || "";
+      const publicationName = words.join(" ");
 
-      const primaryText = document.createElement("span");
-      const accentText = document.createElement("span");
+      const brandText = document.createElement("span");
+      const publicationText = document.createElement("span");
       const lineBreak = document.createElement("br");
 
-      accentText.className = "about-intro__slogan-accent";
+      brandText.className = "about-intro__slogan-accent";
       slogan.setAttribute("aria-label", fullText);
-      slogan.replaceChildren(primaryText, lineBreak, accentText);
+      slogan.replaceChildren(brandText, lineBreak, publicationText);
 
-      // Show the complete, homepage-matched slogan without typing for reduced-motion users.
+      // Show the complete brand lockup immediately for reduced-motion users.
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       if (prefersReducedMotion) {
-        primaryText.textContent = firstLine;
-        accentText.textContent = secondLine;
+        brandText.textContent = brandName;
+        publicationText.textContent = publicationName;
       } else {
         const typingSequence = [
-          ...Array.from(firstLine, character => ({ target: primaryText, character })),
-          ...Array.from(secondLine, character => ({ target: accentText, character }))
+          ...Array.from(brandName, character => ({ target: brandText, character })),
+          ...Array.from(publicationName, character => ({ target: publicationText, character }))
         ];
         let characterIndex = 0;
 
@@ -53,7 +53,7 @@ if (intro) {
           window.setTimeout(typeNextCharacter, 48);
         };
 
-        // Let the loader appear first, then type the slogan beneath it.
+        // Let the loader appear first, then type the brand lockup beneath it.
         window.setTimeout(typeNextCharacter, 320);
       }
     }
