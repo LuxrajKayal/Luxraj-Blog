@@ -16,6 +16,7 @@
     content="Clear explanations of technology, engineering, products and the ideas behind the tools we use."
   >
   <title>About | Luxraj Blog</title>
+  <link rel="preload" as="image" href="../assets/images/ui/luxraj-blog-loader.svg" type="image/svg+xml" fetchpriority="high">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,8 +35,21 @@
   <link rel="stylesheet" href="../assets/css/dropdowns.css">
   <link rel="stylesheet" href="../assets/css/search.css">
   <link rel="stylesheet" href="../assets/css/responsive.css">
+  <link rel="stylesheet" href="../assets/css/about.css">
 </head>
 <body data-site-root="../" data-page-type="about">
+  <div class="about-intro" data-about-intro aria-hidden="true">
+    <img
+      class="about-intro__loader"
+      src="../assets/images/ui/luxraj-blog-loader.svg"
+      alt=""
+      width="240"
+      height="240"
+      fetchpriority="high"
+      decoding="async"
+    >
+    <p class="about-intro__slogan">Technology. Without the noise.</p>
+  </div>
   <!-- SHARED:TOPBAR -->
   <!-- SHARED:MAIN-HEADER -->
 
@@ -126,5 +140,6 @@
 
   <!-- SHARED:FOOTER -->
   <script type="module" src="../assets/js/main.js"></script>
+  <script type="module" src="../assets/js/about-intro.js"></script>
 </body>
 </html>
