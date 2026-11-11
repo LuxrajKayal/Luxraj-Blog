@@ -14,27 +14,41 @@ if (intro) {
 
     if (slogan) {
       const fullText = slogan.textContent.trim();
-      slogan.setAttribute("aria-label", fullText);
+      const sentenceEnd = fullText.indexOf(".");
+      const firstLine = sentenceEnd >= 0 ? fullText.slice(0, sentenceEnd + 1) : fullText;
+      const secondLine = sentenceEnd >= 0 ? fullText.slice(sentenceEnd + 1).trim() : "";
 
-      // Show the complete slogan immediately for visitors who prefer reduced motion.
+      const primaryText = document.createElement("span");
+      const accentText = document.createElement("span");
+      const lineBreak = document.createElement("br");
+
+      accentText.className = "about-intro__slogan-accent";
+      slogan.setAttribute("aria-label", fullText);
+      slogan.replaceChildren(primaryText, lineBreak, accentText);
+
+      // Show the complete, homepage-matched slogan without typing for reduced-motion users.
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       if (prefersReducedMotion) {
-        slogan.textContent = fullText;
+        primaryText.textContent = firstLine;
+        accentText.textContent = secondLine;
       } else {
-        const characters = Array.from(fullText);
+        const typingSequence = [
+          ...Array.from(firstLine, character => ({ target: primaryText, character })),
+          ...Array.from(secondLine, character => ({ target: accentText, character }))
+        ];
         let characterIndex = 0;
 
-        slogan.textContent = "";
         slogan.classList.add("is-typing");
 
         const typeNextCharacter = () => {
-          if (characterIndex >= characters.length) {
+          if (characterIndex >= typingSequence.length) {
             slogan.classList.remove("is-typing");
             return;
           }
 
-          slogan.textContent += characters[characterIndex];
+          const next = typingSequence[characterIndex];
+          next.target.textContent += next.character;
           characterIndex += 1;
           window.setTimeout(typeNextCharacter, 48);
         };
