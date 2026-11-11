@@ -378,6 +378,12 @@
   color: var(--brand-crimson);
 }
 
+.contact-copy.is-copied {
+  border-color: var(--brand-crimson);
+  background: var(--color-surface);
+  color: var(--brand-crimson);
+}
+
 .contact-copy svg {
   width: 15px;
   height: 15px;
