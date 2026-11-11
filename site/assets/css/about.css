@@ -42,12 +42,16 @@
   text-wrap: balance;
 }
 
+.about-intro__slogan-accent {
+  color: var(--brand-crimson);
+}
+
 .about-intro__slogan.is-typing::after {
   display: inline-block;
   width: .075em;
   height: .9em;
   margin-left: .12em;
-  background: currentColor;
+  background: var(--brand-crimson);
   content: "";
   vertical-align: -.08em;
   animation: about-intro-cursor-blink .7s steps(1, end) infinite;
