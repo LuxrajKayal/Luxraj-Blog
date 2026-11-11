@@ -1,0 +1,245 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  merge_group:
+
+env:
+  CARGO_TERM_COLOR: always
+  WASM_PACK_VERSION: "v0.14.0"
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{matrix.os}}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - build: linux
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            cross: false
+          - build: macos
+            os: macos-latest
+            target: x86_64-apple-darwin
+            cross: false
+
+          - build: freebsd
+            os: ubuntu-latest
+            target: x86_64-unknown-freebsd
+            cross: true
+          - build: windows
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            cross: false
+          - build: windows-arm64
+            os: windows-11-arm
+            target: aarch64-pc-windows-msvc
+            cross: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+
+      - name: Cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.rustup
+            target
+          key: ${{ runner.os }}-min165
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 20
+
+      - name: Install Nightly Rust
+        run: |
+          rustup toolchain install nightly --component rustfmt,clippy,rust-src --target ${{ matrix.target }}
+          rustup default nightly
+
+      - name: Set up python 3.12
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+          # NOTE: ^this strategy leaves older python versions intentionally
+          # without test coverage to keep CI fast.
+
+      - name: Check versions
+        run: |
+          cargo --version
+          rustc --version
+
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@0d096b08b4e5a7de8c28de67e11e945404e9eefa # v0.4.0
+        with:
+          version: ${{env.WASM_PACK_VERSION}}
+
+      - name: Check Unix tools availability
+        if: matrix.build == 'windows-arm64'
+        run: |
+          echo "Shell: $SHELL"
+          echo "Bash: $(bash --version | head -1)"
+          which gzip && gzip --version | head -1 || echo "gzip: NOT FOUND"
+          which grep && grep --version | head -1 || echo "grep: NOT FOUND"
+          which printf || echo "printf: NOT FOUND"
+          which cat || echo "cat: NOT FOUND"
+
+      - name: Build WASM
+        working-directory: ./pagefind_web
+        run: ./local_build.sh
+
+      - name: Install Rust
+        run: |
+          rustup toolchain install beta --component rustfmt,clippy --target ${{ matrix.target }}
+          rustup default beta
+
+      - name: Check versions
+        run: |
+          cargo --version
+          rustc --version
+
+      - name: Build Coupled JS
+        working-directory: ./pagefind_web_js
+        run: npm i && npm run build-coupled
+
+      - name: Build UI
+        working-directory: ./pagefind_ui/default
+        run: npm i && npm run build
+
+      - name: Build Modular UI
+        working-directory: ./pagefind_ui/modular
+        run: npm i && npm run build
+
+      - name: Build Component UI
+        working-directory: ./pagefind_ui/component
+        run: npm i && npm run build
+
+      - name: Typecheck Component UI
+        working-directory: ./pagefind_ui/component
+        run: npm run typecheck
+
+      - name: Build Playground
+        working-directory: ./pagefind_playground
+        run: npm i && npm run build
+
+      - name: Test Web
+        working-directory: ./pagefind_web
+        run: cargo test --release
+
+      - name: Build Testing Binary
+        if: matrix.build != 'freebsd'
+        working-directory: ./pagefind
+        run: cargo build --release --features extended
+
+      - name: Install Cross (for FreeBSD compilation)
+        if: matrix.cross == true
+        run: cargo install cross
+
+      - name: Build FreeBSD Test Binary
+        working-directory: ./pagefind
+        if: matrix.build == 'freebsd'
+        run: cross build --release --target ${{matrix.target}} --features extended
+
+      - name: Upload Testing Binary
+        if: matrix.build!= 'freebsd'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pagefind-${{ matrix.target }}
+          path: target/release/pagefind${{ startsWith(matrix.build, 'windows') && '.exe' || '' }}
+      
+      - name: Upload Testing Binary (FreeBSD)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: matrix.build == 'freebsd'
+        with:
+          name: pagefind-${{ matrix.target }}
+          path: target/${{matrix.target}}/release/pagefind
+
+      - name: Test 
+        if: matrix.build != 'freebsd'
+        working-directory: ./pagefind
+        run: cargo test --release --lib --features extended
+
+      - name: Test CLI
+        if: matrix.build!= 'freebsd'
+        run: npx -y toolproof@latest -s -c 1 --timeout 45 --retry-count 2
+
+      - name: Set up uv
+        if: matrix.build != 'freebsd'
+        run: ./wrappers/python/scripts/ci/github/setup_uv.sh
+
+      - name: cache venv
+        if: matrix.build != 'freebsd'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: wrappers/python/.venv
+          key: ${{ runner.os }}-uv-3.12-${{ hashFiles('**/uv.lock') }}
+
+      - name: Install dev dependencies
+        if: matrix.build != 'freebsd'
+        run: ./wrappers/python/scripts/ci/github/install_dev_dependencies.sh
+
+      - name: activate venv
+        if: matrix.build != 'freebsd'
+        run: ./wrappers/python/scripts/ci/github/activate_venv.sh
+
+      - name: debug python paths
+        if: matrix.build != 'freebsd'
+        run: ./wrappers/python/scripts/ci/github/debug_python_paths.sh
+
+      - name: Lint python
+        if: runner.os == 'Linux' && matrix.build != 'freebsd'
+        working-directory: ./wrappers/python
+        run: ./scripts/ci/python_lints.sh
+
+      - name: ensure cog up-to-date
+        if: runner.os == 'Linux' && matrix.build != 'freebsd'
+        working-directory: ./wrappers/python
+        run: ./scripts/ci/cog/check.sh
+
+      - name: set PYTHONPATH
+        if: matrix.build != 'freebsd'
+        shell: bash
+        working-directory: ./wrappers/python
+        run: python ./scripts/ci/github/add_src_to_pythonpath.py
+
+      - name: add target/release to windows PATH
+        if: matrix.build != 'freebsd'
+        shell: bash
+        run: echo $PWD/target/release >> "$GITHUB_PATH"
+
+      - name: Test python API
+        if: matrix.build != 'freebsd'
+        timeout-minutes: 1
+        run: ./wrappers/python/scripts/ci/github/integration_tests.sh
+
+  deploy-docs:
+    name: Deploy Docs (Staging)
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: staging
+    concurrency:
+      group: deploy-docs-staging
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: pagefind-x86_64-unknown-linux-musl
+          path: docs/pagefind-bin
+      - run: chmod +x docs/pagefind-bin/pagefind
+      - uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # 1.6
+      - run: flyctl deploy --config docs/fly.toml --dockerfile docs/Dockerfile.prebuilt
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_DEPLOY_STAGING }}

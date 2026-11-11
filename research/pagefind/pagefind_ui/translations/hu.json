@@ -1,0 +1,32 @@
+{
+    "thanks_to": "Adam Laki <info@adamlaki.com>",
+    "comments": "",
+    "direction": "ltr",
+    "strings": {
+        "placeholder": "Keresés",
+        "clear_search": "Törlés",
+        "load_more": "További találatok betöltése",
+        "search_label": "Keresés az oldalon",
+        "filters_label": "Szűrés",
+        "zero_results": "Nincs találat a(z) [SEARCH_TERM] kifejezésre",
+        "many_results": "[COUNT] db találat a(z) [SEARCH_TERM] kifejezésre",
+        "one_result": "[COUNT] db találat a(z) [SEARCH_TERM] kifejezésre",
+        "total_zero_results": "Nincs találat",
+        "total_one_result": "[COUNT] találat",
+        "total_many_results": "[COUNT] találat",
+        "alt_search": "Nincs találat a(z) [SEARCH_TERM] kifejezésre. Találatok mutatása inkább a(z) [DIFFERENT_TERM] kifejezésre",
+        "search_suggestion": "Nincs találat a(z) [SEARCH_TERM] kifejezésre. Próbáld meg a következő keresések egyikét:",
+        "searching": "Keresés a(z) [SEARCH_TERM] kifejezésre...",
+        "results_label": "Keresési találatok",
+        "keyboard_navigate": "navigálás",
+        "keyboard_select": "kiválasztás",
+        "keyboard_clear": "törlés",
+        "keyboard_close": "bezárás",
+        "keyboard_search": "keresés",
+        "error_search": "A keresés sikertelen",
+        "filter_selected_one": "[COUNT] kiválasztva",
+        "filter_selected_many": "[COUNT] kiválasztva",
+        "input_hint": "A találatok gépelés közben jelennek meg",
+        "loading": "Betöltés"
+    }
+}

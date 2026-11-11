@@ -1,0 +1,161 @@
+---
+title: "<pagefind-results>"
+nav_title: "<pagefind-results>"
+nav_section: Components
+weight: 20
+---
+
+Displays search results with automatic lazy loading. Results load their full data only when scrolled into view.
+
+<div class="demo-box demo-box-attached" style="flex-direction: column; gap: 1rem; height: 400px;">
+<pagefind-input instance="results-demo"></pagefind-input>
+<div class="results-scroll" style="flex: 1; overflow-y: auto; width: 100%; min-height: 0;">
+<pagefind-results instance="results-demo"></pagefind-results>
+</div>
+<pagefind-keyboard-hints instance="results-demo"></pagefind-keyboard-hints>
+</div>
+
+```html
+<pagefind-results></pagefind-results>
+```
+
+## Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `show-images` | boolean | `false` | Show/hide result images |
+| `hide-sub-results` | boolean | `false` | Hide anchor-based sub-results |
+| `max-sub-results` | number | `3` | Maximum number of sub-results per result |
+| `max-results` | number | unlimited | Limit number of results shown |
+| `link-target` | string | — | Set `target` attribute on result links (e.g., `_blank` for new tab) |
+| `instance` | string | `"default"` | Connect to a specific Pagefind instance |
+
+## Keyboard Navigation
+
+When results are focused, use these keys to navigate:
+
+| Key | Action |
+|-----|--------|
+| `↓` / `↑` | Navigate between results |
+| `Enter` | Follow the selected link |
+| `Backspace` | Focus input and delete last character |
+| `/` | Focus the search input |
+| Any letter | Focus input and type the character |
+
+## Custom Templates
+
+Customize result rendering using `<script type="text/pagefind-template">` elements inside the component. Templates use a simple syntax with variables, conditionals, and loops.
+
+### Basic Template
+
+```html
+<pagefind-results>
+  <script type="text/pagefind-template">
+    <li class="my-result">
+      <h3>{{ meta.title }}</h3>
+      <a href="{{ url | safeUrl }}">{{ url }}</a>
+      <p>{{+ excerpt +}}</p>
+    </li>
+  </script>
+</pagefind-results>
+```
+
+Your template must have a single root element (e.g. a single `<li>`). Keyboard navigation moves between `<a>` elements in the results list, so ensure your main result link is an `<a>` tag.
+
+The full templating syntax can be seen in the [adequate-little-templates](https://github.com/bglw/adequate-little-templates?tab=readme-ov-file#syntax) package.
+
+### Available Data
+
+Templates receive this data structure:
+
+| Field | Description |
+|-------|-------------|
+| `meta.title` | Page title |
+| `meta.url` | Page URL |
+| `meta.image` | Page image (if set) |
+| `meta.image_alt` | Image alt text |
+| `meta.*` | Any custom metadata |
+| `excerpt` | Search excerpt with `<mark>` highlighting (use `{{+ excerpt +}}`) |
+| `url` | Fallback URL |
+| `sub_results` | Array of matching sections within the page |
+| `options.*` | The attributes supplied to the `<pagefind-results>` element |
+
+Each sub-result has: `title`, `url`, `excerpt`.
+
+### Template Filters
+
+The template engine provides [built-in filters](https://github.com/bglw/adequate-little-templates?tab=readme-ov-file#syntax). The Component UI registers the following additional filters:
+
+#### `resolveUrl(pageUrl)`
+
+Resolves a relative URL against a page URL. Absolute URLs are returned unchanged. If the page URL includes a domain, for example from a `baseUrl` on a merged index, the resolved URL keeps that domain.
+
+```
+"images/hero.png" | resolveUrl("/blog/post/")  →  /blog/post/images/hero.png
+"images/hero.png" | resolveUrl("https://example.com/blog/post/")  →  https://example.com/blog/post/images/hero.png
+```
+
+### Placeholder Template
+
+While results are loading, a skeleton placeholder is shown. You can customize it with a second template using `data-template="placeholder"`, as shown in the full example below. The placeholder template receives no data — it is static HTML.
+
+### Full Template Example
+
+Here's the built-in template. Copy and customize it:
+
+```html
+<pagefind-results>
+  <script type="text/pagefind-template">
+    <li class="pf-result">
+      <div class="pf-result-card">
+        {{#if and(options.show_images, meta.image)}}
+        <img class="pf-result-image" src="{{ meta.image | resolveUrl(meta.url | default(url)) }}" alt="{{ meta.image_alt | default(meta.title) }}">
+        {{/if}}
+        <div class="pf-result-content">
+          <p class="pf-result-title">
+            <a class="pf-result-link" href="{{ meta.url | default(url) | safeUrl }}"{{#if options.link_target}} target="{{ options.link_target }}"{{/if}}{{#if eq(options.link_target, "_blank")}} rel="noopener"{{/if}}>{{ meta.title }}</a>
+          </p>
+          {{#if excerpt}}
+          <p class="pf-result-excerpt">{{+ excerpt +}}</p>
+          {{/if}}
+        </div>
+      </div>
+      {{#if sub_results}}
+      <ul class="pf-heading-chips">
+        {{#each sub_results as sub}}
+        <li class="pf-heading-chip">
+          <a class="pf-heading-link" href="{{ sub.url | safeUrl }}"{{#if options.link_target}} target="{{ options.link_target }}"{{/if}}{{#if eq(options.link_target, "_blank")}} rel="noopener"{{/if}}>{{ sub.title }}</a>
+          <p class="pf-heading-excerpt">{{+ sub.excerpt +}}</p>
+        </li>
+        {{/each}}
+      </ul>
+      {{/if}}
+    </li>
+  </script>
+  <script type="text/pagefind-template" data-template="placeholder">
+    <li class="pf-result" aria-hidden="true">
+      <div class="pf-result-card">
+        <div class="pf-skeleton pf-skeleton-image"></div>
+        <div class="pf-result-content">
+          <p class="pf-result-title pf-skeleton pf-skeleton-title"></p>
+          <p class="pf-result-excerpt pf-skeleton pf-skeleton-excerpt"></p>
+        </div>
+      </div>
+    </li>
+  </script>
+</pagefind-results>
+```
+
+## Results Layout
+
+By default, results display in a single column. You can change the layout of the results container using CSS variables, for example a grid layout:
+
+```css
+:root {
+    --pf-results-display: grid;
+    --pf-results-columns: repeat(auto-fill, minmax(250px, 1fr));
+    --pf-results-gap: 16px;
+}
+```
+
+See [CSS Variables](/docs/css-variables/) for all available layout variables.

@@ -1,0 +1,32 @@
+{
+    "thanks_to": "Vladyslav Lyshenko <vladdnepr1989@gmail.com>",
+    "comments": "",
+    "direction": "ltr",
+    "strings": {
+        "placeholder": "Пошук",
+        "clear_search": "Очистити поле",
+        "load_more": "Завантажити ще",
+        "search_label": "Пошук по сайту",
+        "filters_label": "Фільтри",
+        "zero_results": "Нічого не знайдено за запитом: [SEARCH_TERM]",
+        "many_results": "[COUNT] результатів на запит: [SEARCH_TERM]",
+        "one_result": "[COUNT] результат за запитом: [SEARCH_TERM]",
+        "total_zero_results": "Нічого не знайдено",
+        "total_one_result": "[COUNT] результат",
+        "total_many_results": "[COUNT] результатів",
+        "alt_search": "Нічого не знайдено на запит: [SEARCH_TERM]. Показано результати на запит: [DIFFERENT_TERM]",
+        "search_suggestion": "Нічого не знайдено на запит: [SEARCH_TERM]. Спробуйте один із таких варіантів",
+        "searching": "Пошук за запитом: [SEARCH_TERM]",
+        "results_label": "Результати пошуку",
+        "keyboard_navigate": "навігація",
+        "keyboard_select": "вибрати",
+        "keyboard_clear": "очистити",
+        "keyboard_close": "закрити",
+        "keyboard_search": "пошук",
+        "error_search": "Помилка пошуку",
+        "filter_selected_one": "[COUNT] вибрано",
+        "filter_selected_many": "[COUNT] вибрано",
+        "input_hint": "Результати з'являтимуться під час введення",
+        "loading": "Завантаження"
+    }
+}

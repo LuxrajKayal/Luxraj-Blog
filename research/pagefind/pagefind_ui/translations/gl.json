@@ -1,0 +1,32 @@
+{
+    "thanks_to": "Pablo Villaverde <https://github.com/pvillaverde>",
+    "comments": "",
+    "direction": "ltr",
+    "strings": {
+        "placeholder": "Buscar",
+        "clear_search": "Limpar",
+        "load_more": "Ver máis resultados",
+        "search_label": "Buscar neste sitio",
+        "filters_label": "Filtros",
+        "zero_results": "Non se atoparon resultados para [SEARCH_TERM]",
+        "many_results": "[COUNT] resultados atopados para [SEARCH_TERM]",
+        "one_result": "[COUNT] resultado atopado para [SEARCH_TERM]",
+        "total_zero_results": "Sen resultados",
+        "total_one_result": "[COUNT] resultado",
+        "total_many_results": "[COUNT] resultados",
+        "alt_search": "Non se atoparon resultados para [SEARCH_TERM]. Amosando no seu lugar resultados para [DIFFERENT_TERM]",
+        "search_suggestion": "Non se atoparon resultados para [SEARCH_TERM]. Probe unha das seguintes pesquisas:",
+        "searching": "Buscando [SEARCH_TERM]...",
+        "results_label": "Resultados da busca",
+        "keyboard_navigate": "navegar",
+        "keyboard_select": "escoller",
+        "keyboard_clear": "limpar",
+        "keyboard_close": "pechar",
+        "keyboard_search": "buscar",
+        "error_search": "Erro na busca",
+        "filter_selected_one": "[COUNT] seleccionado",
+        "filter_selected_many": "[COUNT] seleccionados",
+        "input_hint": "Os resultados aparecerán mentres escribe",
+        "loading": "Cargando"
+    }
+}

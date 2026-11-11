@@ -1,0 +1,32 @@
+{
+    "thanks_to": "Mikel Larreategi <mlarreaegi@codesyntax.com>",
+    "comments": "",
+    "direction": "ltr",
+    "strings": {
+        "placeholder": "Bilatu",
+        "clear_search": "Garbitu",
+        "load_more": "Kargatu emaitza gehiagi",
+        "search_label": "Bilatu",
+        "filters_label": "Iragazkiak",
+        "zero_results": "Ez dago emaitzarik [SEARCH_TERM] bilaketarentzat",
+        "many_results": "[COUNT] emaitza [SEARCH_TERM] bilaketarentzat",
+        "one_result": "Emaitza bat [COUNT] [SEARCH_TERM] bilaketarentzat",
+        "total_zero_results": "Emaitzarik ez",
+        "total_one_result": "[COUNT] emaitza",
+        "total_many_results": "[COUNT] emaitza",
+        "alt_search": "Ez dago emaitzarik [SEARCH_TERM] bilaketarentzat. [DIFFERENT_TERM] bilaketaren emaitzak erakusten",
+        "search_suggestion": "Ez dago emaitzarik [SEARCH_TERM] bilaketarentzat. Saiatu hauetako beste bateikin:",
+        "searching": "[SEARCH_TERM] bilatzen...",
+        "results_label": "Bilaketaren emaitzak",
+        "keyboard_navigate": "nabigatu",
+        "keyboard_select": "hautatu",
+        "keyboard_clear": "garbitu",
+        "keyboard_close": "itxi",
+        "keyboard_search": "bilatu",
+        "error_search": "Bilaketak huts egin du",
+        "filter_selected_one": "[COUNT] hautatuta",
+        "filter_selected_many": "[COUNT] hautatuta",
+        "input_hint": "Emaitzak idatzi ahala agertuko dira",
+        "loading": "Kargatzen"
+    }
+}

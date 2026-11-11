@@ -1,0 +1,32 @@
+{
+    "thanks_to": "Paul van Brouwershaven",
+    "comments": "",
+    "direction": "ltr",
+    "strings": {
+        "placeholder": "Zoeken",
+        "clear_search": "Reset",
+        "load_more": "Meer resultaten laden",
+        "search_label": "Doorzoek deze site",
+        "filters_label": "Filters",
+        "zero_results": "Geen resultaten voor [SEARCH_TERM]",
+        "many_results": "[COUNT] resultaten voor [SEARCH_TERM]",
+        "one_result": "[COUNT] resultaat voor [SEARCH_TERM]",
+        "total_zero_results": "Geen resultaten",
+        "total_one_result": "[COUNT] resultaat",
+        "total_many_results": "[COUNT] resultaten",
+        "alt_search": "Geen resultaten voor [SEARCH_TERM]. In plaats daarvan worden resultaten voor [DIFFERENT_TERM] weergegeven",
+        "search_suggestion": "Geen resultaten voor [SEARCH_TERM]. Probeer een van de volgende zoekopdrachten:",
+        "searching": "Zoeken naar [SEARCH_TERM]...",
+        "results_label": "Zoekresultaten",
+        "keyboard_navigate": "navigeren",
+        "keyboard_select": "selecteren",
+        "keyboard_clear": "wissen",
+        "keyboard_close": "sluiten",
+        "keyboard_search": "zoeken",
+        "error_search": "Zoeken mislukt",
+        "filter_selected_one": "[COUNT] geselecteerd",
+        "filter_selected_many": "[COUNT] geselecteerd",
+        "input_hint": "Resultaten verschijnen terwijl u typt",
+        "loading": "Laden"
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "thanks_to": "Jan Claasen <jan@cloudcannon.com>",
+    "comments": "",
+    "direction": "ltr",
+    "strings": {
+        "placeholder": "Soek",
+        "clear_search": "Opruim",
+        "load_more": "Laai nog resultate",
+        "search_label": "Soek hierdie webwerf",
+        "filters_label": "Filters",
+        "zero_results": "Geen resultate vir [SEARCH_TERM]",
+        "many_results": "[COUNT] resultate vir [SEARCH_TERM]",
+        "one_result": "[COUNT] resultate vir [SEARCH_TERM]",
+        "total_zero_results": "Geen resultate",
+        "total_one_result": "[COUNT] resultaat",
+        "total_many_results": "[COUNT] resultate",
+        "alt_search": "Geen resultate vir [SEARCH_TERM]. Toon resultate vir [DIFFERENT_TERM] in plaas daarvan",
+        "search_suggestion": "Geen resultate vir [SEARCH_TERM]. Probeer eerder een van die volgende terme:",
+        "searching": "Soek vir [SEARCH_TERM]",
+        "results_label": "Soekresultate",
+        "keyboard_navigate": "navigeer",
+        "keyboard_select": "kies",
+        "keyboard_clear": "wis",
+        "keyboard_close": "sluit",
+        "keyboard_search": "soek",
+        "error_search": "Soek het misluk",
+        "filter_selected_one": "[COUNT] gekies",
+        "filter_selected_many": "[COUNT] gekies",
+        "input_hint": "Resultate sal verskyn terwyl jy tik",
+        "loading": "Laai"
+    }
+}

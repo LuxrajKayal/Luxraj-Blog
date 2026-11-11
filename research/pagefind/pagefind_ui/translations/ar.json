@@ -1,0 +1,32 @@
+{
+    "thanks_to": "Jermanuts",
+    "comments": "",
+    "direction": "rtl",
+    "strings": {
+        "placeholder": "بحث",
+        "clear_search": "امسح",
+        "load_more": "حمِّل المزيد من النتائج",
+        "search_label": "ابحث في هذا الموقع",
+        "filters_label": "تصفيات",
+        "zero_results": "لا توجد نتائج ل [SEARCH_TERM]",
+        "many_results": "[COUNT] نتائج ل [SEARCH_TERM]",
+        "one_result": "[COUNT] نتيجة ل [SEARCH_TERM]",
+        "total_zero_results": "لا توجد نتائج",
+        "total_one_result": "[COUNT] نتيجة",
+        "total_many_results": "[COUNT] نتائج",
+        "alt_search": "لا توجد نتائج ل [SEARCH_TERM]. يعرض النتائج ل [DIFFERENT_TERM] بدلاً من ذلك",
+        "search_suggestion": "لا توجد نتائج ل [SEARCH_TERM]. جرب أحد عمليات البحث التالية:",
+        "searching": "يبحث عن [SEARCH_TERM]...",
+        "results_label": "نتائج البحث",
+        "keyboard_navigate": "تنقل",
+        "keyboard_select": "اختيار",
+        "keyboard_clear": "امسح",
+        "keyboard_close": "إغلاق",
+        "keyboard_search": "بحث",
+        "error_search": "فشل البحث",
+        "filter_selected_one": "[COUNT] محدد",
+        "filter_selected_many": "[COUNT] محدد",
+        "input_hint": "ستظهر النتائج أثناء الكتابة",
+        "loading": "جارٍ التحميل"
+    }
+}
