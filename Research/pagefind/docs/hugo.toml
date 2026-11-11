@@ -1,0 +1,28 @@
+baseURL = 'https://pagefind.app/'
+languageCode = 'en-us'
+title = 'Pagefind'
+summaryLength = 30
+disableKinds = ["taxonomy"]
+
+[outputFormats.md]
+mediaType = "text/markdown"
+baseName = "index"
+isPlainText = true
+
+[outputs]
+home = ["HTML", "md"]
+page = ["HTML", "md"]
+section = ["HTML", "md"]
+
+[markup]
+highlight.noClasses = false
+
+[markup.tableOfContents]
+startLevel = 2
+endLevel = 3
+ordered = false
+
+[markup.goldmark.renderer]
+# ensures html inside markdown is allowed to render
+unsafe = true
+

@@ -1,0 +1,32 @@
+{
+    "thanks_to": "Maruf Alom <mail@marufalom.com>",
+    "comments": "",
+    "direction": "ltr",
+    "strings": {
+        "placeholder": "অনুসন্ধান করুন",
+        "clear_search": "মুছে ফেলুন",
+        "load_more": "আরো ফলাফল দেখুন",
+        "search_label": "এই ওয়েবসাইটে অনুসন্ধান করুন",
+        "filters_label": "ফিল্টার",
+        "zero_results": "[SEARCH_TERM] এর জন্য কিছু খুঁজে পাওয়া যায়নি",
+        "many_results": "[COUNT]-টি ফলাফল পাওয়া গিয়েছে [SEARCH_TERM] এর জন্য",
+        "one_result": "[COUNT]-টি ফলাফল পাওয়া গিয়েছে [SEARCH_TERM] এর জন্য",
+        "total_zero_results": "কোন ফলাফল নেই",
+        "total_one_result": "[COUNT]-টি ফলাফল",
+        "total_many_results": "[COUNT]-টি ফলাফল",
+        "alt_search": "কোন কিছু খুঁজে পাওয়া যায়নি [SEARCH_TERM] এর জন্য. পরিবর্তে [DIFFERENT_TERM] এর জন্য দেখানো হচ্ছে",
+        "search_suggestion": "কোন কিছু খুঁজে পাওয়া যায়নি [SEARCH_TERM] এর বিষয়ে. নিন্মের বিষয়বস্তু খুঁজে দেখুন:",
+        "searching": "অনুসন্ধান চলছে [SEARCH_TERM]...",
+        "results_label": "অনুসন্ধানের ফলাফল",
+        "keyboard_navigate": "নেভিগেট",
+        "keyboard_select": "নির্বাচন",
+        "keyboard_clear": "মুছুন",
+        "keyboard_close": "বন্ধ",
+        "keyboard_search": "অনুসন্ধান",
+        "error_search": "অনুসন্ধান ব্যর্থ",
+        "filter_selected_one": "[COUNT]-টি নির্বাচিত",
+        "filter_selected_many": "[COUNT]-টি নির্বাচিত",
+        "input_hint": "টাইপ করার সাথে সাথে ফলাফল দেখা যাবে",
+        "loading": "লোড হচ্ছে"
+    }
+}
