@@ -35,6 +35,7 @@ Luxraj-Blog/
 │   │   └── article-layout.html    # Optional shared article frame with full-width header and empty sidebar rail
 │   ├── categories/               # Category/subcategory pages and their articles
 │   ├── pages/                    # Standalone utility/legal pages, when present
+│   ├── content/                  # Public Markdown content consumed by page scripts
 │   ├── assets/                   # Shared CSS, JavaScript and images
 │   ├── sitemap.xml
 │   └── 404.html
@@ -54,6 +55,23 @@ site/assets/css/contact.css
 site/assets/js/contact.js
 documentation/Contact.md
 ```
+
+## Editor's Desk
+
+The Editor's Desk is the personal editorial column of Luxraj Kayal, Founder & Editor-in-Chief. It is implemented as an independent page module and is not part of the reusable article-author byline system. The page reads entries from one public Markdown file, sorts them by date (newest first), and updates the title, date, type, writing, image and image credit together during navigation. It uses a small built-in Markdown renderer; raw HTML in the content file is escaped.
+
+The module uses the shared topbar, main-header and footer markers. Its page-specific CSS and JavaScript load only on the Editorial page. The static-site builder copies `site/content/editorial-notes.md` to the public output as a text asset without needing a build-script change. The shared footer links to the page and its canonical URL is listed in `site/sitemap.xml`. Sample Unsplash image references are demonstration material; replace them with approved editorial imagery before publication.
+
+```text
+site/pages/editorial.html
+site/assets/css/editorial.css
+site/assets/js/editorial.js
+site/content/editorial-notes.md
+site/assets/images/editorial/editorial-default.svg
+documentation/Editorial-Desk.md
+```
+
+**Entry format:** Add new entries at the top of `editorial-notes.md`. Each entry uses ENTRY / END ENTRY markers, a date, type, title, image URL, alt text, image credit/source and Markdown body. The byline remains fixed in the page template. The accepted types are Daily, Weekly and Monthly. Blank or failed image URLs use the local fallback SVG.
 
 ## 1. Public Website — GitHub Pages
 

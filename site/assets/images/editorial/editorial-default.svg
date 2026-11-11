@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-labelledby="title description">
+  <title id="title">Luxraj Blog editorial fallback artwork</title>
+  <desc id="description">A dark editorial illustration with a crimson line motif and subtle circuit paths.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#171717"/><stop offset="1" stop-color="#262626"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#DC2626" stop-opacity=".24"/><stop offset="1" stop-color="#DC2626" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#bg)"/><rect width="800" height="1000" fill="url(#glow)"/>
+  <g fill="none" stroke="#737373" stroke-opacity=".3" stroke-width="2">
+    <path d="M-20 210h170l70 70h160M820 330H650l-70 70H430M-20 560h150l80-80h140M820 690H650l-90-90H420M180-20v150l70 70v100M620 1020V860l-75-75V650"/>
+  </g>
+  <g fill="#DC2626"><circle cx="150" cy="210" r="5"/><circle cx="400" cy="280" r="5"/><circle cx="650" cy="330" r="5"/><circle cx="130" cy="560" r="5"/><circle cx="420" cy="480" r="5"/><circle cx="650" cy="690" r="5"/></g>
+  <g transform="translate(140 265)">
+    <rect width="520" height="370" rx="10" fill="#1F1F1F" stroke="#525252" stroke-width="2"/>
+    <path d="M44 74h105l40 40h70M476 152H360l-42 42h-86M48 260h120l44-44h64" fill="none" stroke="#DC2626" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="44" cy="74" r="7" fill="#DC2626"/><circle cx="476" cy="152" r="7" fill="#DC2626"/>
+    <text x="260" y="170" fill="#FAFAFA" font-family="Georgia,serif" font-size="60" font-weight="700" letter-spacing="-3" text-anchor="middle">LUXRAJ</text>
+    <text x="260" y="215" fill="#DC2626" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="8" text-anchor="middle">EDITORIAL</text>
+    <path d="M190 250h140" stroke="#525252"/>
+  </g>
+  <text x="400" y="790" fill="#FAFAFA" font-family="Georgia,serif" font-size="30" text-anchor="middle">The Editor's Desk</text>
+  <text x="400" y="830" fill="#A3A3A3" font-family="Arial,sans-serif" font-size="15" letter-spacing="3" text-anchor="middle">A PERSPECTIVE WORTH SHARING</text>
+  <path d="M300 875h200" stroke="#DC2626" stroke-width="3"/>
+</svg>
