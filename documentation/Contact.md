@@ -1,4 +1,4 @@
-# Luxraj Blog — Contact Page
+# Luxraj Blog: Contact Page
 
 ## Status
 Implemented in the shared-site architecture. The Contact page uses the standard topbar, main navigation header and footer.
