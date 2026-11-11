@@ -1,5 +1,5 @@
 # Luxraj-Blog
-
+test before add pagefind
 this is test commit from windows pc
 
 ## CSS cleanup — pending review
