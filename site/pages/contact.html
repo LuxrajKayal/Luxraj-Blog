@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta
+    name="description"
+    content="Contact Luxraj Blog for editorial inquiries, technical support, partnerships, newsletter questions and formal correspondence."
+  >
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Contact Luxraj Blog">
+  <meta
+    property="og:description"
+    content="Find the right contact channel for Luxraj Blog, or choose your preferred email provider to compose a message."
+  >
+  <link rel="canonical" href="https://blog.luxraj.com/pages/contact.html">
+  <title>Contact Luxraj Blog</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/topbar.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/section-page.css">
+  <link rel="stylesheet" href="../assets/css/shared-h1.css">
+  <link rel="stylesheet" href="../assets/css/header.css">
+  <link rel="stylesheet" href="../assets/css/dropdowns.css">
+  <link rel="stylesheet" href="../assets/css/search.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+  <link rel="stylesheet" href="../assets/css/contact.css">
+</head>
+<body data-site-root="../" data-page-type="contact">
+  <!-- SHARED:TOPBAR -->
+  <!-- SHARED:MAIN-HEADER -->
+
+  <main class="page-shell section-page contact-page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../index.html">Home</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Contact</span>
+    </nav>
+
+    <header class="contact-hero">
+      <p class="eyebrow">CONTACT LUXRAJ BLOG</p>
+      <h1>Let's talk.</h1>
+      <p>Questions, feedback, technical issues or a new opportunity — choose the contact route that best fits your message. We'd be glad to hear from you.</p>
+    </header>
+
+    <section class="contact-composer" aria-labelledby="contact-composer-heading">
+      <div class="contact-composer__intro">
+        <p class="eyebrow">WRITE TO US</p>
+        <h2 id="contact-composer-heading">Start with the right inbox.</h2>
+        <p>Choose the Luxraj Blog contact you need, then select the email service you prefer. We'll open a new compose window with the recipient and a suggested subject already filled in.</p>
+      </div>
+
+      <div class="contact-composer__fields">
+        <div class="contact-field">
+          <label for="contact-recipient">Who would you like to contact?</label>
+          <div class="contact-field__control">
+            <select id="contact-recipient" name="recipient">
+              <option value="blog@luxraj.com" data-subject="General and editorial inquiry — Luxraj Blog">General &amp; Editorial</option>
+              <option value="support.blog@luxraj.com" data-subject="Technical support — Luxraj Blog">Technical Support</option>
+              <option value="partnerships@luxraj.com" data-subject="Partnership and advertising inquiry — Luxraj Blog">Partnerships &amp; Advertising</option>
+              <option value="newsletter@luxraj.com" data-subject="Newsletter inquiry — Luxraj Blog">Newsletter Correspondence</option>
+              <option value="iamluxy@luxraj.com" data-subject="Formal correspondence — Luxraj Blog">Owner &amp; Formal Matters</option>
+            </select>
+            <svg class="contact-field__chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="contact-field">
+          <span class="contact-field__label" id="contact-provider-label">Preferred email service</span>
+          <div class="contact-provider" data-provider-select>
+            <button
+              class="contact-provider__trigger"
+              type="button"
+              id="contact-provider-trigger"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="contact-provider-options"
+              aria-labelledby="contact-provider-label contact-provider-current"
+            >
+              <span class="contact-provider__selected-icon" data-selected-provider-icon aria-hidden="true">
+                <svg viewBox="0 0 24 18" focusable="false">
+                  <path fill="#EA4335" d="M1 3.1 3.7.9 12 7.1 20.3.9 23 3.1v13.8h-3.4V5.8L12 11.5 4.4 5.8v11.1H1z"/>
+                  <path fill="#34A853" d="M1 3.1 4.4 5.8v11.1H1z"/>
+                  <path fill="#4285F4" d="M19.6 5.8 23 3.1v13.8h-3.4z"/>
+                </svg>
+              </span>
+              <span class="contact-provider__current" id="contact-provider-current" data-selected-provider-label>Gmail</span>
+              <svg class="contact-field__chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <div
+              class="contact-provider__options"
+              id="contact-provider-options"
+              role="listbox"
+              aria-labelledby="contact-provider-label"
+              hidden
+            >
+              <div class="contact-provider__option" role="option" aria-selected="true" tabindex="-1" data-provider-option="gmail">
+                <span class="contact-provider__option-icon" data-provider-icon aria-hidden="true">
+                  <svg viewBox="0 0 24 18" focusable="false">
+                    <path fill="#EA4335" d="M1 3.1 3.7.9 12 7.1 20.3.9 23 3.1v13.8h-3.4V5.8L12 11.5 4.4 5.8v11.1H1z"/>
+                    <path fill="#34A853" d="M1 3.1 4.4 5.8v11.1H1z"/>
+                    <path fill="#4285F4" d="M19.6 5.8 23 3.1v13.8h-3.4z"/>
+                  </svg>
+                </span>
+                <span>Gmail</span>
+              </div>
+
+              <div class="contact-provider__option" role="option" aria-selected="false" tabindex="-1" data-provider-option="outlook">
+                <span class="contact-provider__option-icon" data-provider-icon aria-hidden="true">
+                  <svg viewBox="0 0 24 20" focusable="false">
+                    <path fill="#0078D4" d="M1 4.2 10.5 1v18L1 16.8z"/>
+                    <path fill="#28A8EA" d="M12 3h10v14H12z"/>
+                    <path fill="#fff" d="m12 6.1 5 3.5 5-3.5v2.4l-5 3.5-5-3.5z"/>
+                    <path fill="#185ABD" d="M1 4.2 10.5 1v18L1 16.8z"/>
+                    <path fill="#fff" d="M4.2 7.4c.7-.8 1.6-1.2 2.8-1.2s2.1.4 2.8 1.2c.7.8 1 1.8 1 3.2s-.4 2.5-1.1 3.3c-.7.8-1.6 1.2-2.8 1.2s-2.1-.4-2.8-1.2c-.7-.8-1-1.9-1-3.3s.4-2.5 1.1-3.2Zm1.4 5.2c.3.5.8.7 1.4.7s1.1-.2 1.4-.7c.3-.5.5-1.1.5-2s-.2-1.5-.5-2c-.3-.5-.8-.7-1.4-.7s-1.1.2-1.4.7c-.4.5-.5 1.2-.5 2s.2 1.5.5 2Z"/>
+                  </svg>
+                </span>
+                <span>Outlook</span>
+              </div>
+
+              <div class="contact-provider__option" role="option" aria-selected="false" tabindex="-1" data-provider-option="yahoo">
+                <span class="contact-provider__option-icon contact-provider__option-icon--yahoo" data-provider-icon aria-hidden="true">
+                  <svg viewBox="0 0 24 20" focusable="false">
+                    <path fill="#6001D2" d="M1 3h5.1l3.1 5.3L12.4 3h5.2l-6.1 9.2v5H6.8v-5z"/>
+                    <path fill="#6001D2" d="M18.7 3h4.1l-1.1 10.1h-2.8zM19 15.1h3.6v2.8H19z"/>
+                  </svg>
+                </span>
+                <span>Yahoo Mail</span>
+              </div>
+
+              <div class="contact-provider__option" role="option" aria-selected="false" tabindex="-1" data-provider-option="default">
+                <span class="contact-provider__option-icon contact-provider__option-icon--default" data-provider-icon aria-hidden="true">
+                  <svg viewBox="0 0 24 20" focusable="false">
+                    <rect x="1.5" y="2.5" width="21" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="m3 4 9 7 9-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span>Default email app</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-composer__action">
+        <button class="button-link contact-composer__proceed" type="button" data-compose-submit>
+          Proceed
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <p class="contact-composer__note">A new tab or your default email application will open. You may need to sign in to your selected service before composing.</p>
+      </div>
+      <p class="contact-feedback" data-contact-feedback role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="contact-directory" aria-labelledby="contact-directory-heading">
+      <div class="contact-section-heading">
+        <p class="eyebrow">CONTACT CHANNELS</p>
+        <h2 id="contact-directory-heading">Find the right inbox.</h2>
+        <p>Each address has a specific purpose. Choose the one that best matches your message, or copy it to use later.</p>
+      </div>
+
+      <div class="contact-directory__grid">
+        <article class="contact-card contact-card--primary">
+          <div class="contact-card__topline">
+            <span class="contact-card__category">GENERAL &amp; EDITORIAL</span>
+            <span class="contact-card__marker" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM4 6l8 7 8-7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <h3>Luxraj Blog</h3>
+          <p>For general questions, editorial feedback, article suggestions and publication-related correspondence.</p>
+          <div class="contact-card__email-row">
+            <a href="mailto:blog@luxraj.com">blog@luxraj.com</a>
+            <button class="contact-copy" type="button" data-copy-email="blog@luxraj.com" aria-label="Copy blog@luxraj.com">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span data-copy-label>Copy</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="contact-card">
+          <div class="contact-card__topline">
+            <span class="contact-card__category">TECHNICAL ASSISTANCE</span>
+            <span class="contact-card__marker" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 13v-2a8 8 0 0 1 16 0v2M4 13H3v4h4v-4H4Zm16 0h1v4h-4v-4h3ZM17 19c-.8 1.1-2.1 1.7-4 1.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <h3>Luxraj Blog Support</h3>
+          <p>For website issues, broken links, technical difficulties and help with site features.</p>
+          <div class="contact-card__email-row">
+            <a href="mailto:support.blog@luxraj.com">support.blog@luxraj.com</a>
+            <button class="contact-copy" type="button" data-copy-email="support.blog@luxraj.com" aria-label="Copy support.blog@luxraj.com">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span data-copy-label>Copy</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="contact-card">
+          <div class="contact-card__topline">
+            <span class="contact-card__category">BUSINESS INQUIRIES</span>
+            <span class="contact-card__marker" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M3 8h18v12H3zM8 8V5h8v3M3 13h18m-11-2v4h4v-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <h3>Luxraj Partnerships</h3>
+          <p>For advertising opportunities, sponsorships, brand collaborations and partnership proposals.</p>
+          <div class="contact-card__email-row">
+            <a href="mailto:partnerships@luxraj.com">partnerships@luxraj.com</a>
+            <button class="contact-copy" type="button" data-copy-email="partnerships@luxraj.com" aria-label="Copy partnerships@luxraj.com">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span data-copy-label>Copy</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="contact-card">
+          <div class="contact-card__topline">
+            <span class="contact-card__category">NEWSLETTER</span>
+            <span class="contact-card__marker" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7 8h10M7 12h10M7 16h6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </span>
+          </div>
+          <h3>Luxraj Newsletter</h3>
+          <p>For newsletter replies, subscription questions, delivery issues and reader feedback.</p>
+          <div class="contact-card__email-row">
+            <a href="mailto:newsletter@luxraj.com">newsletter@luxraj.com</a>
+            <button class="contact-copy" type="button" data-copy-email="newsletter@luxraj.com" aria-label="Copy newsletter@luxraj.com">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span data-copy-label>Copy</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="contact-card">
+          <div class="contact-card__topline">
+            <span class="contact-card__category">OWNER &amp; FORMAL MATTERS</span>
+            <span class="contact-card__marker" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 20a7 7 0 0 1 14 0M19 5l2 2m0-2-2 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <h3>Owner correspondence</h3>
+          <p>For direct owner-level correspondence and selected formal or legal matters concerning Luxraj Blog.</p>
+          <div class="contact-card__email-row">
+            <a href="mailto:iamluxy@luxraj.com">iamluxy@luxraj.com</a>
+            <button class="contact-copy" type="button" data-copy-email="iamluxy@luxraj.com" aria-label="Copy iamluxy@luxraj.com">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span data-copy-label>Copy</span>
+            </button>
+          </div>
+        </article>
+      </div>
+      <p class="contact-privacy-note">For privacy requests, please use the owner and formal correspondence address and identify your request clearly in the subject line.</p>
+    </section>
+
+    <section class="contact-social" aria-labelledby="contact-social-heading">
+      <div class="contact-section-heading">
+        <p class="eyebrow">STAY CONNECTED</p>
+        <h2 id="contact-social-heading">Find Luxraj on social media.</h2>
+        <p>Follow our official channels for publication updates and more from Luxraj.</p>
+      </div>
+      <nav class="contact-social__links" aria-label="Official Luxraj social profiles">
+        <a href="https://www.facebook.com/LuxrajOfficial/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8h3.4z"/></svg>
+          <span>Facebook</span>
+        </a>
+        <a href="https://www.instagram.com/Luxrajofficial/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.6" cy="6.7" r="1.2"/></svg>
+          <span>Instagram</span>
+        </a>
+        <a href="https://x.com/Luxraj" target="_blank" rel="noopener noreferrer" aria-label="X" title="X">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 3H22l-6.8 7.8L23.2 21h-6.3L12 14.7 6.5 21H3.3l7.3-8.4L2.8 3h6.5l4.5 5.9L18.9 3Zm-1.1 16h1.7L8.3 4.9H6.5L17.8 19Z"/></svg>
+          <span>X</span>
+        </a>
+        <a href="https://www.youtube.com/@LuxrajOfficial" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.2 7a3 3 0 0 0-2.1-2.1C19.2 4.4 12 4.4 12 4.4s-7.2 0-9.1.5A3 3 0 0 0 .8 7 31 31 0 0 0 .3 12a31 31 0 0 0 .5 5 3 3 0 0 0 2.1 2.1c1.9.5 9.1.5 9.1.5s7.2 0 9.1-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-5 31 31 0 0 0-.5-5ZM9.6 15.5v-7l6.1 3.5-6.1 3.5Z"/></svg>
+          <span>YouTube</span>
+        </a>
+        <a href="https://github.com/LuxrajKayal" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .9a11.1 11.1 0 0 0-3.5 21.6c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.5-1.3-1.3-1.6-1.3-1.6-1.1-.8.1-.8.1-.8 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.6-1.4-5.6-6.1 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.7-2.9 5.8-5.6 6.1.4.4.8 1 .8 2v3c0 .3.2.7.8.6A11.1 11.1 0 0 0 12 .9Z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </nav>
+    </section>
+  </main>
+
+  <!-- SHARED:FOOTER -->
+  <script type="module" src="../assets/js/main.js"></script>
+  <script type="module" src="../assets/js/contact.js"></script>
+</body>
+</html>
