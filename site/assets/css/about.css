@@ -30,19 +30,37 @@
 }
 
 .about-intro__slogan {
+  max-width: 100%;
   margin: 0;
   color: var(--color-text-primary);
   font-family: var(--font-ui);
-  font-size: clamp(1.15rem, 2.5vw, 1.55rem);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: -.035em;
+  font-size: clamp(1.2rem, 3.6vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -.04em;
   line-height: var(--line-height-heading);
   text-align: center;
   text-wrap: balance;
 }
 
+.about-intro__slogan.is-typing::after {
+  display: inline-block;
+  width: .075em;
+  height: .9em;
+  margin-left: .12em;
+  background: currentColor;
+  content: "";
+  vertical-align: -.08em;
+  animation: about-intro-cursor-blink .7s steps(1, end) infinite;
+}
+
 html.about-intro-active {
   overflow: hidden;
+}
+
+@keyframes about-intro-cursor-blink {
+  50% {
+    opacity: 0;
+  }
 }
 
 @keyframes about-intro-dismiss {
@@ -57,5 +75,9 @@ html.about-intro-active {
 @media (prefers-reduced-motion: reduce) {
   .about-intro {
     animation-duration: .01ms;
+  }
+
+  .about-intro__slogan.is-typing::after {
+    animation: none;
   }
 }
