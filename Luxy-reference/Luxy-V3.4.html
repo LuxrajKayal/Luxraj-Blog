@@ -1,0 +1,2396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusTech Engineering | Luxy Multi-Page Static Crawler & RAG Engine</title>
+  <style>
+    /* ==========================================================================
+       1. VISUAL DESIGN SYSTEM (STRICTLY ZERO ANIMATIONS)
+       ========================================================================== */
+    :root {
+      --bg-primary: #0D0E12;
+      --bg-surface: #14161D;
+      --bg-elevated: #1C1F2A;
+      --bg-interactive: #232736;
+      --border-color: #2B3040;
+      --border-accent: #3E455B;
+
+      /* Luxy Mascot Brand Palette */
+      --luxy-primary: #8B5CF6;
+      --luxy-secondary: #EC4899;
+      --luxy-cyan: #06B6D4;
+      --luxy-emerald: #10B981;
+      --luxy-amber: #F59E0B;
+      --luxy-crimson: #EF4444;
+
+      --text-primary: #F3F4F6;
+      --text-secondary: #D1D5DB;
+      --text-muted: #9CA3AF;
+
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    body.light-mode {
+      --bg-primary: #F8FAFC;
+      --bg-surface: #FFFFFF;
+      --bg-elevated: #F1F5F9;
+      --bg-interactive: #E2E8F0;
+      --border-color: #CBD5E1;
+      --border-accent: #94A3B8;
+      --text-primary: #0F172A;
+      --text-secondary: #1E293B;
+      --text-muted: #475569;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      animation: none !important;
+      transition: none !important;
+    }
+
+    html {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--luxy-primary); }
+
+    /* ==========================================================================
+       2. HEADER & MULTI-PAGE NAVIGATION BAR
+       ========================================================================== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.7rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .mascot-frame {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--luxy-primary), var(--luxy-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+    }
+
+    .search-launcher-bar {
+      flex: 1;
+      max-width: 460px;
+      background-color: var(--bg-interactive);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-md);
+      padding: 0.45rem 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.86rem;
+    }
+
+    .search-launcher-bar:hover {
+      border-color: var(--luxy-primary);
+      color: var(--text-primary);
+    }
+
+    .kbd-shortcut {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-accent);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background-color: var(--bg-interactive);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background-color: var(--border-accent);
+      border-color: var(--text-muted);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--luxy-primary), var(--luxy-secondary));
+      border-color: var(--luxy-primary);
+      color: #fff;
+    }
+
+    .btn-cyan {
+      background-color: rgba(6, 182, 212, 0.15);
+      border-color: var(--luxy-cyan);
+      color: var(--luxy-cyan);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.74rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: var(--luxy-emerald);
+      font-family: var(--font-mono);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--luxy-emerald);
+    }
+
+    /* Multi-Page Sub-Navbar */
+    .multipage-nav {
+      background-color: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.45rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      overflow-x: auto;
+      font-size: 0.8rem;
+    }
+
+    .nav-route-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-right: 0.4rem;
+    }
+
+    .route-link {
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      background: transparent;
+    }
+
+    .route-link:hover {
+      background-color: var(--bg-interactive);
+      border-color: var(--border-accent);
+    }
+
+    .route-link.active {
+      background-color: rgba(139, 92, 246, 0.18);
+      border-color: var(--luxy-primary);
+      color: var(--luxy-primary);
+      font-weight: 700;
+    }
+
+    /* ==========================================================================
+       3. MAIN LAYOUT, ARTICLES & MULTI-PAGE VIEWPORT
+       ========================================================================== */
+    .container {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 1.75rem 1.5rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    .site-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 1080px) {
+      .site-layout { grid-template-columns: 1fr; }
+    }
+
+    .hero-banner {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--luxy-primary);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+      color: var(--text-primary);
+    }
+
+    .hero-sub {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      max-width: 780px;
+    }
+
+    .article-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .tech-article {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.6rem;
+      position: relative;
+    }
+
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.65rem;
+      font-family: var(--font-mono);
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background: rgba(139, 92, 246, 0.16);
+      border: 1px solid var(--luxy-primary);
+      color: #C4B5FD;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    body.light-mode .tag { color: #5B21B6; }
+
+    .page-origin-pill {
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid var(--luxy-cyan);
+      color: var(--luxy-cyan);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+
+    .article-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.9rem;
+      line-height: 1.3;
+    }
+
+    .article-content h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--luxy-secondary);
+      margin: 1.2rem 0 0.45rem 0;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .article-content p {
+      color: var(--text-secondary);
+      font-size: 0.91rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .article-content ul {
+      margin: 0.4rem 0 0.9rem 1.4rem;
+      color: var(--text-secondary);
+      font-size: 0.89rem;
+    }
+
+    .code-block {
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-accent);
+      border-left: 3px solid var(--luxy-cyan);
+      border-radius: var(--radius-sm);
+      padding: 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      white-space: pre;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.8rem 0;
+      font-size: 0.82rem;
+    }
+
+    .spec-table th, .spec-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.45rem 0.7rem;
+      text-align: left;
+    }
+
+    .spec-table th {
+      background-color: var(--bg-interactive);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+    }
+
+    .spec-table td { color: var(--text-secondary); }
+
+    /* Static Target Highlight (Zero Animation) */
+    .dom-highlight-static {
+      outline: 3px solid var(--luxy-amber) !important;
+      background-color: rgba(245, 158, 11, 0.14) !important;
+      border-radius: 4px;
+    }
+
+    /* Sidebar Widgets */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .widget-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.15rem;
+    }
+
+    .widget-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .crawler-log-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      font-size: 0.76rem;
+      font-family: var(--font-mono);
+      max-height: 210px;
+      overflow-y: auto;
+    }
+
+    .crawler-log-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.35rem 0.5rem;
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+    }
+
+    .form-group { margin-bottom: 0.65rem; }
+    .form-label {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 0.2rem;
+      font-family: var(--font-mono);
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.6rem;
+      color: var(--text-primary);
+      font-size: 0.82rem;
+      font-family: var(--font-sans);
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--luxy-primary);
+    }
+
+    /* ==========================================================================
+       4. LUXY CONVERSATIONAL SEARCH & MULTI-PAGE RAG MODAL
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background-color: rgba(9, 10, 15, 0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .search-modal-container {
+      width: 100%;
+      max-width: 960px;
+      height: 86vh;
+      max-height: 780px;
+      background-color: var(--bg-surface);
+      border: 2px solid var(--border-accent);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 0.85rem 1.25rem;
+      background-color: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .modal-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .luxy-status-pill {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      background: rgba(139, 92, 246, 0.2);
+      border: 1px solid var(--luxy-primary);
+      color: #DDD6FE;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    /* Filter & Telemetry Bar inside Modal */
+    .modal-Subbar {
+      background-color: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.45rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      flex-wrap: wrap;
+    }
+
+    .scope-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .chat-messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .message-row {
+      display: flex;
+      gap: 0.85rem;
+      max-width: 94%;
+    }
+
+    .message-row.user {
+      margin-left: auto;
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      border: 1px solid var(--border-accent);
+      background-color: var(--bg-elevated);
+    }
+
+    .bot .message-avatar {
+      background: linear-gradient(135deg, var(--luxy-primary), var(--luxy-secondary));
+      border-color: var(--luxy-primary);
+    }
+
+    .message-bubble {
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.95rem 1.15rem;
+      font-size: 0.89rem;
+      line-height: 1.55;
+      color: var(--text-primary);
+      width: 100%;
+    }
+
+    .user .message-bubble {
+      background-color: rgba(139, 92, 246, 0.16);
+      border-color: var(--luxy-primary);
+      width: auto;
+    }
+
+    .telemetry-header {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.55rem;
+    }
+
+    .intent-pill {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      color: var(--luxy-amber);
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .score-pill {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      color: var(--luxy-cyan);
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .Correction-pill {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      color: var(--luxy-emerald);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    mark {
+      background-color: rgba(236, 72, 153, 0.25);
+      color: #F472B6;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+
+    body.light-mode mark { color: #9D174D; }
+
+    .secondary-synthesis-box {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      background-color: var(--bg-surface);
+      border-left: 3px solid var(--luxy-primary);
+      border-radius: var(--radius-sm);
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+    }
+
+    .sources-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.8rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-accent);
+      color: var(--luxy-cyan);
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 0.73rem;
+      font-family: var(--font-mono);
+      cursor: pointer;
+    }
+
+    .source-pill:hover {
+      background-color: var(--luxy-primary);
+      color: #fff;
+      border-color: var(--luxy-primary);
+    }
+
+    .followups-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.7rem;
+    }
+
+    .followup-chip {
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-accent);
+      color: var(--text-muted);
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.77rem;
+      cursor: pointer;
+    }
+
+    .followup-chip:hover {
+      color: var(--text-primary);
+      border-color: var(--luxy-secondary);
+    }
+
+    .modal-footer {
+      padding: 0.85rem 1.25rem;
+      background-color: var(--bg-elevated);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .quick-prompts {
+      display: flex;
+      gap: 0.45rem;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .prompt-tag {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      white-space: nowrap;
+      cursor: pointer;
+      font-family: var(--font-mono);
+    }
+
+    .prompt-tag:hover {
+      border-color: var(--luxy-primary);
+      color: var(--text-primary);
+    }
+
+    .search-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-md);
+      padding: 0.35rem 0.6rem;
+    }
+
+    .search-input-wrapper:focus-within {
+      border-color: var(--luxy-primary);
+    }
+
+    .modal-search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      padding: 0.35rem;
+      outline: none;
+      font-family: var(--font-sans);
+    }
+
+    /* Floating Launcher Button (Static) */
+    .floating-search-fab {
+      position: fixed;
+      bottom: 1.75rem;
+      right: 1.75rem;
+      z-index: 50;
+      height: 54px;
+      padding: 0 1.1rem;
+      border-radius: 27px;
+      background: linear-gradient(135deg, var(--luxy-primary), var(--luxy-secondary));
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      font-size: 0.86rem;
+    }
+
+    .fab-badge {
+      background-color: var(--bg-primary);
+      color: var(--luxy-cyan);
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 2px 7px;
+      border-radius: 10px;
+      border: 1px solid var(--luxy-cyan);
+    }
+
+    /* Toast Notification (Instant Static Display) */
+    .toast {
+      position: fixed;
+      bottom: 1.75rem;
+      left: 1.75rem;
+      background-color: var(--bg-elevated);
+      border: 2px solid var(--luxy-primary);
+      color: var(--text-primary);
+      padding: 0.6rem 1.1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      z-index: 250;
+      display: none;
+    }
+
+    .toast.show { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       HEADER BAR WITH LUXY STATIC SVG MASCOT
+       ========================================================================== -->
+  <header class="app-header">
+    <a href="#" class="brand-logo" onclick="switchActivePageRoute('index.html'); return false;">
+      <div class="mascot-frame" id="header-mascot-icon"></div>
+      <div>
+        <span>LUXY</span>
+        <span style="color: var(--luxy-cyan); font-weight: 400; font-size: 0.9rem;">Multi-Page Spider</span>
+      </div>
+    </a>
+
+    <div class="search-launcher-bar" onclick="openSearchModal()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <span>Ask Luxy across all crawled pages (supports tag:, page:, has:code)...</span>
+      <span class="kbd-shortcut">Ctrl K</span>
+    </div>
+
+    <div class="header-controls">
+      <div class="status-badge" title="Multi-Page Index Status">
+        <span class="status-dot"></span>
+        <span id="indexed-count-label">0 Pages • 0 Chunks</span>
+      </div>
+      <button class="btn btn-cyan" onclick="runFullMultiPageCrawl()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>
+        Spider All Pages
+      </button>
+      <button class="btn" onclick="openExtractorModal()">Extract Code</button>
+      <button class="btn" onclick="toggleTheme()">Theme</button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MULTI-PAGE SITE ROUTE SWITCHER (HOST DOM + VIRTUAL CRAWLED PAGES)
+       ========================================================================== -->
+  <nav class="multipage-nav" id="multipage-route-bar">
+    <span class="nav-route-label">Site Pages:</span>
+    <a href="index.html" class="route-link active" data-route="index.html" onclick="switchActivePageRoute('index.html'); return false;">
+      /index.html (Host DOM - 5 Articles)
+    </a>
+    <a href="/docs/risc-v-vector.html" class="route-link" data-route="/docs/risc-v-vector.html" onclick="switchActivePageRoute('/docs/risc-v-vector.html'); return false;">
+      /docs/risc-v-vector.html
+    </a>
+    <a href="/docs/fpga-timing.html" class="route-link" data-route="/docs/fpga-timing.html" onclick="switchActivePageRoute('/docs/fpga-timing.html'); return false;">
+      /docs/fpga-timing.html
+    </a>
+    <a href="/docs/can-fd-bus.html" class="route-link" data-route="/docs/can-fd-bus.html" onclick="switchActivePageRoute('/docs/can-fd-bus.html'); return false;">
+      /docs/can-fd-bus.html
+    </a>
+    <a href="/docs/usb-pd-controller.html" class="route-link" data-route="/docs/usb-pd-controller.html" onclick="switchActivePageRoute('/docs/usb-pd-controller.html'); return false;">
+      /docs/usb-pd-controller.html
+    </a>
+  </nav>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <div class="container">
+    <div class="hero-banner">
+      <div>
+        <h1 class="hero-title" id="current-page-banner-title">Host Page (/index.html): Hardware & Systems Engineering Archives</h1>
+        <p class="hero-sub" id="current-page-banner-sub">
+          Luxy crawls both the active DOM and linked multi-page HTML routes using BFS link discovery, DOMParser extraction, and field-weighted BM25+ indexing.
+        </p>
+      </div>
+      <div style="text-align: right; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted);">
+        <div>ACTIVE ROUTE: <strong style="color: var(--luxy-cyan);" id="active-route-indicator">index.html</strong></div>
+        <div>ENGINE: <strong style="color: var(--luxy-primary);">LUXY-RAG v3.4</strong></div>
+      </div>
+    </div>
+
+    <div class="site-layout">
+      <!-- Primary Article Viewport -->
+      <main class="article-feed" id="article-feed">
+
+        <!-- HOST ARTICLE 1 -->
+        <article class="tech-article" id="art-esp32" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Embedded Systems</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: OCT 14, 2026 • BY ALEX MERCER</span>
+          </div>
+          <h1 class="article-title">Low-Power ESP32 Telemetry & Custom PCB Routing</h1>
+          <div class="article-content">
+            <h2 id="esp32-deep-sleep">Deep Sleep Power Optimization & Current Draw</h2>
+            <p>Achieving ultra-low current consumption in ESP32 edge telemetry nodes requires disabling unused peripherals before invoking deep sleep. In standard deep sleep mode, the main CPU core, Wi-Fi radio, and Bluetooth baseband are completely powered down, leaving only the Real-Time Clock (RTC) controller and RTC fast memory active.</p>
+            <p>With proper power domain configuration, current consumption drops from 240mA during Wi-Fi transmission down to approximately <strong>10µA to 15µA in deep sleep</strong>. Configure timer wake-up programmatically:</p>
+            <div class="code-block">// ESP-IDF Deep Sleep Configuration
+esp_sleep_enable_timer_wakeup(SLEEP_DURATION_SEC * 1000000ULL);
+gpio_deep_sleep_hold_dis(); // Release GPIO pins to prevent leakage
+esp_deep_sleep_start();</div>
+
+            <h2 id="esp32-ldo-power">Custom LDO Selection & Power Gating</h2>
+            <p>Standard linear regulators like the AMS1117 feature a high quiescent current (~5mA), rendering them unsuitable for battery-powered IoT nodes. Instead, design with ultra-low quiescent current (Iq) LDO regulators such as the Texas Instruments TPS7A02, which exhibits an Iq of only 25nA.</p>
+
+            <h2 id="esp32-rf-trace">RF Trace Impedance Matching (50Ω Coplanar Waveguide)</h2>
+            <p>When routing the 2.4GHz Wi-Fi RF trace between the ESP32 chip and the PCB antenna, maintain strict 50-ohm characteristic impedance. Utilize a Grounded Coplanar Waveguide (GCPW) layout with continuous ground plane shielding on Layer 2 and ground stitching vias placed every λ/20 along the RF path.</p>
+
+            <h2 id="esp32-i2c-polling">I2C Sensor Polling Architecture</h2>
+            <p>To minimize energy spent per telemetry burst, poll environmental sensors (such as BME280 or MPU6050) over I2C operating at 400kHz Fast Mode. Read sensor data into RTC memory, evaluate threshold triggers, and immediately return to deep sleep if no critical delta is detected.</p>
+          </div>
+        </article>
+
+        <!-- HOST ARTICLE 2 -->
+        <article class="tech-article" id="art-class-d" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Audio Engineering</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: NOV 02, 2026 • BY DR. HELENA VANCE</span>
+          </div>
+          <h1 class="article-title">Class-D 2.1 Audio Amplifier Architecture & Filter Design</h1>
+          <div class="article-content">
+            <h2 id="classd-pwm-switching">High-Frequency PWM Modulation Strategy</h2>
+            <p>Class-D audio amplifiers operate output MOSFETs in switching states (fully ON or fully OFF), yielding efficiency ratings exceeding 90%. Switching frequencies typically range between 300kHz and 1.2MHz, pushing switching noise far above the 20Hz–20kHz audible spectrum.</p>
+
+            <h2 id="classd-lc-filter">LC Reconstruction Filter Inductor & Capacitor Calculation</h2>
+            <p>To convert the high-frequency PWM pulse train back into a clean analog acoustic waveform, a 2nd-order Butterworth LC low-pass filter must be placed at the output stage. The resonant cutoff frequency Fc is determined by:</p>
+            <div class="code-block">Fc = 1 / (2 * π * sqrt(L * C))
+For a 4-ohm speaker load and Fc = 30kHz:
+Inductor (L) = 10µH (Shielded ferrite core, saturation current > 15A)
+Capacitor (C) = 0.68µF (Film capacitor, Metalized Polypropylene)</div>
+
+            <h2 id="classd-subwoofer-crossover">Active Subwoofer Crossover at 80Hz</h2>
+            <p>In a 2.1 channel system, the subwoofer low-pass crossover is set at 80Hz using a 4th-order Linkwitz-Riley active filter topology, providing a flat amplitude response across the crossover region with a steep 24dB/octave attenuation slope.</p>
+
+            <h2 id="classd-thermal-dissipation">Thermal Dissipation & Copper Pour Heatsinking</h2>
+            <p>High-power peaks (e.g., 200W RMS into subwoofer) generate heat concentrated within the power stage IC. Utilize 2oz copper PCB layers with an array of thermal vias (0.3mm diameter, 0.8mm pitch) directly under the exposed thermal pad connecting to the bottom ground plane.</p>
+          </div>
+        </article>
+
+        <!-- HOST ARTICLE 3 -->
+        <article class="tech-article" id="art-multimeter" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Analog Circuits</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: NOV 19, 2026 • BY MARCUS THORN</span>
+          </div>
+          <h1 class="article-title">Digital Multimeter Protection & Circuit Sandbox Design</h1>
+          <div class="article-content">
+            <h2 id="dmm-overvoltage">Overvoltage Input Protection (PTC & MOV Clamping)</h2>
+            <p>Industrial digital multimeters (DMMs) rated for CAT III 1000V / CAT IV 600V safety standards must withstand high-voltage transient spikes without rupturing. Protection circuits utilize Positive Temperature Coefficient (PTC) thermistors in series and Metal Oxide Varistors (MOVs) in parallel.</p>
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th>Protection Component</th>
+                  <th>Primary Function</th>
+                  <th>Typical Rating / Parameter</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>PTC Thermistor</td>
+                  <td>Current Limiting / Self-Resetting Fuse</td>
+                  <td>1000V Hold Current 10mA, Cold Resistance 1kΩ</td>
+                </tr>
+                <tr>
+                  <td>Metal Oxide Varistor (MOV)</td>
+                  <td>High-Energy Voltage Clamping</td>
+                  <td>Varistor Voltage 1100V, Surge Energy >70J</td>
+                </tr>
+                <tr>
+                  <td>High-Energy HRC Fuse</td>
+                  <td>Short-Circuit Fault Interrupt</td>
+                  <td>1000V / 11A, 10kA Interrupt Capacity</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2 id="dmm-input-impedance">10MΩ High-Impedance Attenuator Network</h2>
+            <p>To avoid loading delicate active circuits during voltage measurements, DMM inputs feature a precise 10MΩ input impedance divider network built from 0.1% tolerance thin-film resistor arrays.</p>
+
+            <h2 id="dmm-nodal-solver">Kirchhoff Nodal Analysis Solver Engine</h2>
+            <p>Interactive circuit sandbox software implements Modified Nodal Analysis (MNA) to solve circuit equations dynamically using matrix <strong>[G][V] = [I]</strong>, where G represents conductances, V is unknown node voltages, and I is independent current sources.</p>
+          </div>
+        </article>
+
+        <!-- HOST ARTICLE 4 -->
+        <article class="tech-article" id="art-vector-anim" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Graphics & Vision</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: DEC 04, 2026 • BY SOPHIA CHEN</span>
+          </div>
+          <h1 class="article-title">Automated 2D Vector Animation & Rotoscoping Pipeline</h1>
+          <div class="article-content">
+            <h2 id="vec-opencv-edges">OpenCV Frame Difference Edge Detection</h2>
+            <p>Automated vector rotoscoping extracts high-contrast contours from raw video frames. Sequential frames are converted to grayscale, smoothed with a 5x5 Gaussian Blur, and processed via Canny edge detection:</p>
+            <div class="code-block">gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+edges = cv2.Canny(blurred, threshold1=50, threshold2=150)
+contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</div>
+
+            <h2 id="vec-vtracer-simplification">VTracer Path Simplification & Bézier Fitting</h2>
+            <p>Pixel-based raster edges are converted to smooth vector paths using Douglas-Peucker polygon simplification followed by cubic Bézier curve fitting to minimize SVG node count.</p>
+          </div>
+        </article>
+
+        <!-- HOST ARTICLE 5 -->
+        <article class="tech-article" id="art-rag-architecture" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Web Architecture</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: JAN 10, 2027 • BY BENJAMIN ROTH</span>
+          </div>
+          <h1 class="article-title">Zero-Backend Static Site Architecture & Client-Side Crawling</h1>
+          <div class="article-content">
+            <h2 id="rag-dom-indexing">Multi-Page Client-Side Crawling & DOMParser Retrieval</h2>
+            <p>Modern client-side engines execute 100% inside the browser without backend server overhead. The multi-page spider discovers internal links via <code>a[href]</code> and parses external HTML documents in memory using <code>fetch()</code> and <code>new DOMParser().parseFromString(html, 'text/html')</code>.</p>
+
+            <h2 id="rag-bm25-ranking">BM25+ Lexical Ranking & Proximity Boosting</h2>
+            <p>To rank document chunks across multiple pages, Luxy implements Okapi BM25 with field weights, bi-gram proximity scoring, Porter-lite stemming, and Levenshtein fuzzy typo correction:</p>
+            <div class="code-block">score(D, Q) = ∑ IDF(q) * ((tf * (k1 + 1)) / (tf + k1 * (1 - b + b * (dl / avgdl)))) + ProximityBoost</div>
+          </div>
+        </article>
+
+      </main>
+
+      <!-- Sidebar Controls: Multi-Page Spider Status & Custom Page Injection -->
+      <aside class="sidebar">
+
+        <!-- Multi-Page Crawler Telemetry Widget -->
+        <div class="widget-card">
+          <h3 class="widget-title">
+            <span>Multi-Page Spider Queue</span>
+            <span style="font-size: 0.72rem; color: var(--luxy-cyan); font-family: var(--font-mono);" id="spider-depth-badge">MAX DEPTH: 2</span>
+          </h3>
+          <ul class="crawler-log-list" id="crawler-log-list"></ul>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.4rem;">
+            <input type="text" id="custom-crawl-url" class="form-input" placeholder="Crawl URL (e.g. /docs/fpga-timing.html)">
+            <button class="btn btn-primary" onclick="crawlSingleUrlFromInput()">Spider</button>
+          </div>
+        </div>
+
+        <!-- Add Custom Multi-Page or Host Section -->
+        <div class="widget-card">
+          <h3 class="widget-title">Inject New Page / Section</h3>
+          <div class="form-group">
+            <label class="form-label">TARGET PAGE ROUTE</label>
+            <select id="new-page-route" class="form-select">
+              <option value="index.html">index.html (Current Host DOM)</option>
+              <option value="/docs/risc-v-vector.html">/docs/risc-v-vector.html</option>
+              <option value="/docs/fpga-timing.html">/docs/fpga-timing.html</option>
+              <option value="/docs/can-fd-bus.html">/docs/can-fd-bus.html</option>
+              <option value="/docs/usb-pd-controller.html">/docs/usb-pd-controller.html</option>
+              <option value="/docs/custom-node.html">/docs/custom-node.html (Create New Page)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ARTICLE TITLE & TAG</label>
+            <input type="text" id="new-title" class="form-input" placeholder="e.g. GaN Half-Bridge Motor Driver">
+          </div>
+          <div class="form-group">
+            <label class="form-label">SECTION HEADING (H2)</label>
+            <input type="text" id="new-heading" class="form-input" placeholder="e.g. Dead-Time Shoot-Through Prevention">
+          </div>
+          <div class="form-group">
+            <label class="form-label">TECHNICAL CONTENT</label>
+            <textarea id="new-content" class="form-textarea" rows="3" placeholder="Enter specs, formulas, or protocols..."></textarea>
+          </div>
+          <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="injectCustomPageContent()">
+            Publish & Re-Spider Site
+          </button>
+        </div>
+
+        <!-- Index Export / Persistence -->
+        <div class="widget-card">
+          <h3 class="widget-title">Multi-Page Index Storage</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.45rem;">
+            <button class="btn" style="width: 100%; justify-content: center;" onclick="siteCrawler.exportIndexJSON()">
+              Export Multi-Page Index (.json)
+            </button>
+            <button class="btn" style="width: 100%; justify-content: center;" onclick="clearAndRebuildCache()">
+              Purge Cache & Cold Re-Crawl
+            </button>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- FLOATING LAUNCHER (LUXY MASCOT) -->
+  <button class="floating-search-fab" onclick="openSearchModal()">
+    <span id="fab-mascot-holder" style="display:flex; align-items:center;"></span>
+    <span>Ask Luxy</span>
+    <span class="fab-badge" id="fab-chunk-count">0</span>
+  </button>
+
+  <!-- ==========================================================================
+       LUXY CONVERSATIONAL MULTI-PAGE MODAL
+       ========================================================================== -->
+  <div class="modal-backdrop" id="search-modal-backdrop" onclick="if(event.target.id==='search-modal-backdrop') closeSearchModal()">
+    <div class="search-modal-container">
+
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="mascot-frame" id="modal-mascot-avatar" style="width: 42px; height: 42px;"></div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-weight: 800; font-size: 1rem;">Luxy — Multi-Page Technical Mascot</span>
+              <span class="luxy-status-pill" id="luxy-mood-label">STATE: READY</span>
+            </div>
+            <div style="font-size: 0.73rem; color: var(--text-muted); font-family: var(--font-mono);">
+              BM25+ Proximity • Cross-Page Synthesis • Typo & Synonym Graph • Zero-Animation Static UI
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.45rem;">
+          <button class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.74rem;" onclick="clearChatHistory()">Clear Chat</button>
+          <button class="btn" style="padding: 0.3rem 0.65rem;" onclick="closeSearchModal()">✕</button>
+        </div>
+      </div>
+
+      <!-- Scope & Operator Helper Bar -->
+      <div class="modal-Subbar">
+        <div class="scope-selector">
+          <span>PAGE SCOPE:</span>
+          <select id="search-page-scope" class="form-select" style="width: auto; padding: 2px 6px; font-size: 0.74rem;">
+            <option value="ALL">All Crawled Pages (Global Site)</option>
+            <option value="index.html">index.html only</option>
+            <option value="/docs/risc-v-vector.html">/docs/risc-v-vector.html</option>
+            <option value="/docs/fpga-timing.html">/docs/fpga-timing.html</option>
+            <option value="/docs/can-fd-bus.html">/docs/can-fd-bus.html</option>
+            <option value="/docs/usb-pd-controller.html">/docs/usb-pd-controller.html</option>
+          </select>
+        </div>
+        <div style="color: var(--text-muted);">
+          Operators: <code>"exact phrase"</code> | <code>-exclude</code> | <code>tag:fpga</code> | <code>has:table</code> | <code>has:code</code>
+        </div>
+      </div>
+
+      <!-- Chat Feed -->
+      <div class="chat-messages-container" id="chat-messages"></div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <div class="quick-prompts">
+          <span class="prompt-tag" onclick="runQuickPrompt('What is ESP32 deep sleep current draw?')">⚡ ESP32 sleep current</span>
+          <span class="prompt-tag" onclick="runQuickPrompt('How do RISC-V vector registers handle strip-mining?')">🧮 RISC-V strip-mining (External Page)</span>
+          <span class="prompt-tag" onclick="runQuickPrompt('FPGA setup and hold time violation fixes has:table')">⏱️ FPGA timing table (External Page)</span>
+          <span class="prompt-tag" onclick="runQuickPrompt('CAN-FD arbitration vs data phase bit rate')">🚗 CAN-FD bit rates (External Page)</span>
+          <span class="prompt-tag" onclick="runQuickPrompt('USB-PD 240W Extended Power Range EPR negotiation')">🔌 USB-PD 240W EPR (External Page)</span>
+          <span class="prompt-tag" onclick="runQuickPrompt('has:table protection')">🛡️ Query Operator: has:table</span>
+        </div>
+
+        <div class="search-input-wrapper">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--luxy-primary);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="chat-input" class="modal-search-input" placeholder="Ask Luxy anything across all crawled pages (typos & operators supported)..." onkeydown="if(event.key==='Enter') sendSearchQuery()">
+          <button class="btn btn-primary" onclick="sendSearchQuery()">Ask Luxy</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODULAR CODE EXTRACTOR MODAL
+       ========================================================================== -->
+  <div class="modal-backdrop" id="extractor-modal-backdrop" onclick="if(event.target.id==='extractor-modal-backdrop') closeExtractorModal()">
+    <div class="search-modal-container" style="max-width: 860px; height: 78vh;">
+      <div class="modal-header">
+        <div style="font-weight: 700;">Luxy Multi-Page Crawler — Standalone Code Extractor</div>
+        <button class="btn" onclick="closeExtractorModal()">✕</button>
+      </div>
+      <div style="padding: 1rem; flex: 1; display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-primary" onclick="switchCodeTab('crawler')">luxy-multipage-spider.js</button>
+          <button class="btn" onclick="switchCodeTab('rag')">luxy-bm25-rag.js</button>
+        </div>
+        <textarea id="code-display-area" class="code-block" style="flex: 1; width: 100%; margin: 0; resize: none;" readonly></textarea>
+      </div>
+      <div style="padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-primary" onclick="copyExtractedCode()">Copy Module Code</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast-message">Status Normal</div>
+
+  <!-- ==========================================================================
+       5. LUXY MULTI-PAGE SPIDER, BM25+ ENGINE & STATIC SVG MASCOT CONTROLLER
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       PART A: LUXY STATIC SVG MASCOT GENERATOR (ZERO ANIMATIONS, MOOD STATES)
+       ========================================================================== */
+    const LuxyMascotSVG = {
+      render(mood = 'default') {
+        // Distinct static eye/visor geometries per engineering state
+        let eyesSvg = '';
+        let badgeColor = '#06B6D4';
+
+        if (mood === 'spec' || mood === 'analytical') {
+          // Cybernetic HUD monocle & precision visor
+          badgeColor = '#F59E0B';
+          eyesSvg = `
+            <rect x="19" y="26" width="9" height="5" rx="1" fill="#06B6D4"/>
+            <circle cx="39" cy="28" r="5" fill="none" stroke="#F59E0B" stroke-width="2"/>
+            <circle cx="39" cy="28" r="2" fill="#F59E0B"/>
+          `;
+        } else if (mood === 'code' || mood === 'procedural') {
+          // Terminal bracket eyes > <
+          badgeColor = '#10B981';
+          eyesSvg = `
+            <path d="M19 25 L25 28 L19 31" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M43 25 L37 28 L43 31" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
+          `;
+        } else if (mood === 'fallback') {
+          // Diagnostic warning state
+          badgeColor = '#EF4444';
+          eyesSvg = `
+            <circle cx="23" cy="28" r="3.5" fill="#F59E0B"/>
+            <circle cx="39" cy="28" r="3.5" fill="#F59E0B"/>
+            <line x1="20" y1="22" x2="27" y2="24" stroke="#EF4444" stroke-width="2"/>
+            <line x1="42" y1="22" x2="35" y2="24" stroke="#EF4444" stroke-width="2"/>
+          `;
+        } else {
+          // Default alert cyber-fox eyes
+          eyesSvg = `
+            <ellipse cx="23" cy="28" rx="3.5" ry="4" fill="#06B6D4"/>
+            <ellipse cx="39" cy="28" rx="3.5" ry="4" fill="#06B6D4"/>
+            <circle cx="24" cy="26.5" r="1.2" fill="#FFFFFF"/>
+            <circle cx="40" cy="26.5" r="1.2" fill="#FFFFFF"/>
+          `;
+        }
+
+        return `
+          <svg viewBox="0 0 62 62" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <!-- Fox Ears -->
+            <polygon points="10,24 14,6 27,16" fill="#1F2437" stroke="#EC4899" stroke-width="2"/>
+            <polygon points="52,24 48,6 35,16" fill="#1F2437" stroke="#06B6D4" stroke-width="2"/>
+            <!-- Main Cyber Head Shield -->
+            <polygon points="10,22 31,13 52,22 48,44 31,54 14,44" fill="#14161D" stroke="#8B5CF6" stroke-width="2.2"/>
+            <!-- Dark Visor Plate -->
+            <polygon points="15,23 31,19 47,23 44,35 31,38 18,35" fill="#090A0F" stroke="${badgeColor}" stroke-width="1.2"/>
+            <!-- Dynamic Static Eyes -->
+            ${eyesSvg}
+            <!-- Cyber Snout Node -->
+            <polygon points="28,41 34,41 31,45" fill="#EC4899"/>
+            <!-- Cheek Circuit Traces -->
+            <line x1="14" y1="38" x2="21" y2="40" stroke="#8B5CF6" stroke-width="1.5"/>
+            <line x1="48" y1="38" x2="41" y2="40" stroke="#06B6D4" stroke-width="1.5"/>
+          </svg>
+        `;
+      }
+    };
+
+    /* ==========================================================================
+       PART B: VIRTUAL MULTI-PAGE STATIC FILESYSTEM (FOR LOCAL / SELF-CONTAINED SPIDERING)
+       ========================================================================== */
+    const VIRTUAL_STATIC_PAGES = {
+      '/docs/risc-v-vector.html': `
+        <!DOCTYPE html><html><head><title>RISC-V Vector Extension (RVV 1.0) Architecture</title></head><body>
+          <nav><a href="index.html">Home</a><a href="/docs/fpga-timing.html">FPGA Timing</a></nav>
+          <article id="art-riscv" data-crawlable="true">
+            <div class="article-meta"><span class="tag">Computer Architecture</span><span>PUBLISHED: FEB 02, 2027 • BY DR. KENJI SATO</span></div>
+            <h1 class="article-title">RISC-V Vector Extension (RVV 1.0) & Strip-Mining</h1>
+            <div class="article-content">
+              <h2 id="rvv-registers">Vector Length Agnostic (VLA) Register File (v0–v31)</h2>
+              <p>Unlike fixed-width SIMD architectures (such as x86 AVX-512), the RISC-V Vector Extension (RVV 1.0) utilizes Vector Length Agnostic (VLA) programming. The hardware implementation defines 32 vector registers (<code>v0</code> through <code>v31</code>) with a hardware bit-length parameter <strong>VLEN</strong> ranging from 128 bits up to 65,536 bits.</p>
+              <p>Register grouping (<strong>LMUL</strong>) allows combining up to 8 adjacent vector registers into a single logical vector operand, maximizing arithmetic intensity during matrix-multiply workloads.</p>
+
+              <h2 id="rvv-strip-mining">Hardware Strip-Mining Loop & vsetvli Instruction</h2>
+              <p>Strip-mining in RVV eliminates manual scalar tail-loop cleanup code. The <code>vsetvli</code> instruction dynamically computes the active vector length (<code>vl</code>) based on remaining application elements (<code>AVL</code>) and the Selected Element Width (<code>SEW</code>):</p>
+              <div class="code-block">// RVV 1.0 Vector SAXPY Strip-Mining Assembly Loop
+loop_saxpy:
+  vsetvli t0, a0, e32, m4, ta, ma  // Set vl (t0) for 32-bit floats, LMUL=4
+  vle32.v v4, (a1)                 // Vector load X[]
+  vle32.v v8, (a2)                 // Vector load Y[]
+  vfmacc.vf v8, fa0, v4            // Y[i] = (a * X[i]) + Y[i]
+  vse32.v v8, (a2)                 // Vector store Y[]
+  sub a0, a0, t0                   // Decrement remaining count
+  sh2add a1, t0, a1                // Advance pointer X by t0 * 4 bytes
+  sh2add a2, t0, a2                // Advance pointer Y by t0 * 4 bytes
+  bnez a0, loop_saxpy</div>
+            </div>
+          </article>
+        </body></html>
+      `,
+      '/docs/fpga-timing.html': `
+        <!DOCTYPE html><html><head><title>FPGA Static Timing Analysis & Clock Domain Crossing</title></head><body>
+          <nav><a href="index.html">Home</a><a href="/docs/can-fd-bus.html">CAN-FD Bus</a></nav>
+          <article id="art-fpga" data-crawlable="true">
+            <div class="article-meta"><span class="tag">FPGA & RTL</span><span>PUBLISHED: FEB 14, 2027 • BY CLAIRE VANDENBERG</span></div>
+            <h1 class="article-title">FPGA Static Timing Closure, Setup/Hold Slack & CDC</h1>
+            <div class="article-content">
+              <h2 id="fpga-setup-hold">Setup Time & Hold Time Slack Equations</h2>
+              <p>Closing timing on high-speed Xilinx UltraScale+ or Intel Agilex FPGAs at 400MHz+ requires positive Worst Negative Slack (WNS) and Total Negative Slack (TNS) across all synchronous register-to-register paths. Setup slack ensures data arrives before the capture clock edge, while hold slack prevents data corruption from fast paths:</p>
+              <table class="spec-table">
+                <thead>
+                  <tr><th>Timing Metric</th><th>Governing Inequality</th><th>Primary Mitigation Strategy</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Setup Slack (WNS)</td><td>T_clk + T_skew ≥ T_cq + T_logic + T_route + T_setup</td><td>Pipeline combinational LUT chains, retiming, floorplan Pblocks</td></tr>
+                  <tr><td>Hold Slack (WHS)</td><td>T_cq + T_logic + T_route ≥ T_hold + T_skew</td><td>Insert routing delay buffers (automated by router), fix clock skew</td></tr>
+                  <tr><td>Clock-to-Out (T_co)</td><td>Pad delay budget ≤ System I/O margin</td><td>Pack registers into dedicated IOB (Input/Output Block) flip-flops</td></tr>
+                </tbody>
+              </table>
+
+              <h2 id="fpga-cdc-fifo">Clock Domain Crossing (CDC) & Gray-Code Asynchronous FIFOs</h2>
+              <p>Transferring multi-bit buses across unrelated asynchronous clock domains causes metastability if synchronized via simple 2-FF synchronizers. Multi-bit pointers in an Asynchronous FIFO must be encoded in <strong>Gray Code</strong> (where only 1 bit transitions per increment) before crossing clock domains.</p>
+            </div>
+          </article>
+        </body></html>
+      `,
+      '/docs/can-fd-bus.html': `
+        <!DOCTYPE html><html><head><title>Automotive CAN-FD Bus Arbitration & Transceiver Termination</title></head><body>
+          <nav><a href="index.html">Home</a><a href="/docs/usb-pd-controller.html">USB-PD 3.1</a></nav>
+          <article id="art-canfd" data-crawlable="true">
+            <div class="article-meta"><span class="tag">Automotive Networks</span><span>PUBLISHED: FEB 21, 2027 • BY DIETER KRAUSE</span></div>
+            <h1 class="article-title">CAN-FD Protocol Bit-Rate Switching & Split Termination</h1>
+            <div class="article-content">
+              <h2 id="canfd-bitrate">Arbitration Phase (1Mbps) vs. Data Phase (5Mbps–8Mbps)</h2>
+              <p>Controller Area Network Flexible Data-Rate (CAN-FD, ISO 11898-1) overcomes classic CAN's 8-byte payload and 1Mbps speed limit. During the arbitration phase, all nodes communicate at up to <strong>1Mbps</strong> to accommodate bus propagation delay. Once the winning node asserts the <strong>BRS (Bit Rate Switch)</strong> recessive bit, the clock prescaler shifts to the fast Data Phase at <strong>5Mbps to 8Mbps</strong>, carrying up to <strong>64 bytes</strong> per frame.</p>
+
+              <h2 id="canfd-split-termination">120Ω Split Termination & Common-Mode Choke Filtering</h2>
+              <p>To suppress common-mode electromagnetic emissions on differential CANH/CANL twisted pairs, split termination divides the standard 120-ohm termination resistor into two <strong>60Ω resistors</strong> in series, with a <strong>4.7nF capacitor</strong> tied from their center tap to chassis ground.</p>
+            </div>
+          </article>
+        </body></html>
+      `,
+      '/docs/usb-pd-controller.html': `
+        <!DOCTYPE html><html><head><title>USB-C Power Delivery 3.1 (240W EPR) Firmware Architecture</title></head><body>
+          <nav><a href="index.html">Home</a></nav>
+          <article id="art-usbpd" data-crawlable="true">
+            <div class="article-meta"><span class="tag">Power Electronics</span><span>PUBLISHED: MAR 01, 2027 • BY PRIYA NAIR</span></div>
+            <h1 class="article-title">USB-PD 3.1 Extended Power Range (240W EPR) & BMC Encoding</h1>
+            <div class="article-content">
+              <h2 id="usbpd-epr-240w">240W Extended Power Range (48V @ 5A) & AVS Negotiation</h2>
+              <p>USB Power Delivery 3.1 expands the legacy 100W (20V @ 5A) Standard Power Range (SPR) up to <strong>240W Extended Power Range (EPR)</strong> using fixed voltage steps of 28V, 36V, and <strong>48V at 5A</strong>. It also introduces Adjustable Voltage Supply (AVS), allowing the sink microcontroller to request fine 100mV increments between 15V and 48V.</p>
+              <div class="code-block">// USB-PD 3.1 EPR Source_Capabilities PDO Bitfield (48V / 5A)
+uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
+                       ((48000 / 50) << 10)  | // Voltage in 50mV units (960)
+                       (5000 / 10);            // Max Current in 10mA units (500)</div>
+
+              <h2 id="usbpd-cc-bmc">CC Pin Biphase Mark Coding (BMC) & E-Marker Sniffing</h2>
+              <p>PD protocol messages are transmitted across the Configuration Channel (CC1/CC2) wire at 300kbps using Biphase Mark Coding (BMC). Before entering 240W EPR mode, the source controller must query the cable's integrated Electronic Marker (E-Marker) IC via SOP' packets to verify 50V/5A rating and arc-mitigation compliance.</p>
+            </div>
+          </article>
+        </body></html>
+      `
+    };
+
+    /* ==========================================================================
+       PART C: PORTER-LITE STEMMER & LEVENSHTEIN DISTANCE UTILITIES
+       ========================================================================== */
+    function stemToken(word) {
+      if (word.length < 4) return word;
+      return word
+        .replace(/(ing|ed|ly|es|s|tion|ations|ment)$/i, '')
+        .replace(/ies$/i, 'y');
+    }
+
+    function levenshteinDistance(a, b) {
+      if (!a.length) return b.length;
+      if (!b.length) return a.length;
+      const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          const cost = b.charAt(i - 1) === a.charAt(j - 1) ? 0 : 1;
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j - 1] + cost
+          );
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
+    /* ==========================================================================
+       PART D: MultiPageSiteCrawler - BFS SPIDER + DOMPARSER + STRUCTURED EXTRACTOR
+       ========================================================================== */
+    class MultiPageSiteCrawler {
+      constructor() {
+        this.index = [];
+        this.crawledPages = new Map(); // url -> { status, chunksCount, title, htmlSnapshot }
+        this.vocabulary = new Set();
+        this.maxDepth = 2;
+        this.stopWords = new Set([
+          "a", "an", "the", "and", "or", "but", "about", "above", "after", "along",
+          "among", "as", "at", "by", "for", "from", "in", "into", "of", "on", "onto",
+          "over", "through", "to", "under", "with", "within", "without", "what",
+          "is", "how", "do", "i", "can", "you", "tell", "me", "please", "why", "where",
+          "which", "when", "does", "are", "would", "should", "could", "this", "that"
+        ]);
+      }
+
+      tokenize(text) {
+        return text.toLowerCase()
+          .replace(/[^\w\s\-]/g, ' ')
+          .split(/\s+/)
+          .filter(t => t.length > 1 && !this.stopWords.has(t));
+      }
+
+      cleanText(text) {
+        return text.replace(/\s+/g, ' ').trim();
+      }
+
+      /**
+       * Parse any Document or Element container (Host DOM or DOMParser External Doc)
+       */
+      extractChunksFromRoot(rootNode, pageUrl = 'index.html') {
+        const targetElements = rootNode.querySelectorAll('article, [data-crawlable="true"]');
+        let pageChunkCount = 0;
+
+        targetElements.forEach((art, artIdx) => {
+          const articleId = art.id || `art-${pageUrl.replace(/\W/g, '')}-${artIdx}`;
+          const articleTitle = art.querySelector('h1, .article-title')?.textContent.trim() || 'Untitled Document';
+          const tag = art.querySelector('.tag')?.textContent.trim() || 'Engineering';
+          const contentContainer = art.querySelector('.article-content') || art;
+          const headers = contentContainer.querySelectorAll('h2, h3');
+
+          if (headers.length === 0) {
+            const rawText = this.cleanText(contentContainer.textContent);
+            this.registerChunk({
+              id: articleId,
+              pageUrl,
+              articleId,
+              articleTitle,
+              heading: articleTitle,
+              tag,
+              text: rawText,
+              bulletPoints: [],
+              codeSnippets: [],
+              tableRows: [],
+              elementId: articleId
+            });
+            pageChunkCount++;
+          } else {
+            headers.forEach((h, hIdx) => {
+              const headingText = h.textContent.trim();
+              const headingId = h.id || `${articleId}-sec-${hIdx}`;
+              if (!h.id) h.id = headingId;
+
+              let siblingText = '';
+              let bulletPoints = [];
+              let codeSnippets = [];
+              let tableRows = [];
+              let curr = h.nextElementSibling;
+
+              while (curr && !['H2', 'H3'].includes(curr.tagName)) {
+                if (curr.tagName === 'UL' || curr.tagName === 'OL') {
+                  curr.querySelectorAll('li').forEach(li => bulletPoints.push(li.textContent.trim()));
+                  siblingText += ' ' + curr.textContent.trim();
+                } else if (curr.classList && curr.classList.contains('code-block')) {
+                  const codeRaw = curr.textContent.trim();
+                  codeSnippets.push(codeRaw);
+                  siblingText += ' ' + codeRaw;
+                } else if (curr.tagName === 'TABLE' || (curr.classList && curr.classList.contains('spec-table'))) {
+                  const rows = [];
+                  curr.querySelectorAll('tr').forEach(tr => {
+                    const cells = Array.from(tr.querySelectorAll('th, td')).map(c => c.textContent.trim());
+                    if (cells.length) rows.push(cells);
+                  });
+                  tableRows = rows;
+                  siblingText += ' ' + rows.map(r => r.join(' ')).join(' ');
+                } else {
+                  siblingText += ' ' + curr.textContent.trim();
+                }
+                curr = curr.nextElementSibling;
+              }
+
+              this.registerChunk({
+                id: `${pageUrl}#${headingId}`,
+                pageUrl,
+                articleId,
+                articleTitle,
+                heading: headingText,
+                tag,
+                text: this.cleanText(siblingText),
+                bulletPoints,
+                codeSnippets,
+                tableRows,
+                elementId: headingId
+              });
+              pageChunkCount++;
+            });
+          }
+        });
+
+        return pageChunkCount;
+      }
+
+      registerChunk(data) {
+        const rawTokens = this.tokenize(`${data.articleTitle} ${data.heading} ${data.tag} ${data.text}`);
+        const stemmedTokens = rawTokens.map(t => stemToken(t));
+        const termFreq = {};
+        const stemFreq = {};
+
+        rawTokens.forEach((t, i) => {
+          termFreq[t] = (termFreq[t] || 0) + 1;
+          const st = stemmedTokens[i];
+          stemFreq[st] = (stemFreq[st] || 0) + 1;
+          this.vocabulary.add(t);
+        });
+
+        // Remove existing chunk with same ID if re-crawling
+        this.index = this.index.filter(c => c.id !== data.id);
+
+        this.index.push({
+          ...data,
+          tokens: rawTokens,
+          stemmedTokens,
+          termFreq,
+          stemFreq,
+          wordCount: rawTokens.length,
+          hasCode: data.codeSnippets.length > 0,
+          hasTable: data.tableRows.length > 0
+        });
+      }
+
+      /**
+       * Fetches & parses an external page (supports both Virtual Static Pages and real Fetch HTTP)
+       */
+      async fetchAndParsePage(url) {
+        try {
+          let htmlText = '';
+          let sourceMode = 'VIRTUAL-FS';
+
+          if (VIRTUAL_STATIC_PAGES[url]) {
+            htmlText = VIRTUAL_STATIC_PAGES[url];
+          } else {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            htmlText = await response.text();
+            sourceMode = 'LIVE-FETCH';
+          }
+
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlText, 'text/html');
+          const chunksAdded = this.extractChunksFromRoot(doc, url);
+
+          // Discover outgoing links on that page
+          const discoveredLinks = [];
+          doc.querySelectorAll('a[href]').forEach(a => {
+            const href = a.getAttribute('href');
+            if (href && !href.startsWith('#') && !href.startsWith('http') && !href.startsWith('mailto:')) {
+              discoveredLinks.push(href);
+            }
+          });
+
+          this.crawledPages.set(url, {
+            status: `INDEXED (${sourceMode})`,
+            chunksCount: chunksAdded,
+            discoveredLinks
+          });
+
+          return discoveredLinks;
+        } catch (err) {
+          this.crawledPages.set(url, {
+            status: 'UNREACHABLE',
+            chunksCount: 0,
+            discoveredLinks: []
+          });
+          return [];
+        }
+      }
+
+      /**
+       * Full Multi-Page BFS Spider across Host DOM + Discovered Links
+       */
+      async crawlEntireSite(seedUrls = ['/docs/risc-v-vector.html', '/docs/fpga-timing.html', '/docs/can-fd-bus.html', '/docs/usb-pd-controller.html']) {
+        this.index = [];
+        this.crawledPages.clear();
+        this.vocabulary.clear();
+
+        // 1. Ensure Host DOM is loaded & crawl it first
+        if (currentDisplayedRoute === 'index.html') {
+          cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
+        }
+        const hostParser = new DOMParser();
+        const hostDoc = hostParser.parseFromString(`<div>${cachedHostDomHTML}</div>`, 'text/html');
+        const hostChunks = this.extractChunksFromRoot(hostDoc, 'index.html');
+        this.crawledPages.set('index.html', {
+          status: 'HOST-DOM',
+          chunksCount: hostChunks,
+          discoveredLinks: seedUrls
+        });
+
+        // 2. BFS Queue for Multi-Page Spidering
+        const queue = seedUrls.map(u => ({ url: u, depth: 1 }));
+        const visited = new Set(['index.html']);
+
+        while (queue.length > 0) {
+          const { url, depth } = queue.shift();
+          if (visited.has(url) || depth > this.maxDepth) continue;
+          visited.add(url);
+
+          const childLinks = await this.fetchAndParsePage(url);
+          childLinks.forEach(nextUrl => {
+            if (!visited.has(nextUrl)) {
+              queue.push({ url: nextUrl, depth: depth + 1 });
+            }
+          });
+        }
+
+        this.updateCrawlerTelemetryUI();
+        return this.index;
+      }
+
+      updateCrawlerTelemetryUI() {
+        const pageCount = this.crawledPages.size;
+        const chunkCount = this.index.length;
+        document.getElementById('indexed-count-label').textContent = `${pageCount} Pages • ${chunkCount} Chunks`;
+        document.getElementById('fab-chunk-count').textContent = `${chunkCount}`;
+
+        const logList = document.getElementById('crawler-log-list');
+        logList.innerHTML = '';
+        this.crawledPages.forEach((info, url) => {
+          const li = document.createElement('li');
+          li.className = 'crawler-log-item';
+          const color = info.chunksCount > 0 ? 'var(--luxy-emerald)' : 'var(--luxy-crimson)';
+          li.innerHTML = `
+            <span style="cursor:pointer; text-decoration:underline;" onclick="switchActivePageRoute('${url}')">${url}</span>
+            <span style="color: ${color};">${info.chunksCount} chunks [${info.status}]</span>
+          `;
+          logList.appendChild(li);
+        });
+      }
+
+      exportIndexJSON() {
+        const payload = {
+          engine: 'Luxy Multi-Page Spider v3.4',
+          timestamp: new Date().toISOString(),
+          pagesCrawled: Array.from(this.crawledPages.entries()),
+          chunks: this.index
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'luxy-multipage-index.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Exported luxy-multipage-index.json');
+      }
+    }
+
+    /* ==========================================================================
+       PART E: LuxyConversationalEngine - BM25+, PROXIMITY, OPERATORS & RAG
+       ========================================================================== */
+    class LuxyConversationalEngine {
+      constructor(crawler) {
+        this.crawler = crawler;
+        this.k1 = 1.5;
+        this.b = 0.75;
+        this.conversationMemory = []; // Stores last 3 matched chunks for pronoun/follow-up resolution
+
+        // Technical Domain Synonym Graph
+        this.synonymGraph = {
+          'mcu': ['esp32', 'microcontroller', 'riscv', 'firmware'],
+          'esp32': ['mcu', 'sleep', 'rtc', 'telemetry'],
+          'power': ['current', 'draw', 'consumption', 'ldo', 'quiescent', 'epr', '240w', 'watt'],
+          'current': ['power', 'draw', 'ua', 'ma', 'ampere', 'quiescent'],
+          'audio': ['classd', 'amplifier', 'speaker', 'subwoofer', 'crossover', 'pwm'],
+          'filter': ['butterworth', 'linkwitz', 'inductor', 'capacitor', 'cutoff', 'lc'],
+          'protection': ['overvoltage', 'ptc', 'mov', 'varistor', 'fuse', 'dmm', 'multimeter'],
+          'fpga': ['timing', 'setup', 'hold', 'slack', 'cdc', 'metastability', 'fifo'],
+          'can': ['canfd', 'arbitration', 'automotive', 'transceiver', 'termination'],
+          'usb': ['usbpd', 'epr', '240w', 'bmc', 'emarker'],
+          'vector': ['riscv', 'rvv', 'stripmining', 'vsetvli', 'opencv', 'bezier']
+        };
+      }
+
+      /**
+       * Parse advanced query syntax: "exact phrase", -exclude, tag:xyz, page:xyz, has:code, has:table
+       */
+      parseQueryOperators(rawQuery) {
+        let q = rawQuery.trim();
+        const filters = {
+          exactPhrases: [],
+          excludedTerms: [],
+          tagFilter: null,
+          pageFilter: document.getElementById('search-page-scope')?.value || 'ALL',
+          requireCode: false,
+          requireTable: false
+        };
+
+        // Extract "exact phrases"
+        q = q.replace(/"([^"]+)"/g, (_, phrase) => {
+          filters.exactPhrases.push(phrase.toLowerCase().trim());
+          return ' ';
+        });
+
+        // Extract field operators
+        q = q.replace(/\btag:(\S+)/gi, (_, t) => { filters.tagFilter = t.toLowerCase(); return ' '; });
+        q = q.replace(/\bpage:(\S+)/gi, (_, p) => { filters.pageFilter = p.toLowerCase(); return ' '; });
+        q = q.replace(/\bhas:code\b/gi, () => { filters.requireCode = true; return ' '; });
+        q = q.replace(/\bhas:table\b/gi, () => { filters.requireTable = true; return ' '; });
+
+        // Extract negative exclusions (-term)
+        q = q.replace(/(?:^|\s)-(\w+)/g, (_, ex) => {
+          filters.excludedTerms.push(ex.toLowerCase());
+          return ' ';
+        });
+
+        return { cleanedQuery: q.trim(), filters };
+      }
+
+      detectIntent(query) {
+        const q = query.toLowerCase();
+        if (q.includes('code') || q.includes('assembly') || q.includes('snippet') || q.includes('how to') || q.includes('configure') || q.includes('loop')) {
+          return 'procedural';
+        }
+        if (q.includes('current') || q.includes('voltage') || q.includes('rate') || q.includes('frequency') || q.includes('table') || q.includes('spec') || q.includes('rating')) {
+          return 'specification';
+        }
+        if (q.includes('vs') || q.includes('versus') || q.includes('compare') || q.includes('difference') || q.includes('why')) {
+          return 'analytical';
+        }
+        return 'definitional';
+      }
+
+      /**
+       * Execute Multi-Page BM25+ Search with Stemming, Synonym Expansion & Levenshtein Recovery
+       */
+      search(rawUserQuery) {
+        const { cleanedQuery, filters } = this.parseQueryOperators(rawUserQuery);
+        let baseTokens = this.crawler.tokenize(cleanedQuery);
+
+        // Conversational Context Carryover for follow-ups ("tell me more", "what about its code?", "show the table")
+        const isContextualFollowup = /\b(it|its|this|that|more|elaborate|code|table)\b/i.test(cleanedQuery) && baseTokens.length <= 3;
+        if (isContextualFollowup && this.conversationMemory.length > 0) {
+          const lastChunk = this.conversationMemory[0];
+          baseTokens = baseTokens.concat(this.crawler.tokenize(lastChunk.heading));
+        }
+
+        const corrections = [];
+        const resolvedTokens = [];
+
+        // Typo Tolerance (Levenshtein Distance <= 1 or <= 2 for long technical words)
+        baseTokens.forEach(token => {
+          const existsExact = this.crawler.vocabulary.has(token);
+          if (existsExact) {
+            resolvedTokens.push(token);
+          } else if (token.length >= 4) {
+            let bestMatch = null;
+            let minDistance = 99;
+            const maxAllowed = token.length >= 7 ? 2 : 1;
+
+            for (const vocabWord of this.crawler.vocabulary) {
+              if (Math.abs(vocabWord.length - token.length) <= maxAllowed) {
+                const dist = levenshteinDistance(token, vocabWord);
+                if (dist <= maxAllowed && dist < minDistance) {
+                  minDistance = dist;
+                  bestMatch = vocabWord;
+                }
+              }
+            }
+            if (bestMatch) {
+              resolvedTokens.push(bestMatch);
+              corrections.push(`${token} → ${bestMatch}`);
+            } else {
+              resolvedTokens.push(token);
+            }
+          } else {
+            resolvedTokens.push(token);
+          }
+        });
+
+        // Synonym Expansion (weighted at 0.55x so exact terms still dominate)
+        const synonymTokens = new Set();
+        resolvedTokens.forEach(t => {
+          if (this.synonymGraph[t]) {
+            this.synonymGraph[t].forEach(syn => {
+              if (!resolvedTokens.includes(syn)) synonymTokens.add(syn);
+            });
+          }
+        });
+
+        const chunks = this.crawler.index;
+        if (chunks.length === 0) return { results: [], corrections, filters };
+
+        const totalDocs = chunks.length;
+        const avgdl = chunks.reduce((sum, c) => sum + c.wordCount, 0) / totalDocs;
+
+        // Compute IDF across all crawled pages
+        const allQueryTerms = [...resolvedTokens, ...Array.from(synonymTokens)];
+        const idf = {};
+        allQueryTerms.forEach(term => {
+          const stem = stemToken(term);
+          const docCount = chunks.filter(c => c.termFreq[term] || c.stemFreq[stem]).length;
+          idf[term] = Math.log((totalDocs - docCount + 0.5) / (docCount + 0.5) + 1);
+        });
+
+        // Score every chunk across all pages
+        const scored = chunks.map(chunk => {
+          // 1. Apply hard boolean / scope filters first
+          if (filters.pageFilter !== 'ALL' && !chunk.pageUrl.toLowerCase().includes(filters.pageFilter.toLowerCase())) {
+            return { chunk, score: 0, matchedTokens: [] };
+          }
+          if (filters.tagFilter && !chunk.tag.toLowerCase().includes(filters.tagFilter)) {
+            return { chunk, score: 0, matchedTokens: [] };
+          }
+          if (filters.requireCode && !chunk.hasCode) {
+            return { chunk, score: 0, matchedTokens: [] };
+          }
+          if (filters.requireTable && !chunk.hasTable) {
+            return { chunk, score: 0, matchedTokens: [] };
+          }
+          for (const ex of filters.excludedTerms) {
+            if (chunk.termFreq[ex] || chunk.text.toLowerCase().includes(ex)) {
+              return { chunk, score: 0, matchedTokens: [] };
+            }
+          }
+
+          let score = 0;
+          const matchedTokens = new Set();
+
+          // Filter boost if user only typed has:table or has:code without tokens
+          if (resolvedTokens.length === 0 && (filters.requireCode || filters.requireTable || filters.tagFilter)) {
+            score += 5.0;
+          }
+
+          // 2. Primary Token & Stem Scoring
+          resolvedTokens.forEach(token => {
+            const stem = stemToken(token);
+            const exactTf = chunk.termFreq[token] || 0;
+            const stemTf = chunk.stemFreq[stem] || 0;
+            const effectiveTf = exactTf > 0 ? exactTf : stemTf * 0.8;
+
+            if (effectiveTf > 0) {
+              matchedTokens.add(token);
+              const num = effectiveTf * (this.k1 + 1);
+              const den = effectiveTf + this.k1 * (1 - this.b + this.b * (chunk.wordCount / avgdl));
+              score += (idf[token] || 1.0) * (num / den);
+
+              // Field Multipliers
+              if (chunk.articleTitle.toLowerCase().includes(token)) score += 3.0;
+              if (chunk.heading.toLowerCase().includes(token)) score += 2.5;
+              if (chunk.tag.toLowerCase().includes(token)) score += 2.0;
+            }
+          });
+
+          // 3. Synonym Graph Expansion Scoring
+          synonymTokens.forEach(syn => {
+            const tf = chunk.termFreq[syn] || 0;
+            if (tf > 0) {
+              matchedTokens.add(syn);
+              score += 0.55 * (idf[syn] || 0.8) * ((tf * (this.k1 + 1)) / (tf + this.k1));
+            }
+          });
+
+          // 4. Exact Phrase & Bi-gram Proximity Window Bonus
+          const lowerBody = `${chunk.heading} ${chunk.text}`.toLowerCase();
+          filters.exactPhrases.forEach(phrase => {
+            if (lowerBody.includes(phrase)) {
+              score += 8.0;
+              phrase.split(/\s+/).forEach(w => matchedTokens.add(w));
+            } else {
+              score = 0; // Strict enforcement for quoted phrases
+            }
+          });
+
+          if (resolvedTokens.length >= 2) {
+            for (let i = 0; i < resolvedTokens.length - 1; i++) {
+              const bigram = `${resolvedTokens[i]} ${resolvedTokens[i + 1]}`;
+              if (lowerBody.includes(bigram)) score += 3.2;
+            }
+          }
+
+          return { chunk, score, matchedTokens: Array.from(matchedTokens) };
+        });
+
+        const results = scored
+          .filter(r => r.score > 0.35)
+          .sort((a, b) => b.score - a.score);
+
+        if (results.length > 0) {
+          this.conversationMemory.unshift(results[0].chunk);
+          if (this.conversationMemory.length > 3) this.conversationMemory.pop();
+        }
+
+        return { results, corrections, filters };
+      }
+
+      /**
+       * Synthesize Multi-Page Conversational Answer with Structured Code & Table Rendering
+       */
+      synthesizeResponse(userQuery) {
+        const intent = this.detectIntent(userQuery);
+        const { results, corrections, filters } = this.search(userQuery);
+
+        if (results.length === 0) {
+          setLuxyMascotMood('fallback');
+          return {
+            intent: 'fallback',
+            corrections,
+            textHtml: `I searched across all <strong>${this.crawler.crawledPages.size} crawled pages (${this.crawler.index.length} chunks)</strong> but found no match for <strong>"${escapeHtml(userQuery)}"</strong>. Verify your page filter scope or try querying topics like <em>ESP32 deep sleep</em>, <em>RISC-V strip-mining</em>, <em>FPGA setup slack</em>, <em>CAN-FD arbitration</em>, or <em>USB-PD 240W EPR</em>.`,
+            sources: [],
+            followups: [
+              'What is ESP32 deep sleep current draw?',
+              'How do RISC-V vector registers handle strip-mining?',
+              'FPGA setup and hold time violation fixes has:table',
+              'USB-PD 240W Extended Power Range EPR negotiation'
+            ]
+          };
+        }
+
+        const top = results[0];
+        const topChunk = top.chunk;
+
+        // Update Luxy Mascot Static Mood State
+        if (topChunk.hasCode || intent === 'procedural') setLuxyMascotMood('code');
+        else if (topChunk.hasTable || intent === 'specification') setLuxyMascotMood('spec');
+        else setLuxyMascotMood('default');
+
+        // Highlight matched terms safely
+        const highlightTokens = (text, tokens) => {
+          let safe = escapeHtml(text);
+          tokens.forEach(tok => {
+            if (tok.length < 2) return;
+            const regex = new RegExp(`\\b(${tok}\\w*)\\b`, 'gi');
+            safe = safe.replace(regex, '<mark>$1</mark>');
+          });
+          return safe;
+        };
+
+        const highlightedPrimary = highlightTokens(topChunk.text, top.matchedTokens);
+
+        // Build Structured Table HTML if present in top chunk
+        let structuredTableHtml = '';
+        if (topChunk.tableRows && topChunk.tableRows.length > 1) {
+          const headers = topChunk.tableRows[0];
+          const bodyRows = topChunk.tableRows.slice(1);
+          structuredTableHtml = `
+            <table class="spec-table" style="margin-top:0.65rem;">
+              <thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>
+              <tbody>
+                ${bodyRows.map(r => `<tr>${r.map(c => `<td>${highlightTokens(c, top.matchedTokens)}</td>`).join('')}</tr>`).join('')}
+              </tbody>
+            </table>
+          `;
+        }
+
+        // Build Code Block HTML if present in top chunk
+        let structuredCodeHtml = '';
+        if (topChunk.codeSnippets && topChunk.codeSnippets.length > 0) {
+          structuredCodeHtml = topChunk.codeSnippets.map(code => `
+            <div class="code-block">${escapeHtml(code)}</div>
+          `).join('');
+        }
+
+        // Cross-Page Secondary Synthesis (if a 2nd relevant chunk exists)
+        let secondaryHtml = '';
+        if (results.length > 1 && results[1].score >= top.score * 0.45) {
+          const sec = results[1].chunk;
+          secondaryHtml = `
+            <div class="secondary-synthesis-box">
+              <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--luxy-primary); margin-bottom:0.25rem;">
+                + CORRELATED INSIGHT FROM [${escapeHtml(sec.pageUrl)}] → ${escapeHtml(sec.heading)} (BM25: ${results[1].score.toFixed(2)})
+              </div>
+              <div>${highlightTokens(sec.text.slice(0, 260) + (sec.text.length > 260 ? '...' : ''), results[1].matchedTokens)}</div>
+            </div>
+          `;
+        }
+
+        // Build Cross-Page Citation Pills
+        const sources = results.slice(0, 4).map(r => ({
+          pageUrl: r.chunk.pageUrl,
+          articleTitle: r.chunk.articleTitle,
+          heading: r.chunk.heading,
+          elementId: r.chunk.elementId,
+          score: r.score.toFixed(2)
+        }));
+
+        return {
+          intent,
+          topScore: top.score.toFixed(2),
+          pageOrigin: topChunk.pageUrl,
+          corrections,
+          opener: `Retrieved from <strong>${escapeHtml(topChunk.articleTitle)}</strong> (<code>${escapeHtml(topChunk.pageUrl)}</code> → <em>${escapeHtml(topChunk.heading)}</em>):`,
+          highlightedPrimary,
+          structuredTableHtml,
+          structuredCodeHtml,
+          secondaryHtml,
+          sources,
+          followups: this.buildContextualFollowups(topChunk)
+        };
+      }
+
+      buildContextualFollowups(chunk) {
+        if (chunk.pageUrl.includes('risc-v')) {
+          return ['Show the RVV 1.0 strip-mining assembly loop', 'What is VLEN and LMUL register grouping?'];
+        }
+        if (chunk.pageUrl.includes('fpga')) {
+          return ['How do Gray-code asynchronous FIFOs prevent metastability?', 'What is the governing equation for Setup Slack?'];
+        }
+        if (chunk.pageUrl.includes('can-fd')) {
+          return ['Why use 60-ohm split termination with 4.7nF capacitor?', 'What is the CAN-FD Bit Rate Switch (BRS) speed?'];
+        }
+        if (chunk.pageUrl.includes('usb-pd')) {
+          return ['How is the 48V 5A EPR PDO bitfield encoded?', 'Why does USB-PD 3.1 query the cable E-Marker IC?'];
+        }
+        return [
+          'How do RISC-V vector registers handle strip-mining?',
+          'FPGA setup and hold time violation fixes has:table',
+          'USB-PD 240W Extended Power Range EPR negotiation'
+        ];
+      }
+    }
+
+    /* ==========================================================================
+       PART F: UI CONTROLLER, MULTI-PAGE ROUTER & CROSS-PAGE CITATION JUMPER
+       ========================================================================== */
+    let siteCrawler;
+    let ragEngine;
+    let cachedHostDomHTML = '';
+    let currentDisplayedRoute = 'index.html';
+
+    function setLuxyMascotMood(mood = 'default') {
+      const svg = LuxyMascotSVG.render(mood);
+      document.getElementById('header-mascot-icon').innerHTML = svg;
+      document.getElementById('modal-mascot-avatar').innerHTML = svg;
+      document.getElementById('fab-mascot-holder').innerHTML = `<div style="width:28px;height:28px;">${svg}</div>`;
+      const moodLabel = document.getElementById('luxy-mood-label');
+      if (moodLabel) moodLabel.textContent = `STATE: ${mood.toUpperCase()}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
+      setLuxyMascotMood('default');
+
+      siteCrawler = new MultiPageSiteCrawler();
+      await siteCrawler.crawlEntireSite();
+      ragEngine = new LuxyConversationalEngine(siteCrawler);
+
+      renderInitialGreeting();
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          openSearchModal();
+        }
+        if (e.key === 'Escape') {
+          closeSearchModal();
+          closeExtractorModal();
+        }
+      });
+    });
+
+    function renderInitialGreeting() {
+      const container = document.getElementById('chat-messages');
+      container.innerHTML = `
+        <div class="message-row bot">
+          <div class="message-avatar">${LuxyMascotSVG.render('default')}</div>
+          <div class="message-bubble">
+            <div class="telemetry-header">
+              <span class="intent-pill">MASCOT: LUXY v3.4</span>
+              <span class="score-pill">${siteCrawler.crawledPages.size} PAGES SPIDERED</span>
+              <span class="Correction-pill">${siteCrawler.index.length} CHUNKS INDEXED</span>
+            </div>
+            <div style="font-weight: 700; margin-bottom: 0.35rem;">
+              Multi-Page Static Site Index Online.
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.86rem;">
+              I have crawled <code>index.html</code> along with external static documentation pages (<code>/docs/risc-v-vector.html</code>, <code>/docs/fpga-timing.html</code>, <code>/docs/can-fd-bus.html</code>, and <code>/docs/usb-pd-controller.html</code>). Click any citation pill in my responses to automatically navigate to that page and highlight the exact DOM section.
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Switch between Host Page (index.html) and Crawled External Pages seamlessly
+     */
+    function switchActivePageRoute(routeUrl, targetElementId = null) {
+      // Save current host DOM edits if leaving index.html
+      if (currentDisplayedRoute === 'index.html') {
+        cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
+      }
+
+      currentDisplayedRoute = routeUrl;
+      document.getElementById('active-route-indicator').textContent = routeUrl;
+
+      // Update active nav tab
+      document.querySelectorAll('.route-link').forEach(link => {
+        link.classList.toggle('active', link.getAttribute('data-route') === routeUrl);
+      });
+
+      const feed = document.getElementById('article-feed');
+
+      if (routeUrl === 'index.html') {
+        document.getElementById('current-page-banner-title').textContent = 'Host Page (/index.html): Hardware & Systems Engineering Archives';
+        feed.innerHTML = cachedHostDomHTML;
+      } else if (VIRTUAL_STATIC_PAGES[routeUrl]) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(VIRTUAL_STATIC_PAGES[routeUrl], 'text/html');
+        const pageTitle = doc.querySelector('title')?.textContent || routeUrl;
+        document.getElementById('current-page-banner-title').textContent = `Crawled Page (${routeUrl}): ${pageTitle}`;
+
+        const articles = doc.querySelectorAll('article, [data-crawlable="true"]');
+        feed.innerHTML = Array.from(articles).map(a => a.outerHTML).join('');
+      } else {
+        showToast(`Route ${routeUrl} not found in virtual router.`);
+        return;
+      }
+
+      // If jumping to a specific element ID on that page, highlight it statically
+      if (targetElementId) {
+        const targetEl = document.getElementById(targetElementId);
+        if (targetEl) {
+          document.querySelectorAll('.dom-highlight-static').forEach(el => el.classList.remove('dom-highlight-static'));
+          targetEl.scrollIntoView({ behavior: 'auto', block: 'center' });
+          targetEl.classList.add('dom-highlight-static');
+          showToast(`Jumped to ${routeUrl}#${targetElementId}`);
+        }
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }
+
+    /**
+     * Cross-Page Citation Jumper
+     */
+    function jumpToCrossPageSource(pageUrl, elementId) {
+      closeSearchModal();
+      switchActivePageRoute(pageUrl, elementId);
+    }
+
+    function sendSearchQuery() {
+      const input = document.getElementById('chat-input');
+      const query = input.value.trim();
+      if (!query) return;
+
+      appendUserMessage(query);
+      input.value = '';
+
+      const response = ragEngine.synthesizeResponse(query);
+      appendBotResponse(response);
+    }
+
+    function runQuickPrompt(text) {
+      document.getElementById('chat-input').value = text;
+      sendSearchQuery();
+    }
+
+    function appendUserMessage(text) {
+      const container = document.getElementById('chat-messages');
+      const row = document.createElement('div');
+      row.className = 'message-row user';
+      row.innerHTML = `
+        <div class="message-avatar">YOU</div>
+        <div class="message-bubble">${escapeHtml(text)}</div>
+      `;
+      container.appendChild(row);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function appendBotResponse(resp) {
+      const container = document.getElementById('chat-messages');
+      const row = document.createElement('div');
+      row.className = 'message-row bot';
+
+      const mood = resp.intent === 'fallback' ? 'fallback' : (resp.structuredCodeHtml ? 'code' : (resp.structuredTableHtml ? 'spec' : 'default'));
+      const avatarSvg = LuxyMascotSVG.render(mood);
+
+      const correctionHtml = (resp.corrections && resp.corrections.length > 0)
+        ? `<span class="Correction-pill">FUZZY AUTO-FIX: ${escapeHtml(resp.corrections.join(', '))}</span>`
+        : '';
+
+      if (resp.intent === 'fallback') {
+        row.innerHTML = `
+          <div class="message-avatar">${avatarSvg}</div>
+          <div class="message-bubble">
+            <div class="telemetry-header">
+              <span class="intent-pill">STATUS: NO MATCH</span>
+              ${correctionHtml}
+            </div>
+            <div>${resp.textHtml}</div>
+            <div class="followups-container">
+              ${resp.followups.map(f => `<button class="followup-chip" onclick="runQuickPrompt('${escapeHtml(f)}')">↳ ${escapeHtml(f)}</button>`).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        const sourcesHtml = resp.sources.map(s => `
+          <button class="source-pill" onclick="jumpToCrossPageSource('${escapeHtml(s.pageUrl)}', '${escapeHtml(s.elementId)}')">
+            <span>[${escapeHtml(s.pageUrl)}]</span>
+            <span>${escapeHtml(s.heading)}</span>
+            <span style="opacity:0.75;">(BM25: ${s.score})</span>
+          </button>
+        `).join('');
+
+        const followupsHtml = resp.followups.map(f => `
+          <button class="followup-chip" onclick="runQuickPrompt('${escapeHtml(f)}')">↳ ${escapeHtml(f)}</button>
+        `).join('');
+
+        row.innerHTML = `
+          <div class="message-avatar">${avatarSvg}</div>
+          <div class="message-bubble">
+            <div class="telemetry-header">
+              <span class="intent-pill">INTENT: ${escapeHtml(resp.intent)}</span>
+              <span class="score-pill">BM25+: ${resp.topScore}</span>
+              <span class="score-pill">PAGE: ${escapeHtml(resp.pageOrigin)}</span>
+              ${correctionHtml}
+            </div>
+            <div style="margin-bottom: 0.45rem;">${resp.opener}</div>
+            <div style="color: var(--text-secondary);">${resp.highlightedPrimary}</div>
+            ${resp.structuredTableHtml}
+            ${resp.structuredCodeHtml}
+            ${resp.secondaryHtml}
+            <div class="sources-container">${sourcesHtml}</div>
+            <div class="followups-container">${followupsHtml}</div>
+          </div>
+        `;
+      }
+
+      container.appendChild(row);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    /**
+     * Spider Control & Dynamic Multi-Page Content Injection
+     */
+    async function runFullMultiPageCrawl() {
+      await siteCrawler.crawlEntireSite(Array.from(siteCrawler.crawledPages.keys()).filter(k => k !== 'index.html'));
+      ragEngine = new LuxyConversationalEngine(siteCrawler);
+      showToast(`Spider complete: ${siteCrawler.crawledPages.size} pages, ${siteCrawler.index.length} chunks indexed.`);
+    }
+
+    async function crawlSingleUrlFromInput() {
+      const urlInput = document.getElementById('custom-crawl-url');
+      const url = urlInput.value.trim();
+      if (!url) return;
+      await siteCrawler.fetchAndParsePage(url);
+      siteCrawler.updateCrawlerTelemetryUI();
+      ragEngine = new LuxyConversationalEngine(siteCrawler);
+      urlInput.value = '';
+      showToast(`Crawled ${url} (${siteCrawler.index.length} total chunks)`);
+    }
+
+    async function injectCustomPageContent() {
+      const targetRoute = document.getElementById('new-page-route').value;
+      const title = document.getElementById('new-title').value.trim();
+      const heading = document.getElementById('new-heading').value.trim();
+      const content = document.getElementById('new-content').value.trim();
+
+      if (!title || !heading || !content) {
+        showToast('Please complete Title, Heading, and Content fields.');
+        return;
+      }
+
+      const artId = 'art-custom-' + Date.now();
+      const headId = 'sec-custom-' + Date.now();
+      const articleMarkup = `
+        <article class="tech-article" id="${artId}" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Live Injected Spec</span>
+            <span class="page-origin-pill">PAGE: ${escapeHtml(targetRoute)}</span>
+            <span>JUST PUBLISHED</span>
+          </div>
+          <h1 class="article-title">${escapeHtml(title)}</h1>
+          <div class="article-content">
+            <h2 id="${headId}">${escapeHtml(heading)}</h2>
+            <p>${escapeHtml(content)}</p>
+          </div>
+        </article>
+      `;
+
+      if (targetRoute === 'index.html') {
+        cachedHostDomHTML = articleMarkup + cachedHostDomHTML;
+      } else {
+        if (!VIRTUAL_STATIC_PAGES[targetRoute]) {
+          VIRTUAL_STATIC_PAGES[targetRoute] = `<!DOCTYPE html><html><head><title>${escapeHtml(title)}</title></head><body>${articleMarkup}</body></html>`;
+          // Add route tab to navbar if newly created page
+          const navBar = document.getElementById('multipage-route-bar');
+          const link = document.createElement('a');
+          link.href = targetRoute;
+          link.className = 'route-link';
+          link.setAttribute('data-route', targetRoute);
+          link.textContent = targetRoute;
+          link.onclick = () => { switchActivePageRoute(targetRoute); return false; };
+          navBar.appendChild(link);
+        } else {
+          VIRTUAL_STATIC_PAGES[targetRoute] = VIRTUAL_STATIC_PAGES[targetRoute].replace('</body>', `${articleMarkup}</body>`);
+        }
+      }
+
+      document.getElementById('new-title').value = '';
+      document.getElementById('new-heading').value = '';
+      document.getElementById('new-content').value = '';
+
+      const allSeeds = Object.keys(VIRTUAL_STATIC_PAGES);
+      await siteCrawler.crawlEntireSite(allSeeds);
+      ragEngine = new LuxyConversationalEngine(siteCrawler);
+      switchActivePageRoute(targetRoute, headId);
+      showToast(`Published to ${targetRoute} & re-spidered site!`);
+    }
+
+    async function clearAndRebuildCache() {
+      await runFullMultiPageCrawl();
+      renderInitialGreeting();
+    }
+
+    function clearChatHistory() {
+      ragEngine.conversationMemory = [];
+      renderInitialGreeting();
+    }
+
+    function openSearchModal() {
+      document.getElementById('search-modal-backdrop').classList.add('active');
+      document.getElementById('chat-input').focus();
+    }
+
+    function closeSearchModal() {
+      document.getElementById('search-modal-backdrop').classList.remove('active');
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+    }
+
+    /* ==========================================================================
+       PART G: STANDALONE MODULE EXTRACTOR
+       ========================================================================== */
+    function openExtractorModal() {
+      document.getElementById('extractor-modal-backdrop').classList.add('active');
+      switchCodeTab('crawler');
+    }
+
+    function closeExtractorModal() {
+      document.getElementById('extractor-modal-backdrop').classList.remove('active');
+    }
+
+    function switchCodeTab(tab) {
+      const area = document.getElementById('code-display-area');
+      if (tab === 'crawler') {
+        area.value = MultiPageSiteCrawler.toString();
+      } else {
+        area.value = LuxyConversationalEngine.toString();
+      }
+    }
+
+    function copyExtractedCode() {
+      const code = document.getElementById('code-display-area').value;
+      navigator.clipboard.writeText(code).then(() => showToast('Copied module class to clipboard!'));
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast-message');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
