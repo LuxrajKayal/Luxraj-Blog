@@ -62,58 +62,34 @@
     or replace handler wiring as a separately tested integration step.
   -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>NexusTech Engineering | Luxy Multi-Page Static Crawler & RAG Engine</title>
+
+  <!-- Reuse Luxraj Blog's approved UI and editorial typefaces. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap"
+    rel="stylesheet"
+  >
+  <!-- Reuse the website's shared colour, typography, spacing and radius tokens. -->
+  <link rel="stylesheet" href="../site/assets/css/tokens.css">
+  <!-- Reuse the website's theme preference and data-theme controller. -->
+  <script type="module">
+    import { initTheme } from "../site/assets/js/theme.js";
+    initTheme();
+  </script>
   <style>
     /*
      * MODULARIZATION TARGET: luxy/demo/styles/theme.css
-     * Owns the demo's CSS custom properties, light-mode overrides, base reset,
-     * typography defaults and scrollbar styling.
-     * Presentation only. JavaScript engine modules do not depend on these rules.
-     * Keep the tokens available to the other demo stylesheets when splitting CSS.
+     * Owns demo-specific base reset and scrollbar styling.
+     * Shared colours and typography come from ../site/assets/css/tokens.css;
+     * the shared ../site/assets/js/theme.js controls light/dark mode.
+     * Do not introduce a second demo palette or a separate theme state.
      */
     /* ==========================================================================
        1. VISUAL DESIGN SYSTEM (STRICTLY ZERO ANIMATIONS)
        ========================================================================== */
-    :root {
-      --bg-primary: #0D0E12;
-      --bg-surface: #14161D;
-      --bg-elevated: #1C1F2A;
-      --bg-interactive: #232736;
-      --border-color: #2B3040;
-      --border-accent: #3E455B;
-
-      /* Luxy Mascot Brand Palette */
-      --luxy-primary: #8B5CF6;
-      --luxy-secondary: #EC4899;
-      --luxy-cyan: #06B6D4;
-      --luxy-emerald: #10B981;
-      --luxy-amber: #F59E0B;
-      --luxy-crimson: #EF4444;
-
-      --text-primary: #F3F4F6;
-      --text-secondary: #D1D5DB;
-      --text-muted: #9CA3AF;
-
-      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
-
-      --radius-sm: 4px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-    }
-
-    body.light-mode {
-      --bg-primary: #F8FAFC;
-      --bg-surface: #FFFFFF;
-      --bg-elevated: #F1F5F9;
-      --bg-interactive: #E2E8F0;
-      --border-color: #CBD5E1;
-      --border-accent: #94A3B8;
-      --text-primary: #0F172A;
-      --text-secondary: #1E293B;
-      --text-muted: #475569;
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
@@ -123,10 +99,10 @@
     }
 
     html {
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      line-height: 1.6;
+      background-color: var(--color-page);
+      color: var(--color-text-primary);
+      font-family: var(--font-ui);
+      line-height: var(--line-height-body);
     }
 
     body {
@@ -136,9 +112,9 @@
     }
 
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg-primary); }
-    ::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--luxy-primary); }
+    ::-webkit-scrollbar-track { background: var(--color-page); }
+    ::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--brand-crimson); }
 
     /*
      * MODULARIZATION TARGET: luxy/demo/styles/demo-shell.css
@@ -152,8 +128,8 @@
       position: sticky;
       top: 0;
       z-index: 40;
-      background-color: var(--bg-surface);
-      border-bottom: 1px solid var(--border-color);
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
       padding: 0.7rem 1.5rem;
       display: flex;
       align-items: center;
@@ -167,53 +143,50 @@
       align-items: center;
       gap: 0.75rem;
       text-decoration: none;
-      color: var(--text-primary);
-      font-weight: 800;
-      font-size: 1.15rem;
-      letter-spacing: -0.02em;
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-lg);
+      letter-spacing: var(--letter-spacing-tight);
     }
 
     .mascot-frame {
-      width: 38px;
-      height: 38px;
-      border-radius: var(--radius-md);
-      background: linear-gradient(135deg, var(--luxy-primary), var(--luxy-secondary));
+      background: var(--brand-crimson);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 3px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid var(--color-border-strong);
       flex-shrink: 0;
     }
 
     .search-launcher-bar {
       flex: 1;
       max-width: 460px;
-      background-color: var(--bg-interactive);
-      border: 1px solid var(--border-accent);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border-strong);
       border-radius: var(--radius-md);
       padding: 0.45rem 0.85rem;
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      color: var(--text-muted);
+      color: var(--color-text-muted);
       cursor: pointer;
-      font-size: 0.86rem;
+      font-size: var(--font-size-sm);
     }
 
     .search-launcher-bar:hover {
-      border-color: var(--luxy-primary);
-      color: var(--text-primary);
+      border-color: var(--brand-crimson);
+      color: var(--color-text-primary);
     }
 
     .kbd-shortcut {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-accent);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-strong);
       border-radius: 4px;
       padding: 1px 6px;
-      font-size: 0.72rem;
-      font-family: var(--font-mono);
-      color: var(--text-muted);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-text-muted);
       margin-left: auto;
     }
 
@@ -228,71 +201,71 @@
       display: inline-flex;
       align-items: center;
       gap: 0.45rem;
-      background-color: var(--bg-interactive);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
+      background-color: var(--color-surface);
+      color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
       padding: 0.45rem 0.85rem;
       border-radius: var(--radius-md);
-      font-size: 0.82rem;
-      font-weight: 600;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
       cursor: pointer;
       text-decoration: none;
       white-space: nowrap;
     }
 
     .btn:hover {
-      background-color: var(--border-accent);
-      border-color: var(--text-muted);
+      background-color: var(--color-border-strong);
+      border-color: var(--color-text-muted);
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--luxy-primary), var(--luxy-secondary));
-      border-color: var(--luxy-primary);
-      color: #fff;
+      background: var(--color-action);
+      border-color: var(--color-action);
+      color: var(--color-on-action);
     }
 
     .btn-cyan {
-      background-color: rgba(6, 182, 212, 0.15);
-      border-color: var(--luxy-cyan);
-      color: var(--luxy-cyan);
+      background-color: var(--color-surface);
+      border-color: var(--color-action);
+      color: var(--color-action);
     }
 
     .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      font-size: 0.74rem;
+      font-size: var(--font-size-xs);
       padding: 0.25rem 0.65rem;
-      border-radius: 20px;
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: var(--luxy-emerald);
-      font-family: var(--font-mono);
+      border-radius: var(--radius-pill);
+      background: var(--color-surface);
+      border: 1px solid var(--color-success);
+      color: var(--color-success);
+      font-family: var(--font-code);
     }
 
     .status-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background-color: var(--luxy-emerald);
+      background-color: var(--color-success);
     }
 
     /* Multi-Page Sub-Navbar */
     .multipage-nav {
-      background-color: var(--bg-elevated);
-      border-bottom: 1px solid var(--border-color);
+      background-color: var(--color-surface-raised);
+      border-bottom: 1px solid var(--color-border);
       padding: 0.45rem 1.5rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
       overflow-x: auto;
-      font-size: 0.8rem;
+      font-size: var(--font-size-xs);
     }
 
     .nav-route-label {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      color: var(--text-muted);
+      font-family: var(--font-code);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
       text-transform: uppercase;
       margin-right: 0.4rem;
     }
@@ -300,10 +273,10 @@
     .route-link {
       padding: 0.25rem 0.65rem;
       border-radius: var(--radius-sm);
-      color: var(--text-secondary);
+      color: var(--color-text-secondary);
       text-decoration: none;
-      font-family: var(--font-mono);
-      font-size: 0.76rem;
+      font-family: var(--font-code);
+      font-size: var(--font-size-xs);
       border: 1px solid transparent;
       cursor: pointer;
       white-space: nowrap;
@@ -311,15 +284,15 @@
     }
 
     .route-link:hover {
-      background-color: var(--bg-interactive);
-      border-color: var(--border-accent);
+      background-color: var(--color-surface);
+      border-color: var(--color-border-strong);
     }
 
     .route-link.active {
-      background-color: rgba(139, 92, 246, 0.18);
-      border-color: var(--luxy-primary);
-      color: var(--luxy-primary);
-      font-weight: 700;
+      background-color: var(--color-selection);
+      border-color: var(--brand-crimson);
+      color: var(--brand-crimson);
+      font-weight: var(--font-weight-bold);
     }
 
     /*
@@ -351,9 +324,9 @@
     }
 
     .hero-banner {
-      background-color: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-left: 4px solid var(--luxy-primary);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--brand-crimson);
       border-radius: var(--radius-lg);
       padding: 1.5rem 1.75rem;
       margin-bottom: 1.75rem;
@@ -364,15 +337,15 @@
     }
 
     .hero-title {
-      font-size: 1.55rem;
-      font-weight: 800;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
       margin-bottom: 0.35rem;
-      color: var(--text-primary);
+      color: var(--color-text-primary);
     }
 
     .hero-sub {
-      color: var(--text-muted);
-      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
       max-width: 780px;
     }
 
@@ -383,8 +356,8 @@
     }
 
     .tech-article {
-      background-color: var(--bg-surface);
-      border: 1px solid var(--border-color);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
       border-radius: var(--radius-lg);
       padding: 1.6rem;
       position: relative;
@@ -394,73 +367,71 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
       margin-bottom: 0.65rem;
-      font-family: var(--font-mono);
+      font-family: var(--font-code);
       flex-wrap: wrap;
     }
 
     .tag {
-      background: rgba(139, 92, 246, 0.16);
-      border: 1px solid var(--luxy-primary);
-      color: #C4B5FD;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
       padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.7rem;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
       text-transform: uppercase;
-      font-weight: 600;
+      font-weight: var(--font-weight-semibold);
     }
 
-    body.light-mode .tag { color: #5B21B6; }
-
     .page-origin-pill {
-      background: rgba(6, 182, 212, 0.12);
-      border: 1px solid var(--luxy-cyan);
-      color: var(--luxy-cyan);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
       padding: 2px 7px;
-      border-radius: 4px;
-      font-size: 0.7rem;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
     }
 
     .article-title {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: var(--text-primary);
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-primary);
       margin-bottom: 0.9rem;
-      line-height: 1.3;
+      line-height: var(--line-height-heading);
     }
 
     .article-content h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--luxy-secondary);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--brand-crimson);
       margin: 1.2rem 0 0.45rem 0;
       padding-bottom: 0.25rem;
-      border-bottom: 1px dashed var(--border-color);
+      border-bottom: 1px dashed var(--color-border);
     }
 
     .article-content p {
-      color: var(--text-secondary);
-      font-size: 0.91rem;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
       margin-bottom: 0.8rem;
     }
 
     .article-content ul {
       margin: 0.4rem 0 0.9rem 1.4rem;
-      color: var(--text-secondary);
-      font-size: 0.89rem;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
     }
 
     .code-block {
-      background-color: var(--bg-primary);
-      border: 1px solid var(--border-accent);
-      border-left: 3px solid var(--luxy-cyan);
+      background-color: var(--color-page);
+      border: 1px solid var(--color-border-strong);
+      border-left: 3px solid var(--brand-crimson);
       border-radius: var(--radius-sm);
       padding: 0.8rem;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      color: var(--text-primary);
+      font-family: var(--font-code);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
       overflow-x: auto;
       margin: 0.75rem 0;
       white-space: pre;
@@ -470,28 +441,28 @@
       width: 100%;
       border-collapse: collapse;
       margin: 0.8rem 0;
-      font-size: 0.82rem;
+      font-size: var(--font-size-sm);
     }
 
     .spec-table th, .spec-table td {
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--color-border);
       padding: 0.45rem 0.7rem;
       text-align: left;
     }
 
     .spec-table th {
-      background-color: var(--bg-interactive);
-      color: var(--text-primary);
-      font-family: var(--font-mono);
+      background-color: var(--color-surface);
+      color: var(--color-text-primary);
+      font-family: var(--font-code);
     }
 
-    .spec-table td { color: var(--text-secondary); }
+    .spec-table td { color: var(--color-text-secondary); }
 
     /* Static Target Highlight (Zero Animation) */
     .dom-highlight-static {
-      outline: 3px solid var(--luxy-amber) !important;
-      background-color: rgba(245, 158, 11, 0.14) !important;
-      border-radius: 4px;
+      outline: var(--focus-ring-width) solid var(--color-focus) !important;
+      background-color: var(--color-selection) !important;
+      border-radius: var(--radius-sm);
     }
 
     /* Sidebar Widgets */
@@ -502,16 +473,16 @@
     }
 
     .widget-card {
-      background-color: var(--bg-surface);
-      border: 1px solid var(--border-color);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
       border-radius: var(--radius-lg);
       padding: 1.15rem;
     }
 
     .widget-title {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--text-primary);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-primary);
       margin-bottom: 0.75rem;
       display: flex;
       align-items: center;
@@ -524,8 +495,8 @@
       display: flex;
       flex-direction: column;
       gap: 0.45rem;
-      font-size: 0.76rem;
-      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
       max-height: 210px;
       overflow-y: auto;
     }
@@ -535,34 +506,34 @@
       align-items: center;
       justify-content: space-between;
       padding: 0.35rem 0.5rem;
-      background-color: var(--bg-elevated);
-      border: 1px solid var(--border-color);
+      background-color: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
       border-radius: var(--radius-sm);
     }
 
     .form-group { margin-bottom: 0.65rem; }
     .form-label {
       display: block;
-      font-size: 0.72rem;
-      color: var(--text-muted);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
       margin-bottom: 0.2rem;
-      font-family: var(--font-mono);
+      font-family: var(--font-code);
     }
 
     .form-input, .form-textarea, .form-select {
       width: 100%;
-      background-color: var(--bg-elevated);
-      border: 1px solid var(--border-color);
+      background-color: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
       border-radius: var(--radius-sm);
       padding: 0.45rem 0.6rem;
-      color: var(--text-primary);
-      font-size: 0.82rem;
-      font-family: var(--font-sans);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-ui);
     }
 
     .form-input:focus, .form-textarea:focus, .form-select:focus {
       outline: none;
-      border-color: var(--luxy-primary);
+      border-color: var(--brand-crimson);
     }
 
     /*
@@ -580,7 +551,7 @@
       position: fixed;
       inset: 0;
       z-index: 100;
-      background-color: rgba(9, 10, 15, 0.82);
+      background-color: rgb(0 0 0 / 0.58);
       display: none;
       align-items: center;
       justify-content: center;
@@ -596,8 +567,8 @@
       max-width: 960px;
       height: 86vh;
       max-height: 780px;
-      background-color: var(--bg-surface);
-      border: 2px solid var(--border-accent);
+      background-color: var(--color-surface);
+      border: 2px solid var(--color-border-strong);
       border-radius: var(--radius-lg);
       display: flex;
       flex-direction: column;
@@ -606,8 +577,8 @@
 
     .modal-header {
       padding: 0.85rem 1.25rem;
-      background-color: var(--bg-elevated);
-      border-bottom: 1px solid var(--border-color);
+      background-color: var(--color-surface-raised);
+      border-bottom: 1px solid var(--color-border);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -621,29 +592,26 @@
     }
 
     .luxy-status-pill {
-      font-size: 0.7rem;
-      font-family: var(--font-mono);
-      background: rgba(139, 92, 246, 0.2);
-      border: 1px solid var(--luxy-primary);
-      color: #DDD6FE;
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
       padding: 2px 8px;
-      border-radius: 12px;
-      font-weight: 600;
+      border-radius: var(--radius-pill);
+      font-weight: var(--font-weight-semibold);
     }
-
-    body.light-mode .luxy-status-pill { color: #5B21B6; }
-
     /* Filter & Telemetry Bar inside Modal */
     .modal-Subbar {
-      background-color: var(--bg-primary);
-      border-bottom: 1px solid var(--border-color);
+      background-color: var(--color-page);
+      border-bottom: 1px solid var(--color-border);
       padding: 0.45rem 1.25rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 0.75rem;
-      font-size: 0.75rem;
-      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
       flex-wrap: wrap;
     }
 
@@ -680,33 +648,38 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.78rem;
-      font-weight: 700;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
       flex-shrink: 0;
-      border: 1px solid var(--border-accent);
-      background-color: var(--bg-elevated);
+      border: 1px solid var(--color-border-strong);
+      background-color: var(--color-surface-raised);
     }
 
     .bot .message-avatar {
-      background: linear-gradient(135deg, var(--luxy-primary), var(--luxy-secondary));
-      border-color: var(--luxy-primary);
+      background: var(--brand-crimson);
+      border-color: var(--brand-crimson);
     }
 
     .message-bubble {
-      background-color: var(--bg-elevated);
-      border: 1px solid var(--border-color);
+      background-color: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
       padding: 0.95rem 1.15rem;
-      font-size: 0.89rem;
-      line-height: 1.55;
-      color: var(--text-primary);
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-body);
+      color: var(--color-text-primary);
       width: 100%;
     }
 
-    .user .message-bubble {
-      background-color: rgba(139, 92, 246, 0.16);
-      border-color: var(--luxy-primary);
+    
+    .bot .message-bubble {
+      font-family: var(--font-editorial);
+    }
+.user .message-bubble {
+      background-color: var(--color-selection);
+      border-color: var(--brand-crimson);
       width: auto;
+      font-family: var(--font-ui);
     }
 
     .telemetry-header {
@@ -718,54 +691,58 @@
     }
 
     .intent-pill {
-      font-size: 0.68rem;
-      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
       text-transform: uppercase;
-      color: var(--luxy-amber);
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: var(--color-text-secondary);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
       padding: 1px 6px;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
+    }
+    .status-error-pill {
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-error);
+      background: var(--color-surface);
+      border: 1px solid var(--color-error);
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
     }
 
     .score-pill {
-      font-size: 0.68rem;
-      font-family: var(--font-mono);
-      color: var(--luxy-cyan);
-      background: rgba(6, 182, 212, 0.12);
-      border: 1px solid rgba(6, 182, 212, 0.35);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-text-muted);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
       padding: 1px 6px;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
     }
-
     .Correction-pill {
-      font-size: 0.68rem;
-      font-family: var(--font-mono);
-      color: var(--luxy-emerald);
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.35);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-info);
+      background: var(--color-surface);
+      border: 1px solid var(--color-info);
       padding: 1px 6px;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
     }
-
     mark {
-      background-color: rgba(236, 72, 153, 0.25);
-      color: #F472B6;
+      background-color: var(--color-selection);
+      color: var(--color-text-primary);
       padding: 1px 4px;
-      border-radius: 3px;
-      font-weight: 600;
+      border-radius: var(--radius-sm);
+      font-weight: var(--font-weight-semibold);
     }
-
-    body.light-mode mark { color: #9D174D; }
-
     .secondary-synthesis-box {
       margin-top: 0.75rem;
       padding: 0.65rem 0.85rem;
-      background-color: var(--bg-surface);
-      border-left: 3px solid var(--luxy-primary);
+      background-color: var(--color-surface);
+      border-left: 3px solid var(--brand-crimson);
       border-radius: var(--radius-sm);
-      font-size: 0.83rem;
-      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
     }
 
     .sources-container {
@@ -774,27 +751,27 @@
       gap: 0.45rem;
       margin-top: 0.8rem;
       padding-top: 0.7rem;
-      border-top: 1px solid var(--border-color);
+      border-top: 1px solid var(--color-border);
     }
 
     .source-pill {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      background-color: var(--bg-surface);
-      border: 1px solid var(--border-accent);
-      color: var(--luxy-cyan);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border-strong);
+      color: var(--color-link);
       padding: 4px 10px;
-      border-radius: 16px;
-      font-size: 0.73rem;
-      font-family: var(--font-mono);
+      border-radius: var(--radius-pill);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
       cursor: pointer;
     }
 
     .source-pill:hover {
-      background-color: var(--luxy-primary);
-      color: #fff;
-      border-color: var(--luxy-primary);
+      background-color: var(--color-action);
+      color: var(--color-on-action);
+      border-color: var(--color-action);
     }
 
     .followups-container {
@@ -805,25 +782,26 @@
     }
 
     .followup-chip {
-      background: var(--bg-surface);
-      border: 1px dashed var(--border-accent);
-      color: var(--text-muted);
+      background: var(--color-surface);
+      border: 1px dashed var(--color-border-strong);
+      color: var(--color-text-secondary);
       padding: 0.35rem 0.65rem;
       border-radius: var(--radius-sm);
-      font-size: 0.77rem;
+      font-size: var(--font-size-xs);
+      font-family: var(--font-ui);
       cursor: pointer;
     }
 
     .followup-chip:hover {
-      color: var(--text-primary);
-      border-color: var(--luxy-secondary);
+      color: var(--color-text-primary);
+      border-color: var(--brand-crimson);
     }
 
     /* Live Static Autocomplete Bar */
     .autocomplete-panel {
       display: none;
-      background-color: var(--bg-primary);
-      border: 1px solid var(--luxy-primary);
+      background-color: var(--color-page);
+      border: 1px solid var(--brand-crimson);
       border-radius: var(--radius-md);
       padding: 0.55rem 0.75rem;
       flex-direction: column;
@@ -842,49 +820,49 @@
     }
 
     .autocomplete-label {
-      font-size: 0.68rem;
-      font-family: var(--font-mono);
-      color: var(--text-muted);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-text-muted);
       text-transform: uppercase;
       margin-right: 0.25rem;
     }
 
     .ac-word-chip {
-      background-color: rgba(139, 92, 246, 0.15);
-      border: 1px solid var(--luxy-primary);
-      color: var(--text-primary);
+      background-color: var(--color-surface);
+      border: 1px solid var(--brand-crimson);
+      color: var(--color-text-primary);
       padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.74rem;
-      font-family: var(--font-mono);
+      border-radius: var(--radius-pill);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
       cursor: pointer;
     }
 
     .ac-word-chip:hover, .ac-word-chip.selected {
-      background-color: var(--luxy-primary);
-      color: #fff;
+      background-color: var(--color-action);
+      color: var(--color-on-action);
     }
 
     .ac-heading-chip {
-      background-color: rgba(6, 182, 212, 0.12);
-      border: 1px solid var(--luxy-cyan);
-      color: var(--luxy-cyan);
+      background-color: var(--color-surface);
+      border: 1px solid var(--brand-crimson);
+      color: var(--color-link);
       padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 0.73rem;
-      font-family: var(--font-mono);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
       cursor: pointer;
     }
 
     .ac-heading-chip:hover {
-      background-color: var(--luxy-cyan);
-      color: #090A0F;
+      background-color: var(--color-action);
+      color: var(--color-on-action);
     }
 
     .modal-footer {
       padding: 0.85rem 1.25rem;
-      background-color: var(--bg-elevated);
-      border-top: 1px solid var(--border-color);
+      background-color: var(--color-surface-raised);
+      border-top: 1px solid var(--color-border);
       display: flex;
       flex-direction: column;
       gap: 0.6rem;
@@ -898,45 +876,45 @@
     }
 
     .prompt-tag {
-      background-color: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      color: var(--text-muted);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-muted);
       padding: 3px 8px;
       border-radius: 12px;
-      font-size: 0.72rem;
+      font-size: var(--font-size-xs);
       white-space: nowrap;
       cursor: pointer;
-      font-family: var(--font-mono);
+      font-family: var(--font-code);
     }
 
     .prompt-tag:hover {
-      border-color: var(--luxy-primary);
-      color: var(--text-primary);
+      border-color: var(--brand-crimson);
+      color: var(--color-text-primary);
     }
 
     .search-input-wrapper {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      background-color: var(--bg-surface);
-      border: 1px solid var(--border-accent);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border-strong);
       border-radius: var(--radius-md);
       padding: 0.35rem 0.6rem;
     }
 
     .search-input-wrapper:focus-within {
-      border-color: var(--luxy-primary);
+      border-color: var(--brand-crimson);
     }
 
     .modal-search-input {
       flex: 1;
       background: transparent;
       border: none;
-      color: var(--text-primary);
-      font-size: 0.9rem;
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
       padding: 0.35rem;
       outline: none;
-      font-family: var(--font-sans);
+      font-family: var(--font-ui);
     }
 
     /* Floating Launcher Button (Static) */
@@ -948,25 +926,25 @@
       height: 54px;
       padding: 0 1.1rem;
       border-radius: 27px;
-      background: linear-gradient(135deg, var(--luxy-primary), var(--luxy-secondary));
-      color: #fff;
+      background: var(--brand-crimson);
+      color: var(--color-on-action);
       border: 2px solid rgba(255,255,255,0.2);
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      font-weight: 700;
-      font-size: 0.86rem;
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
     }
 
     .fab-badge {
-      background-color: var(--bg-primary);
-      color: var(--luxy-cyan);
-      font-size: 0.7rem;
-      font-family: var(--font-mono);
+      background-color: var(--color-page);
+      color: var(--brand-crimson);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
       padding: 2px 7px;
       border-radius: 10px;
-      border: 1px solid var(--luxy-cyan);
+      border: 1px solid var(--brand-crimson);
     }
 
     /* Toast Notification (Instant Static Display) */
@@ -974,13 +952,13 @@
       position: fixed;
       bottom: 1.75rem;
       left: 1.75rem;
-      background-color: var(--bg-elevated);
-      border: 2px solid var(--luxy-primary);
-      color: var(--text-primary);
+      background-color: var(--color-surface-raised);
+      border: 2px solid var(--brand-crimson);
+      color: var(--color-text-primary);
       padding: 0.6rem 1.1rem;
       border-radius: var(--radius-md);
-      font-size: 0.82rem;
-      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-code);
       z-index: 250;
       display: none;
     }
@@ -1004,7 +982,7 @@
       <div class="mascot-frame" id="header-mascot-icon"></div>
       <div>
         <span>LUXY</span>
-        <span style="color: var(--luxy-cyan); font-weight: 400; font-size: 0.9rem;">Multi-Page Spider</span>
+        <span style="color: var(--brand-crimson); font-weight: var(--font-weight-regular); font-size: var(--font-size-sm);">Multi-Page Spider</span>
       </div>
     </a>
 
@@ -1024,7 +1002,7 @@
         Spider All Pages
       </button>
       <button class="btn" onclick="openExtractorModal()">Extract Code</button>
-      <button class="btn" onclick="toggleTheme()">Theme</button>
+      <button class="btn" type="button" data-theme-toggle>Theme</button>
     </div>
   </header>
 
@@ -1061,9 +1039,9 @@
           Explore deep-dive technical publications on microcontroller power states, Class-D audio filtering, high-voltage multimeter protection, vector pipelines, and zero-backend web crawlers.
         </p>
       </div>
-      <div style="text-align: right; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted);">
-        <div>ACTIVE ROUTE: <strong style="color: var(--luxy-cyan);" id="active-route-indicator">index.html</strong></div>
-        <div>ENGINE: <strong style="color: var(--luxy-primary);">LUXY-RAG v3.5</strong></div>
+      <div style="text-align: right; font-family: var(--font-code); font-size: var(--font-size-xs); color: var(--color-text-muted);">
+        <div>ACTIVE ROUTE: <strong style="color: var(--brand-crimson);" id="active-route-indicator">index.html</strong></div>
+        <div>ENGINE: <strong style="color: var(--brand-crimson);">LUXY-RAG v3.5</strong></div>
       </div>
     </div>
 
@@ -1232,7 +1210,7 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
         <div class="widget-card">
           <h3 class="widget-title">
             <span>Multi-Page Spider Queue</span>
-            <span style="font-size: 0.72rem; color: var(--luxy-cyan); font-family: var(--font-mono);" id="spider-depth-badge">MAX DEPTH: 2</span>
+            <span style="font-size: var(--font-size-xs); color: var(--brand-crimson); font-family: var(--font-code);" id="spider-depth-badge">MAX DEPTH: 2</span>
           </h3>
           <ul class="crawler-log-list" id="crawler-log-list"></ul>
           <div style="margin-top: 0.75rem; display: flex; gap: 0.4rem;">
@@ -1314,16 +1292,16 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
           <div class="mascot-frame" id="modal-mascot-avatar" style="width: 42px; height: 42px;"></div>
           <div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="font-weight: 800; font-size: 1rem;">Luxy — Multi-Page Technical Mascot</span>
+              <span style="font-weight: var(--font-weight-bold); font-size: var(--font-size-base);">Luxy — Multi-Page Technical Mascot</span>
               <span class="luxy-status-pill" id="luxy-mood-label">STATE: READY</span>
             </div>
-            <div style="font-size: 0.73rem; color: var(--text-muted); font-family: var(--font-mono);">
+            <div style="font-size: var(--font-size-xs); color: var(--color-text-muted); font-family: var(--font-code);">
               BM25+ • Prefix & Stem Expansion • Live Autocomplete • Cross-Page Synthesis
             </div>
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 0.45rem;">
-          <button class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.74rem;" onclick="clearChatHistory()">Clear Chat</button>
+          <button class="btn" style="padding: 0.3rem 0.6rem; font-size: var(--font-size-xs);" onclick="clearChatHistory()">Clear Chat</button>
           <button class="btn" style="padding: 0.3rem 0.65rem;" onclick="closeSearchModal()">✕</button>
         </div>
       </div>
@@ -1332,7 +1310,7 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
       <div class="modal-Subbar">
         <div class="scope-selector">
           <span>PAGE SCOPE:</span>
-          <select id="search-page-scope" class="form-select" style="width: auto; padding: 2px 6px; font-size: 0.74rem;" onchange="handleInputAutocomplete()">
+          <select id="search-page-scope" class="form-select" style="width: auto; padding: 2px 6px; font-size: var(--font-size-xs);" onchange="handleInputAutocomplete()">
             <option value="ALL">All Crawled Pages (Global Site)</option>
             <option value="index.html">index.html only</option>
             <option value="/docs/risc-v-vector.html">/docs/risc-v-vector.html</option>
@@ -1341,7 +1319,7 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
             <option value="/docs/usb-pd-controller.html">/docs/usb-pd-controller.html</option>
           </select>
         </div>
-        <div style="color: var(--text-muted);">
+        <div style="color: var(--color-text-muted);">
           Prefix & Operators: <code>microcontrol</code> | <code>"exact phrase"</code> | <code>tag:fpga</code> | <code>has:table</code> | <code>has:code</code>
         </div>
       </div>
@@ -1368,7 +1346,7 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
         </div>
 
         <div class="search-input-wrapper">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--luxy-primary);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--brand-crimson);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <input
             type="text"
             id="chat-input"
@@ -1396,7 +1374,7 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
   <div class="modal-backdrop" id="extractor-modal-backdrop" onclick="if(event.target.id==='extractor-modal-backdrop') closeExtractorModal()">
     <div class="search-modal-container" style="max-width: 860px; height: 78vh;">
       <div class="modal-header">
-        <div style="font-weight: 700;">Luxy Multi-Page Crawler — Standalone Code Extractor</div>
+        <div style="font-weight: var(--font-weight-bold);">Luxy Multi-Page Crawler — Standalone Code Extractor</div>
         <button class="btn" onclick="closeExtractorModal()">✕</button>
       </div>
       <div style="padding: 1rem; flex: 1; display: flex; flex-direction: column; gap: 0.75rem;">
@@ -1406,7 +1384,7 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
         </div>
         <textarea id="code-display-area" class="code-block" style="flex: 1; width: 100%; margin: 0; resize: none;" readonly></textarea>
       </div>
-      <div style="padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 0.5rem;">
+      <div style="padding: 0.85rem 1.25rem; border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; gap: 0.5rem;">
         <button class="btn btn-primary" onclick="copyExtractedCode()">Copy Module Code</button>
       </div>
     </div>
@@ -1911,7 +1889,7 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
         this.crawledPages.forEach((info, url) => {
           const li = document.createElement('li');
           li.className = 'crawler-log-item';
-          const color = info.chunksCount > 0 ? 'var(--luxy-emerald)' : 'var(--luxy-crimson)';
+          const color = info.chunksCount > 0 ? 'var(--color-success)' : 'var(--color-error)';
           li.innerHTML = `
             <span style="cursor:pointer; text-decoration:underline;" onclick="switchActivePageRoute('${url}')">${url}</span>
             <span style="color: ${color};">${info.chunksCount} chunks [${info.status}]</span>
@@ -2317,7 +2295,7 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
           const sec = results[1].chunk;
           secondaryHtml = `
             <div class="secondary-synthesis-box">
-              <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--luxy-primary); margin-bottom:0.25rem;">
+              <div style="font-family:var(--font-code); font-size:var(--font-size-xs); color:var(--brand-crimson); margin-bottom:0.25rem;">
                 + CORRELATED INSIGHT FROM [${escapeHtml(sec.pageUrl)}] → ${escapeHtml(sec.heading)} (BM25: ${results[1].score.toFixed(2)})
               </div>
               <div>${highlightTokens(sec.text.slice(0, 260) + (sec.text.length > 260 ? '...' : ''), results[1].matchedTokens)}</div>
@@ -2569,10 +2547,10 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
               <span class="score-pill">${siteCrawler.crawledPages.size} PAGES SPIDERED</span>
               <span class="Correction-pill">${siteCrawler.vocabulary.size} VOCAB TERMS</span>
             </div>
-            <div style="font-weight: 700; margin-bottom: 0.35rem;">
+            <div style="font-weight: var(--font-weight-bold); margin-bottom: 0.35rem;">
               Multi-Page Static Site Index & Prefix Autocomplete Online.
             </div>
-            <div style="color: var(--text-secondary); font-size: 0.86rem;">
+            <div style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
               I have indexed <code>index.html</code> and all linked static pages. Partial prefixes (such as typing <code>microcontrol</code> for <code>microcontroller</code>) are automatically expanded, and you can press <strong>Tab</strong> while typing to autocomplete technical vocabulary.
             </div>
           </div>
@@ -2687,7 +2665,7 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
           <div class="message-avatar">${avatarSvg}</div>
           <div class="message-bubble">
             <div class="telemetry-header">
-              <span class="intent-pill">STATUS: NO MATCH</span>
+              <span class="status-error-pill">STATUS: NO MATCH</span>
               ${correctionHtml}
             </div>
             <div>${resp.textHtml}</div>
@@ -2719,7 +2697,7 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
               ${correctionHtml}
             </div>
             <div style="margin-bottom: 0.45rem;">${resp.opener}</div>
-            <div style="color: var(--text-secondary);">${resp.highlightedPrimary}</div>
+            <div style="color: var(--color-text-secondary);">${resp.highlightedPrimary}</div>
             ${resp.structuredTableHtml}
             ${resp.structuredCodeHtml}
             ${resp.secondaryHtml}
@@ -2833,10 +2811,6 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
 
     function closeSearchModal() {
       document.getElementById('search-modal-backdrop').classList.remove('active');
-    }
-
-    function toggleTheme() {
-      document.body.classList.toggle('light-mode');
     }
 
     /*
