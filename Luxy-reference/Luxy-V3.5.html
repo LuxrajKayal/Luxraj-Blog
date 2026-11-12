@@ -2,9 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!--
+    LUXY v3.5 MODULARIZATION MAP
+    Reference: this v3.5 file only. The v3.4 reference is intentionally outside this map.
+
+    REUSABLE ENGINE CANDIDATES
+    - luxy/core/text-utils.js
+      Pure text helpers: stemToken() and levenshteinDistance().
+    - luxy/crawler/multi-page-site-crawler.js
+      MultiPageSiteCrawler and its crawl/index data contract.
+    - luxy/search/luxy-conversational-engine.js
+      LuxyConversationalEngine, query handling, prefix resolution, ranking,
+      conversation context and the current response object contract.
+    - luxy/shared/escape-html.js
+      escapeHtml(), shared by response generation, autocomplete and UI rendering.
+
+    OPTIONAL UI FEATURES
+    - luxy/ui/autocomplete-controller.js
+      Current live vocabulary completion and section suggestions.
+    - luxy/ui/mascot-svg.js
+      LuxyMascotSVG presentation helper.
+    These are not required by the crawler's indexing or BM25 ranking.
+
+    DEMO ONLY
+    - luxy/demo/styles/* and luxy/demo/ui/*
+      The embedded CSS and HTML preview shell, not the Luxraj Blog interface.
+    - luxy/demo/fixtures/virtual-static-pages.js
+      Synthetic pages used by this demo router and virtual crawler source.
+    - luxy/demo/controllers/demo-controller.js
+      Host preview routing, demo chat rendering, sample publishing controls,
+      telemetry, toast notifications and modal controls.
+    - luxy/demo/tools/module-extractor.js
+      The class-to-string clipboard demonstration. Not part of runtime search.
+
+    INTEGRATION BOUNDARIES THAT MUST BE PRESERVED
+    - The crawler publishes .index, .crawledPages, .vocabulary and .globalTermFreq.
+      Each indexed chunk carries article/page/heading/text metadata, code and table
+      content, token arrays, term-frequency maps, wordCount, hasCode and hasTable.
+    - The search engine consumes that crawler instance and its chunk fields.
+    - The autocomplete controller also consumes the crawler vocabulary, global
+      term frequency and index.
+    - The current search response includes source navigation data and, on success,
+      opener, highlightedPrimary, structuredTableHtml, structuredCodeHtml,
+      secondaryHtml, sources and followups. Preserve this contract during extraction.
+    - Some current crawler/search methods call demo globals or DOM elements directly.
+      Their dependencies are annotated at the relevant methods below.
+
+    EXTRACTION SEQUENCE
+    Extract one section at a time. After moving its implementation, replace that
+    original section with the module connection at the same runtime boundary.
+    Reconnect every dependency before testing, then test the moved feature before
+    proceeding to the next section. Do not remove shared state or caller functions
+    until their replacement connection is working.
+
+    CLASSIC-SCRIPT WARNING
+    This file currently uses a classic script and inline HTML event attributes.
+    Switching the script to type="module" changes top-level scope: inline handlers
+    will not automatically see module-local functions. Preserve a deliberate bridge
+    or replace handler wiring as a separately tested integration step.
+  -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NexusTech Engineering | Luxy Multi-Page Static Crawler & RAG Engine</title>
   <style>
+    /*
+     * MODULARIZATION TARGET: luxy/demo/styles/theme.css
+     * Owns the demo's CSS custom properties, light-mode overrides, base reset,
+     * typography defaults and scrollbar styling.
+     * Presentation only. JavaScript engine modules do not depend on these rules.
+     * Keep the tokens available to the other demo stylesheets when splitting CSS.
+     */
     /* ==========================================================================
        1. VISUAL DESIGN SYSTEM (STRICTLY ZERO ANIMATIONS)
        ========================================================================== */
@@ -74,6 +140,11 @@
     ::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--luxy-primary); }
 
+    /*
+     * MODULARIZATION TARGET: luxy/demo/styles/demo-shell.css
+     * Styles the demo header, search launcher, controls, status badge and route bar.
+     * These styles belong to the sample application shell, not the search engine.
+     */
     /* ==========================================================================
        2. HEADER & MULTI-PAGE NAVIGATION BAR
        ========================================================================== */
@@ -251,6 +322,13 @@
       font-weight: 700;
     }
 
+    /*
+     * MODULARIZATION TARGET: luxy/demo/styles/demo-content.css
+     * Styles the demo page layout, article fixtures, code/table presentation,
+     * crawler sidebar, telemetry list and form controls.
+     * The crawler reads article markup from the demo DOM; this stylesheet itself
+     * is not part of crawling, tokenization or ranking.
+     */
     /* ==========================================================================
        3. MAIN LAYOUT, ARTICLES & MULTI-PAGE VIEWPORT
        ========================================================================== */
@@ -487,6 +565,14 @@
       border-color: var(--luxy-primary);
     }
 
+    /*
+     * MODULARIZATION TARGET: luxy/demo/styles/search-ui.css
+     * Styles the demo search modal, messages, score/correction pills, sources,
+     * follow-up chips, autocomplete panel, floating launcher and toast.
+     * Response HTML currently uses classes such as spec-table, code-block,
+     * secondary-synthesis-box, source-pill and followup-chip. Preserve equivalent
+     * styling or adapt the renderer if this demo UI is not carried into Luxraj.
+     */
     /* ==========================================================================
        4. LUXY CONVERSATIONAL SEARCH & LIVE AUTOCOMPLETE MODAL
        ========================================================================== */
@@ -904,6 +990,12 @@
 </head>
 <body>
 
+  <!--
+    MODULARIZATION TARGET: luxy/demo/ui/demo-shell.html
+    Demo-only header and launcher controls. These elements call functions from the
+    classic script through inline onclick attributes. Do not copy this shell into
+    Luxraj Blog when the existing Luxraj search interface is the intended host UI.
+  -->
   <!-- ==========================================================================
        HEADER BAR WITH LUXY STATIC SVG MASCOT
        ========================================================================== -->
@@ -976,6 +1068,12 @@
     </div>
 
     <div class="site-layout">
+      <!--
+        DEMO CORPUS FIXTURE: the host articles below are sample searchable content.
+        crawlEntireSite() reads this article-feed DOM through cachedHostDomHTML.
+        Keep these articles as test fixtures, not as part of the reusable engine.
+        Real Luxraj indexing must receive the actual site's article source instead.
+      -->
       <!-- Primary Article Viewport -->
       <main class="article-feed" id="article-feed">
 
@@ -1121,6 +1219,12 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
 
       </main>
 
+      <!--
+        DEMO-ONLY CONTROLS: crawler telemetry, manual URL crawling, virtual page
+        publishing, index export and cache rebuild. Their event handlers call
+        functions in the demo controller. They are not required for a search-only
+        Luxraj integration unless an equivalent administration UI is explicitly wanted.
+      -->
       <!-- Sidebar Controls: Multi-Page Spider Status & Custom Page Injection -->
       <aside class="sidebar">
 
@@ -1185,6 +1289,13 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
     </div>
   </div>
 
+  <!--
+    DEMO SEARCH UI: floating launcher and search modal markup.
+    The reusable engine should connect to Luxraj's existing search interface;
+    retain only the UI adapter behavior that Luxraj actually needs.
+    Inline event attributes below depend on globally reachable classic-script
+    functions and must be addressed when modules are connected.
+  -->
   <!-- FLOATING LAUNCHER (LUXY MASCOT) -->
   <button class="floating-search-fab" onclick="openSearchModal()">
     <span id="fab-mascot-holder" style="display:flex; align-items:center;"></span>
@@ -1274,6 +1385,11 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
     </div>
   </div>
 
+  <!--
+    DEVELOPMENT DEMO TOOL ONLY: this modal copies class source using toString().
+    It is not a crawler/search dependency and should not enter the production
+    Luxraj integration bundle.
+  -->
   <!-- ==========================================================================
        MODULAR CODE EXTRACTOR MODAL
        ========================================================================== -->
@@ -1302,6 +1418,13 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
        5. LUXY MULTI-PAGE SPIDER, BM25+ PREFIX ENGINE & AUTOCOMPLETE CONTROLLER
        ========================================================================== -->
   <script>
+    /*
+     * MODULARIZATION TARGET: luxy/ui/mascot-svg.js
+     * Export candidate: LuxyMascotSVG (render(mood)).
+     * Consumers in this file: setLuxyMascotMood(), renderInitialGreeting() and
+     * appendBotResponse(). Presentation helper only; no crawler or ranking dependency.
+     * Keep optional if the Luxraj interface uses a different mascot/presentation layer.
+     */
     /* ==========================================================================
        PART A: LUXY STATIC SVG MASCOT GENERATOR (ZERO ANIMATIONS, MOOD STATES)
        ========================================================================== */
@@ -1355,6 +1478,14 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
       }
     };
 
+    /*
+     * MODULARIZATION TARGET: luxy/demo/fixtures/virtual-static-pages.js
+     * Export candidate: VIRTUAL_STATIC_PAGES.
+     * These HTML strings simulate separate documentation routes for this demo.
+     * Consumers: MultiPageSiteCrawler.fetchAndParsePage(), switchActivePageRoute()
+     * and injectCustomPageContent().
+     * This is fixture data, not a required storage layer for real static-site crawling.
+     */
     /* ==========================================================================
        PART B: VIRTUAL MULTI-PAGE STATIC FILESYSTEM
        ========================================================================== */
@@ -1451,6 +1582,14 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       `
     };
 
+    /*
+     * MODULARIZATION TARGET: luxy/core/text-utils.js
+     * Export candidates: stemToken() and levenshteinDistance().
+     * Dependency direction: no browser or application dependencies.
+     * Consumers: crawler.registerChunk() stores stem frequencies; the search engine
+     * uses stemming for document-frequency/scoring/highlighting and Levenshtein
+     * distance for its final typo-recovery stage. Preserve the exact v3.5 behavior.
+     */
     /* ==========================================================================
        PART C: ENHANCED PORTER-LITE STEMMER (STRIPS -ER/-OR & DOUBLED CONSONANTS)
        ========================================================================== */
@@ -1480,10 +1619,36 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       return matrix[b.length][a.length];
     }
 
+    /*
+     * MODULARIZATION TARGET: luxy/crawler/multi-page-site-crawler.js
+     * Export candidate: MultiPageSiteCrawler.
+     *
+     * PUBLIC DATA CONTRACT consumed by the search engine and autocomplete:
+     * - index: chunk records with id, pageUrl, articleId, articleTitle, heading,
+     *   tag, text, bulletPoints, codeSnippets, tableRows and elementId, plus tokens,
+     *   stemmedTokens, termFreq, stemFreq, wordCount, hasCode and hasTable.
+     * - crawledPages: Map of page URL to crawl status/metadata.
+     * - vocabulary: Set of indexed raw tokens.
+     * - globalTermFreq: raw-token occurrence counts used to rank prefix completions.
+     * - tokenize(), fetchAndParsePage() and crawlEntireSite() are called by other
+     *   parts of this application.
+     *
+     * EXTRACTION DEPENDENCIES: import stemToken(); retain DOMParser/fetch support.
+     * Current demo coupling: VIRTUAL_STATIC_PAGES supplies fixture HTML, while
+     * crawlEntireSite() reads cachedHostDomHTML/currentDisplayedRoute and updates
+     * DOM telemetry. Keep the first extraction behavior-compatible; isolate or
+     * inject those host-page inputs and UI callbacks only as separately tested seams.
+     */
     /* ==========================================================================
        PART D: MultiPageSiteCrawler - BFS SPIDER + DOMPARSER + VOCABULARY FREQUENCY
        ========================================================================== */
     class MultiPageSiteCrawler {
+      /*
+       * CRAWLER STATE: initializes the public index/vocabulary/page maps listed
+       * in the module contract above. The search engine and autocomplete retain
+       * references to these exact fields, so names and shapes are compatibility
+       * boundaries during extraction.
+       */
       constructor() {
         this.index = [];
         this.crawledPages = new Map();
@@ -1510,6 +1675,12 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
         return text.replace(/\s+/g, ' ').trim();
       }
 
+      /*
+       * EXTRACTION BOUNDARY: DOM-to-chunk parser.
+       * Reads article/data-crawlable elements and turns each H2/H3 section into a
+       * chunk with source page and element IDs. This establishes the chunk schema
+       * consumed by LuxyConversationalEngine and used for cross-page citations.
+       */
       extractChunksFromRoot(rootNode, pageUrl = 'index.html') {
         const targetElements = rootNode.querySelectorAll('article, [data-crawlable="true"]');
         let pageChunkCount = 0;
@@ -1592,6 +1763,12 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
         return pageChunkCount;
       }
 
+      /*
+       * EXTRACTION BOUNDARY: index-record builder.
+       * Adds raw/stemmed tokens, per-chunk term frequencies, vocabulary entries,
+       * globalTermFreq counts and code/table flags. Requires stemToken() from
+       * core/text-utils.js. Preserve token and chunk field semantics.
+       */
       registerChunk(data) {
         const rawTokens = this.tokenize(`${data.articleTitle} ${data.heading} ${data.tag} ${data.text}`);
         const stemmedTokens = rawTokens.map(t => stemToken(t));
@@ -1620,6 +1797,13 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
         });
       }
 
+      /*
+       * EXTRACTION BOUNDARY: page-source adapter.
+       * Reads the demo's VIRTUAL_STATIC_PAGES first, otherwise fetches the URL,
+       * parses HTML and delegates to extractChunksFromRoot().
+       * When extracting, keep the virtual-fixture provider optional and preserve
+       * the live-fetch path for actual static pages.
+       */
       async fetchAndParsePage(url) {
         try {
           let htmlText = '';
@@ -1663,6 +1847,14 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
         }
       }
 
+      /*
+       * EXTRACTION BOUNDARY: breadth-first crawl coordinator.
+       * Current coupling: pulls the host article-feed snapshot from
+       * cachedHostDomHTML when currentDisplayedRoute is index.html, then crawls
+       * the supplied seed URLs. Those host-page globals belong to the demo
+       * controller, not to a standalone crawler. Reconnect this input explicitly
+       * before removing or relocating either global.
+       */
       async crawlEntireSite(seedUrls = ['/docs/risc-v-vector.html', '/docs/fpga-timing.html', '/docs/can-fd-bus.html', '/docs/usb-pd-controller.html']) {
         this.index = [];
         this.crawledPages.clear();
@@ -1701,6 +1893,13 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
         return this.index;
       }
 
+      /*
+       * DEMO UI ADAPTER, not crawl/index logic.
+       * Writes crawler status into indexed-count-label, fab-chunk-count and
+       * crawler-log-list, and uses switchActivePageRoute() from an inline handler.
+       * Keep it connected for the reference demo or move this DOM work behind a
+       * callback/adapter when the crawler is extracted.
+       */
       updateCrawlerTelemetryUI() {
         const pageCount = this.crawledPages.size;
         const chunkCount = this.index.length;
@@ -1721,6 +1920,12 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
         });
       }
 
+      /*
+       * DEMO EXPORT ADAPTER.
+       * Serializes the crawler's pages/chunks and triggers a browser download,
+       * then calls showToast(). It is useful tooling, but not required for search.
+       * If separated, preserve the exported payload schema.
+       */
       exportIndexJSON() {
         const payload = {
           engine: 'Luxy Multi-Page Spider v3.5',
@@ -1739,6 +1944,23 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       }
     }
 
+    /*
+     * MODULARIZATION TARGET: luxy/search/luxy-conversational-engine.js
+     * Export candidate: LuxyConversationalEngine.
+     * Constructor input: the MultiPageSiteCrawler instance. This engine reads
+     * crawler.index, crawler.tokenize(), crawler.vocabulary and
+     * crawler.globalTermFreq, and stores conversationMemory on the engine.
+     * It also imports stemToken() and levenshteinDistance() from core/text-utils.js.
+     *
+     * BEHAVIOR CONTRACT: preserve query operators, intent classification, exact
+     * phrase/exclusion/tag/page/code/table filters, prefix then substring then
+     * Levenshtein resolution, synonym expansion, BM25+ scoring, conversation
+     * context and the current synthesizeResponse() return shape.
+     *
+     * CURRENT UI COUPLING: parseQueryOperators() reads search-page-scope directly;
+     * synthesizeResponse() calls setLuxyMascotMood() and escapeHtml(), and returns
+     * pre-rendered HTML fragments. Keep these connections explicit during extraction.
+     */
     /* ==========================================================================
        PART E: LuxyConversationalEngine - BM25+, PREFIX AUTO-EXPANSION & RAG
        ========================================================================== */
@@ -1765,6 +1987,12 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
         };
       }
 
+      /*
+       * UI INPUT DEPENDENCY: pageFilter is read from #search-page-scope.
+       * When this engine is connected to a different UI, preserve the page-scope
+       * behavior by passing that value through an explicit option/adapter rather
+       * than silently dropping the filter.
+       */
       parseQueryOperators(rawQuery) {
         let q = rawQuery.trim();
         const filters = {
@@ -1810,6 +2038,13 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
 
       /**
        * Resolve partial prefixes (e.g. "microcontrol" -> "microcontroller"), substrings, and typos
+       */
+      /*
+       * MATCH-RESOLUTION ORDER IS A FEATURE CONTRACT:
+       * exact vocabulary, then startsWith prefix expansion, then substring match
+       * for longer tokens, then Levenshtein typo fallback. Prefix expansion is what
+       * lets an incomplete word such as "microcontrol" resolve to "microcontroller".
+       * Do not reorder these stages during extraction.
        */
       resolveTokenWithPrefixAndFuzzy(token) {
         if (this.crawler.vocabulary.has(token)) {
@@ -1867,6 +2102,13 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
 
       /**
        * Execute Multi-Page BM25+ Search with Prefix Expansion, Stemming, Synonym Graph & Levenshtein Recovery
+       */
+      /*
+       * CORE RETRIEVAL PIPELINE:
+       * query operators and tokenization -> contextual memory -> token resolution
+       * -> synonym expansion -> document frequency/IDF -> BM25+ scoring and boosts
+       * -> filters -> ranked chunks -> conversationMemory update.
+       * This is the search engine's primary behavior path.
        */
       search(rawUserQuery) {
         const { cleanedQuery, filters } = this.parseQueryOperators(rawUserQuery);
@@ -2000,6 +2242,14 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
         return { results, corrections, filters };
       }
 
+      /*
+       * RESPONSE-ASSEMBLY BOUNDARY:
+       * Calls search(), chooses intent/mood, highlights text, formats code/table
+       * output, correlated insight, citations and follow-ups.
+       * Current output is partly presentation HTML, not only raw search data.
+       * Preserve the exact success/fallback response fields while extracting;
+       * do not make the engine's caller adapt until an explicit contract change.
+       */
       synthesizeResponse(userQuery) {
         const intent = this.detectIntent(userQuery);
         const { results, corrections, filters } = this.search(userQuery);
@@ -2098,6 +2348,12 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
         };
       }
 
+      /*
+       * DEMO CORPUS RULES:
+       * These follow-up prompts are hard-coded to the sample RISC-V, FPGA, CAN-FD
+       * and USB-PD routes. They are separate from BM25 ranking and should be
+       * isolated as configurable/demo content if the engine is generalized.
+       */
       buildContextualFollowups(chunk) {
         if (chunk.pageUrl.includes('risc-v')) {
           return ['Show the RVV 1.0 strip-mining assembly loop', 'What is VLEN and LMUL register grouping?'];
@@ -2119,6 +2375,16 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       }
     }
 
+    /*
+     * MODULARIZATION TARGET: luxy/ui/autocomplete-controller.js
+     * Owns currentAutocompleteWords, handleInputAutocomplete(),
+     * applyWordAutocomplete() and handleChatInputKeydown().
+     * Dependencies: siteCrawler.vocabulary/globalTermFreq/index, the chat-input,
+     * autocomplete-panel, ac-words-row, ac-headings-row and search-page-scope DOM
+     * elements, escapeHtml(), and the runQuickPrompt() callback.
+     * UI feature only; it is not required by direct Enter-key search or BM25 ranking.
+     * The generated suggestion buttons also use inline global onclick handlers.
+     */
     /* ==========================================================================
        PART F: LIVE AUTOCOMPLETE ENGINE & KEYBOARD NAVIGATION
        ========================================================================== */
@@ -2222,6 +2488,28 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       }
     }
 
+    /*
+     * MODULARIZATION TARGET: luxy/demo/controllers/demo-controller.js
+     * This section is the demo application shell and integration wiring, not the
+     * reusable crawler/search implementation.
+     *
+     * Shared demo state: siteCrawler, ragEngine, cachedHostDomHTML and
+     * currentDisplayedRoute. The crawler currently reads some of this state.
+     * Runtime wiring: DOMContentLoaded constructs the crawler, runs the crawl,
+     * constructs the search engine and then registers keyboard listeners.
+     *
+     * Function groups:
+     * - setLuxyMascotMood/renderInitialGreeting: demo mascot and initial UI.
+     * - switchActivePageRoute/jumpToCrossPageSource: virtual route and citation UI.
+     * - sendSearchQuery/runQuickPrompt: input-to-engine bridge.
+     * - appendUserMessage/appendBotResponse: demo response renderer.
+     * - crawl/inject/clear functions: demo crawler administration and publishing.
+     * - modal/theme functions: demo interaction controls.
+     *
+     * For Luxraj Blog, build a narrow integration adapter around the existing
+     * Luxraj UI. Do not transplant this sample route router, host preview, custom
+     * publishing panel or chat markup merely to reuse the search engine.
+     */
     /* ==========================================================================
        PART G: UI CONTROLLER, MULTI-PAGE ROUTER & CROSS-PAGE CITATION JUMPER
        ========================================================================== */
@@ -2239,6 +2527,15 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       if (moodLabel) moodLabel.textContent = `STATE: ${mood.toUpperCase()}`;
     }
 
+    /*
+     * DEMO BOOTSTRAP / INITIALIZATION ORDER:
+     * 1. Snapshot host article-feed markup.
+     * 2. Create crawler and complete its initial crawl.
+     * 3. Create the search engine with that crawler instance.
+     * 4. Render the initial greeting and attach global keyboard listeners.
+     * Preserve this order or provide an equivalent ready-state contract when
+     * these components are loaded as separate modules.
+     */
     window.addEventListener('DOMContentLoaded', async () => {
       cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
       setLuxyMascotMood('default');
@@ -2283,6 +2580,12 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       `;
     }
 
+    /*
+     * DEMO ROUTER ONLY: displays the host page or a VIRTUAL_STATIC_PAGES route.
+     * jumpToCrossPageSource() depends on this function to navigate citation links.
+     * A real multi-page Luxraj integration should navigate to the real source URL
+     * and section ID instead of importing this virtual preview router.
+     */
     function switchActivePageRoute(routeUrl, targetElementId = null) {
       if (currentDisplayedRoute === 'index.html') {
         cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
@@ -2331,6 +2634,12 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       switchActivePageRoute(pageUrl, elementId);
     }
 
+    /*
+     * UI-TO-ENGINE BRIDGE:
+     * Reads #chat-input, calls ragEngine.synthesizeResponse(query), then forwards
+     * the result to appendBotResponse(). When connecting Luxraj's existing search
+     * UI, this is the behavior boundary to adapt; keep the engine response contract.
+     */
     function sendSearchQuery() {
       const input = document.getElementById('chat-input');
       const query = input.value.trim();
@@ -2441,6 +2750,15 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       showToast(`Crawled ${url} (${siteCrawler.index.length} total chunks)`);
     }
 
+    /*
+     * DEMO-ONLY VIRTUAL PUBLISHING:
+     * Builds article markup and inserts it into cachedHostDomHTML or a
+     * VIRTUAL_STATIC_PAGES route, then re-crawls and rebuilds ragEngine.
+     * This is not a production blog publishing API and does not write an HTML file.
+     * Known v3.5 issue, intentionally not changed in this annotation pass:
+     * the existing-route replace() result is not assigned back to the map,
+     * so appended markup is discarded for an already-existing virtual route.
+     */
     async function injectCustomPageContent() {
       const targetRoute = document.getElementById('new-page-route').value;
       const title = document.getElementById('new-title').value.trim();
@@ -2521,6 +2839,12 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       document.body.classList.toggle('light-mode');
     }
 
+    /*
+     * MODULARIZATION TARGET: luxy/demo/tools/module-extractor.js
+     * Development/demo utility only. It exposes the current class source through
+     * toString() for clipboard copying; it is not used by crawling, autocomplete
+     * or search execution. Exclude from the production Luxraj runtime.
+     */
     /* ==========================================================================
        PART H: STANDALONE MODULE EXTRACTOR
        ========================================================================== */
@@ -2547,6 +2871,12 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       navigator.clipboard.writeText(code).then(() => showToast('Copied module class to clipboard!'));
     }
 
+    /*
+     * MODULARIZATION TARGET: luxy/demo/ui/toast.js
+     * Demo-only DOM notification helper. Current callers include crawler export
+     * and several demo controller actions. Pass it as a callback or import it only
+     * in the demo shell; the reusable engine should not require toast UI.
+     */
     function showToast(msg) {
       const t = document.getElementById('toast-message');
       t.textContent = msg;
@@ -2554,6 +2884,12 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       setTimeout(() => t.classList.remove('show'), 2600);
     }
 
+    /*
+     * MODULARIZATION TARGET: luxy/shared/escape-html.js
+     * Shared HTML escaping helper used by search response formatting, autocomplete
+     * suggestions and demo UI renderers. Import it explicitly wherever those
+     * functions move; do not duplicate or omit escaping during extraction.
+     */
     function escapeHtml(str) {
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
