@@ -20,8 +20,8 @@
     OPTIONAL UI FEATURES
     - luxy/ui/autocomplete-controller.js
       Current live vocabulary completion and section suggestions.
-    - luxy/ui/mascot-svg.js
-      LuxyMascotSVG presentation helper.
+    - site/assets/images/brand/luxy-static-mascot.svg
+      User-designed static mascot artwork, loaded by the v3.5 UI adapter.
     These are not required by the crawler's indexing or BM25 ranking.
 
     DEMO ONLY
@@ -150,13 +150,24 @@
     }
 
     .mascot-frame {
+      width: 38px;
+      height: 38px;
       background: var(--brand-crimson);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 3px;
+      padding: 0;
+      overflow: hidden;
       border: 1px solid var(--color-border-strong);
       flex-shrink: 0;
+    }
+
+    .luxy-mascot-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
     }
 
     .search-launcher-bar {
@@ -648,11 +659,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
       font-size: var(--font-size-xs);
       font-weight: var(--font-weight-bold);
       flex-shrink: 0;
       border: 1px solid var(--color-border-strong);
       background-color: var(--color-surface-raised);
+    }
+
+    .message-avatar .luxy-mascot-image {
+      width: 100%;
+      height: 100%;
     }
 
     .bot .message-avatar {
@@ -1397,64 +1414,16 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
        ========================================================================== -->
   <script>
     /*
-     * MODULARIZATION TARGET: luxy/ui/mascot-svg.js
-     * Export candidate: LuxyMascotSVG (render(mood)).
-     * Consumers in this file: setLuxyMascotMood(), renderInitialGreeting() and
-     * appendBotResponse(). Presentation helper only; no crawler or ranking dependency.
-     * Keep optional if the Luxraj interface uses a different mascot/presentation layer.
+     * MASCOT ASSET: site/assets/images/brand/luxy-static-mascot.svg
+     * Load the user's approved static SVG artwork. The same asset is used in
+     * the header, modal, floating launcher and assistant message avatars.
+     * Presentation only; no crawler or ranking dependency.
      */
-    /* ==========================================================================
-       PART A: LUXY STATIC SVG MASCOT GENERATOR (ZERO ANIMATIONS, MOOD STATES)
-       ========================================================================== */
-    const LuxyMascotSVG = {
-      render(mood = 'default') {
-        let eyesSvg = '';
-        let badgeColor = '#06B6D4';
+    const LUXY_MASCOT_ASSET = '../site/assets/images/brand/luxy-static-mascot.svg';
 
-        if (mood === 'spec' || mood === 'analytical') {
-          badgeColor = '#F59E0B';
-          eyesSvg = `
-            <rect x="19" y="26" width="9" height="5" rx="1" fill="#06B6D4"/>
-            <circle cx="39" cy="28" r="5" fill="none" stroke="#F59E0B" stroke-width="2"/>
-            <circle cx="39" cy="28" r="2" fill="#F59E0B"/>
-          `;
-        } else if (mood === 'code' || mood === 'procedural') {
-          badgeColor = '#10B981';
-          eyesSvg = `
-            <path d="M19 25 L25 28 L19 31" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M43 25 L37 28 L43 31" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
-          `;
-        } else if (mood === 'fallback') {
-          badgeColor = '#EF4444';
-          eyesSvg = `
-            <circle cx="23" cy="28" r="3.5" fill="#F59E0B"/>
-            <circle cx="39" cy="28" r="3.5" fill="#F59E0B"/>
-            <line x1="20" y1="22" x2="27" y2="24" stroke="#EF4444" stroke-width="2"/>
-            <line x1="42" y1="22" x2="35" y2="24" stroke="#EF4444" stroke-width="2"/>
-          `;
-        } else {
-          eyesSvg = `
-            <ellipse cx="23" cy="28" rx="3.5" ry="4" fill="#06B6D4"/>
-            <ellipse cx="39" cy="28" rx="3.5" ry="4" fill="#06B6D4"/>
-            <circle cx="24" cy="26.5" r="1.2" fill="#FFFFFF"/>
-            <circle cx="40" cy="26.5" r="1.2" fill="#FFFFFF"/>
-          `;
-        }
-
-        return `
-          <svg viewBox="0 0 62 62" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="10,24 14,6 27,16" fill="#1F2437" stroke="#EC4899" stroke-width="2"/>
-            <polygon points="52,24 48,6 35,16" fill="#1F2437" stroke="#06B6D4" stroke-width="2"/>
-            <polygon points="10,22 31,13 52,22 48,44 31,54 14,44" fill="#14161D" stroke="#8B5CF6" stroke-width="2.2"/>
-            <polygon points="15,23 31,19 47,23 44,35 31,38 18,35" fill="#090A0F" stroke="${badgeColor}" stroke-width="1.2"/>
-            ${eyesSvg}
-            <polygon points="28,41 34,41 31,45" fill="#EC4899"/>
-            <line x1="14" y1="38" x2="21" y2="40" stroke="#8B5CF6" stroke-width="1.5"/>
-            <line x1="48" y1="38" x2="41" y2="40" stroke="#06B6D4" stroke-width="1.5"/>
-          </svg>
-        `;
-      }
-    };
+    function renderLuxyMascotMarkup() {
+      return `<img src="${LUXY_MASCOT_ASSET}" alt="Luxy mascot" class="luxy-mascot-image">`;
+    }
 
     /*
      * MODULARIZATION TARGET: luxy/demo/fixtures/virtual-static-pages.js
@@ -2497,10 +2466,10 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
     let currentDisplayedRoute = 'index.html';
 
     function setLuxyMascotMood(mood = 'default') {
-      const svg = LuxyMascotSVG.render(mood);
-      document.getElementById('header-mascot-icon').innerHTML = svg;
-      document.getElementById('modal-mascot-avatar').innerHTML = svg;
-      document.getElementById('fab-mascot-holder').innerHTML = `<div style="width:28px;height:28px;">${svg}</div>`;
+      const mascotMarkup = renderLuxyMascotMarkup();
+      document.getElementById('header-mascot-icon').innerHTML = mascotMarkup;
+      document.getElementById('modal-mascot-avatar').innerHTML = mascotMarkup;
+      document.getElementById('fab-mascot-holder').innerHTML = `<div style="width:28px;height:28px;overflow:hidden;">${mascotMarkup}</div>`;
       const moodLabel = document.getElementById('luxy-mood-label');
       if (moodLabel) moodLabel.textContent = `STATE: ${mood.toUpperCase()}`;
     }
@@ -2540,7 +2509,7 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       const container = document.getElementById('chat-messages');
       container.innerHTML = `
         <div class="message-row bot">
-          <div class="message-avatar">${LuxyMascotSVG.render('default')}</div>
+          <div class="message-avatar">${renderLuxyMascotMarkup()}</div>
           <div class="message-bubble">
             <div class="telemetry-header">
               <span class="intent-pill">MASCOT: LUXY v3.5</span>
@@ -2653,8 +2622,7 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
       const row = document.createElement('div');
       row.className = 'message-row bot';
 
-      const mood = resp.intent === 'fallback' ? 'fallback' : (resp.structuredCodeHtml ? 'code' : (resp.structuredTableHtml ? 'spec' : 'default'));
-      const avatarSvg = LuxyMascotSVG.render(mood);
+      const avatarSvg = renderLuxyMascotMarkup();
 
       const correctionHtml = (resp.corrections && resp.corrections.length > 0)
         ? `<span class="Correction-pill">${escapeHtml(resp.corrections.join(' | '))}</span>`
