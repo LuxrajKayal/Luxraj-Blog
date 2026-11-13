@@ -222,6 +222,111 @@ IMPORTANT: The current four-state integration is an existing implementation
 reference. It does not limit the planned tag system to four exclusive content
 types or four final expressions.
 
+
+NON-INVASIVE INTEGRATION: SEPARATE ADD-ON
+-----------------------------------------
+This is an ADDITION to the existing Luxy v3.5 system. It is not a replacement,
+rewrite, refactor, or modification of the existing crawler or search engine.
+
+NON-NEGOTIABLE:
+- Do not modify the existing crawler.
+- Do not modify the existing search engine, BM25+ ranking, query processing,
+  tokenization, index construction, autocomplete, or existing search behaviour.
+- Do not replace, remove, rename, or repurpose existing crawler/search fields
+  such as tag, hasCode, hasTable, codeSnippets, or tableRows.
+- Do not insert the new content-tagging logic into the crawler or make the
+  crawler responsible for article classification.
+- Do not make successful operation of the existing search depend on the new
+  feature.
+
+The existing v3.5 crawler and search engine continue to do exactly what they
+already do: crawl/index content, process the reader's query, rank results and
+return the existing search response.
+
+The new feature is a separate consumer of the search result. It begins only
+after the existing search engine has produced its result.
+
+RESULT HANDOFF AND INDEPENDENT ARTICLE PROCESSING
+--------------------------------------------------
+The intended flow is:
+
+1. The reader submits a query.
+2. The existing v3.5 crawler and search engine operate without alteration.
+3. The existing search engine returns its normal ranked response and source
+   information.
+4. The new feature receives the selected result/article information and its
+   article URL (link).
+5. The new feature independently fetches that article using the supplied URL.
+6. It processes the fetched article's human-readable author-facing language
+   using the agreed tagging logic and the editable signal library.
+7. It produces the article's content tags.
+8. The expression controller receives those tags and determines the suitable
+   Luxy expression.
+9. The new feature provides its enrichment to the response/UI integration so
+   the answer can display the content tags and the appropriate expression.
+
+The article URL is the handoff into the new feature. The new feature fetches
+and processes the article independently; it does not obtain its classification
+by inspecting or rewriting the crawler's internal index/chunk records.
+
+The initial target is the article associated with the selected search result,
+not a replacement classification pass over the crawler's chunks. When a search
+response contains multiple sources, the rule for choosing which source article
+or articles to process can be finalized during integration design. Do not
+silently assume that every source must be fetched.
+
+The new feature owns its own article-fetching, text preparation, classification
+and expression-composition process. It may use the result metadata needed to
+identify and link to the article, but it must not take ownership of the search
+engine's retrieval or ranking responsibilities.
+
+INTEGRATION BOUNDARY
+--------------------
+The intended connection point is after the existing search response is
+returned, at the response/application integration layer.
+
+In the current v3.5 reference, the relevant existing flow is:
+- sendSearchQuery() calls ragEngine.synthesizeResponse(query).
+- synthesizeResponse() returns the response and its source information.
+- appendBotResponse(resp) receives and renders that response.
+
+These are identified as integration reference points, not authorization to
+rewrite them now. The new feature should be connected as a separate add-on at
+this boundary, using the selected result's article URL as its input.
+
+The existing response should remain usable as it is. The add-on can provide
+additional information (for example, contentTags and an expression result)
+for the UI to display. Its output must not overwrite or invalidate the original
+search result, sources, answer text, tables, code, follow-ups or other existing
+response fields.
+
+FAILURE ISOLATION
+-----------------
+If the add-on cannot fetch an article, cannot prepare its readable text, or
+cannot classify it, the original v3.5 search response must still be displayed
+and remain functional.
+
+The new feature must fail independently and gracefully. A failure in the
+add-on must not block, break, delay indefinitely, or otherwise disable the
+existing search functionality. Appropriate loading and fallback behaviour for
+the optional enrichment can be designed later.
+
+PRESERVATION RULE
+-----------------
+The existing crawler and search engine are stable providers of search results.
+The new content-intelligence feature is a separate downstream consumer.
+
+Existing system:
+  Query -> existing crawler/index -> existing search engine -> normal result
+
+New additive path:
+  Normal result -> selected article URL -> independent fetch ->
+  human-language classification -> content tags -> expression controller ->
+  optional response enrichment
+
+The two paths meet only when the new feature's additional output is presented
+alongside the existing response. The new path must not alter the existing path.
+
 IMPLEMENTATION STATUS
 ---------------------
 This document records planning decisions only. No new content-tagging system,
@@ -229,8 +334,9 @@ signal library, tag UI, or combination-based expression controller has been
 implemented by this plan.
 
 Before implementation, future work should settle and validate details such as:
-- The exact content unit being tagged (whole article, retrieved section, or
-  another existing search-result unit).
+- The rule for selecting the article to process when a search response has
+  multiple sources.
+- The standalone article-fetching and readable-text preparation interface.
 - The editable signal-library schema and location.
 - Context handling and test cases for the agreed language signals.
 - How tag results are attached to search results and displayed per response.
