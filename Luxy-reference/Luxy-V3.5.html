@@ -166,8 +166,8 @@
       display: block;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      object-position: center;
+      max-width: 100%;
+      max-height: 100%;
     }
 
     .search-launcher-bar {
@@ -1412,14 +1412,103 @@ contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</d
   <script>
     /*
      * MASCOT ASSET: site/assets/images/brand/luxy-static-mascot.svg
-     * Load the user's approved static SVG artwork. The same asset is used in
-     * the header, modal, floating launcher and assistant message avatars.
-     * Presentation only; no crawler or ranking dependency.
+     * Inline the approved SVG so JavaScript can switch its four facial groups.
+     * Every rendered copy receives unique IDs to avoid collisions between the
+     * header, modal, floating launcher and individual assistant messages.
+     * This presentation layer does not affect crawler or ranking behaviour.
      */
     const LUXY_MASCOT_ASSET = '../site/assets/images/brand/luxy-static-mascot.svg';
+    const LUXY_MASCOT_STATES = ['default', 'code', 'spec', 'fallback'];
+
+    let luxyMascotSvgTemplate = null;
+    let luxyMascotSvgLoadPromise = null;
+    let luxyMascotCurrentMood = 'default';
+    let luxyMascotInstanceCounter = 0;
+
+    async function loadLuxyMascotSvg() {
+      if (!luxyMascotSvgLoadPromise) {
+        luxyMascotSvgLoadPromise = (async () => {
+          try {
+            const response = await fetch(LUXY_MASCOT_ASSET);
+            if (!response.ok) throw new Error(`Mascot SVG request failed: ${response.status}`);
+
+            const svgText = await response.text();
+            const parsedDocument = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+            const svgRoot = parsedDocument.documentElement;
+
+            if (parsedDocument.querySelector('parsererror') || !svgRoot || svgRoot.localName !== 'svg') {
+              throw new Error('Mascot SVG could not be parsed as valid XML.');
+            }
+
+            for (const state of LUXY_MASCOT_STATES) {
+              if (!svgRoot.querySelector(`[id="luxy-face-${state}"]`)) {
+                throw new Error(`Mascot SVG is missing the luxy-face-${state} group.`);
+              }
+            }
+
+            luxyMascotSvgTemplate = svgRoot;
+            return true;
+          } catch (error) {
+            console.error('Luxy mascot could not be loaded for dynamic expressions:', error);
+            return false;
+          }
+        })();
+      }
+
+      return luxyMascotSvgLoadPromise;
+    }
 
     function renderLuxyMascotMarkup() {
-      return `<img src="${LUXY_MASCOT_ASSET}" alt="Luxy mascot" class="luxy-mascot-image">`;
+      if (!luxyMascotSvgTemplate) {
+        return `<img src="${LUXY_MASCOT_ASSET}" alt="Luxy mascot" class="luxy-mascot-image">`;
+      }
+
+      const svgRoot = luxyMascotSvgTemplate.cloneNode(true);
+      const instancePrefix = `luxy-instance-${++luxyMascotInstanceCounter}`;
+      const elementsWithIds = [svgRoot, ...svgRoot.querySelectorAll('[id]')];
+      const idMap = new Map();
+
+      elementsWithIds.forEach(element => {
+        const originalId = element.getAttribute('id');
+        if (!originalId) return;
+        const uniqueId = `${instancePrefix}-${originalId}`;
+        idMap.set(originalId, uniqueId);
+        element.setAttribute('id', uniqueId);
+      });
+
+      // Keep accessibility labels and local SVG references valid after namespacing IDs.
+      const svgElements = [svgRoot, ...svgRoot.querySelectorAll('*')];
+      svgElements.forEach(element => {
+        Array.from(element.attributes).forEach(attribute => {
+          let value = attribute.value;
+          if (attribute.name === 'aria-labelledby' || attribute.name === 'aria-describedby') {
+            value = value.split(/\s+/).map(id => idMap.get(id) || id).join(' ');
+          }
+          idMap.forEach((uniqueId, originalId) => {
+            value = value.replaceAll(`url(#${originalId})`, `url(#${uniqueId})`);
+            if ((attribute.name === 'href' || attribute.name === 'xlink:href') && value === `#${originalId}`) {
+              value = `#${uniqueId}`;
+            }
+          });
+          if (value !== attribute.value) element.setAttribute(attribute.name, value);
+        });
+      });
+
+      LUXY_MASCOT_STATES.forEach(state => {
+        const face = svgRoot.querySelector(`[id="${instancePrefix}-luxy-face-${state}"]`);
+        if (!face) return;
+        if (state === luxyMascotCurrentMood) face.removeAttribute('style');
+        else face.setAttribute('style', 'display:none;');
+      });
+
+      svgRoot.setAttribute('class', 'luxy-mascot-image');
+      svgRoot.setAttribute('width', '100%');
+      svgRoot.setAttribute('height', '100%');
+      svgRoot.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+      svgRoot.setAttribute('focusable', 'false');
+      svgRoot.setAttribute('data-luxy-mood', luxyMascotCurrentMood);
+
+      return new XMLSerializer().serializeToString(svgRoot);
     }
 
     /*
@@ -2463,12 +2552,21 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
     let currentDisplayedRoute = 'index.html';
 
     function setLuxyMascotMood(mood = 'default') {
-      const mascotMarkup = renderLuxyMascotMarkup();
-      document.getElementById('header-mascot-icon').innerHTML = mascotMarkup;
-      document.getElementById('modal-mascot-avatar').innerHTML = mascotMarkup;
-      document.getElementById('fab-mascot-holder').innerHTML = `<div style="width:28px;height:28px;overflow:hidden;">${mascotMarkup}</div>`;
+      luxyMascotCurrentMood = LUXY_MASCOT_STATES.includes(mood) ? mood : 'default';
+
+      const headerMascot = document.getElementById('header-mascot-icon');
+      const modalMascot = document.getElementById('modal-mascot-avatar');
+      const fabMascot = document.getElementById('fab-mascot-holder');
+
+      if (headerMascot) headerMascot.innerHTML = renderLuxyMascotMarkup();
+      if (modalMascot) modalMascot.innerHTML = renderLuxyMascotMarkup();
+      if (fabMascot) {
+        const mascotMarkup = renderLuxyMascotMarkup();
+        fabMascot.innerHTML = `<div style="width:28px;height:28px;overflow:hidden;">${mascotMarkup}</div>`;
+      }
+
       const moodLabel = document.getElementById('luxy-mood-label');
-      if (moodLabel) moodLabel.textContent = `STATE: ${mood.toUpperCase()}`;
+      if (moodLabel) moodLabel.textContent = `STATE: ${luxyMascotCurrentMood.toUpperCase()}`;
     }
 
     /*
@@ -2482,6 +2580,7 @@ uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
      */
     window.addEventListener('DOMContentLoaded', async () => {
       cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
+      await loadLuxyMascotSvg();
       setLuxyMascotMood('default');
 
       siteCrawler = new MultiPageSiteCrawler();
