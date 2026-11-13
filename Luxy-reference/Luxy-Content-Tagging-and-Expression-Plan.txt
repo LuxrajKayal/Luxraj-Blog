@@ -1,0 +1,252 @@
+LUXY — CONTENT TAGGING & EXPRESSION SYSTEM
+Planning Reference
+Created: 2026-11-13
+Status: DESIGN PLAN — NOT YET IMPLEMENTED
+
+PURPOSE
+-------
+This document records the agreed direction for Luxy's content-tagging and
+mascot-expression architecture. It is a continuity note for future work.
+It describes the plan, not completed functionality.
+
+CORE ARCHITECTURE
+-----------------
+Keep these responsibilities separate:
+
+1. SEARCH / RETRIEVAL
+   The reader enters a search query. The existing search and crawler/index
+   process finds relevant articles or content sections.
+
+2. CONTENT TAGGING
+   After relevant content is retrieved, the tagging system examines the
+   article's author-facing, human-readable language. It applies the established
+   tag logic to determine which content tags belong to that article/content.
+
+3. RESPONSE PRESENTATION
+   Luxy presents the answer and can show the tags associated with the matched
+   content. Tags describe the content; they are not mascot mood labels.
+
+4. EXPRESSION CONTROLLER
+   A separate controller uses the detected tag combination to decide how
+   Luxy should express itself.
+
+IMPORTANT QUERY / TAG DISTINCTION
+---------------------------------
+The reader's search query is used by the search engine to retrieve relevant
+content. The query itself is NOT directly converted into content tags.
+
+Example:
+- Reader searches for: "current".
+- The search process retrieves relevant article content.
+- The tagging system examines the retrieved article's own human-readable
+  wording and applies the established tag signals.
+- The word "current" in the search box does not automatically assign SPEC.
+- The article's classification comes from its own content and the agreed
+  tagging logic, not from the search phrase.
+
+This separation is fundamental. Search retrieval and content classification
+are different responsibilities. Ambiguity in a reader's query must not be
+mistaken for ambiguity in the article-tagging process.
+
+THE FIVE INDEPENDENT CONTENT TAGS
+---------------------------------
+The planned system has five tags:
+
+1. CODE
+   Detect author-facing language that communicates that code or a program is
+   being provided, written, run, pasted, or used.
+
+   Example signals:
+   - "Here is the Python code."
+   - "Paste this into your IDE."
+   - "This is the JavaScript script."
+   - "Write the following function."
+   - "Run this Python program."
+   - "Follow this coding pattern."
+
+   IMPORTANT:
+   CODE remains a valid tag. What is excluded is code-source-based detection.
+   Do not classify by inspecting programming syntax, code blocks, source code,
+   comments, definitions, or implementation details.
+
+2. EXPLANATION
+   Detect language communicating that a concept, process, reason, or principle
+   is being explained.
+
+   Example signals:
+   - "Here is an explanation of Python."
+   - "This is how it works."
+   - "The underlying principle is..."
+   - "Why this happens..."
+   - "Explained in detail."
+
+3. DEMONSTRATION
+   Detect language guiding the reader through an action, example, or practical
+   demonstration.
+
+   Example signals:
+   - "Follow the path."
+   - "Type it."
+   - "Mark the corresponding point."
+   - "Write down the value."
+   - "Try this."
+   - "Follow these steps."
+
+4. SPEC
+   Detect language communicating specifications, technical values, product or
+   goods information, prices, ratings, buying guidance, recommendations, or
+   warnings against buying.
+
+   The signal logic must consider the wording and context. A generic word
+   should not be treated as sufficient evidence by itself when its meaning
+   depends on context.
+
+5. INTERACTIVE
+   Detect author-facing language communicating that the reader can or should
+   interact with an element or feature.
+
+   Example signals:
+   - "Interact with the diagram."
+   - "Click inside this page."
+   - "Drag the slider."
+   - "Select an option."
+   - "Enter the value below."
+   - "Toggle the switch."
+   - "Press Calculate."
+
+   INTERACTIVE is detected from natural-language signals, just like the
+   other tags. It does not depend on inspecting DOM attributes, HTML elements,
+   JavaScript, SVG internals, or implementation code.
+
+TAGGING RULES AND BOUNDARIES
+----------------------------
+- All five tags are independent.
+- Multiple tags can apply to the same article or matched content.
+- Tags do not cancel, replace, or exclude one another.
+- Do not force content into one exclusive category.
+- Do not use percentage composition as the primary tagging mechanism.
+- Detect what the author communicates to the reader, not how the author
+  technically built the page or feature.
+- Use human-readable language signals and their context.
+- Exclude source-code syntax, code comments, code definitions, HTML, CSS,
+  JavaScript implementation, SVG internals, and other technical markup from
+  the classification evidence.
+- The CODE tag is based on human wording about code, not inspection of the
+  code itself.
+- INTERACTIVE is based on human wording about interaction, not inspection of
+  whether a DOM element is technically interactive.
+- DEMONSTRATION and INTERACTIVE can overlap, but they are distinct:
+  * "Write down this value" or "mark the corresponding point" can indicate
+    DEMONSTRATION.
+  * "Click inside this page" or "drag the slider" indicates INTERACTIVE.
+  * A phrase can indicate both when its meaning supports both tags.
+- Do not infer a tag merely because a word appears in the reader's search query.
+
+EDITORIAL DEPENDENCY / INTENTIONAL LIMITATION
+---------------------------------------------
+This approach assumes that an article describing an interactive feature will
+normally communicate how the reader can interact with it.
+
+If an article contains an interactive feature but its author-facing text gives
+no relevant description or interaction instruction, the language-only tagger
+may not identify INTERACTIVE. This is an intentional boundary of the chosen
+approach. Do not compensate by introducing DOM or implementation inspection.
+
+SIGNAL LIBRARY
+--------------
+The tag signals will live in a separate, independently editable library.
+The library can be expanded and refined by adding human-readable words,
+phrases, and relevant context rules.
+
+The signal library is intended to hold the detection knowledge; the tagging
+engine applies that knowledge to article text. This keeps signal maintenance
+separate from the engine itself.
+
+The exact library file format, data schema, matching implementation, and
+editing workflow have not yet been finalized. Do not invent or implement
+those details without discussing them first.
+
+TAG PRESENTATION VS. MASCOT MOOD
+--------------------------------
+Content tags and mascot expressions are two different things:
+
+- CONTENT TAGS describe the matched article or answer.
+- MASCOT EXPRESSION represents Luxy's reaction to the detected tag
+  combination.
+
+The response UI should move toward rounded, response-specific tag labels such
+as CODE, EXPLANATION, DEMONSTRATION, SPEC, and INTERACTIVE.
+
+These labels are not the same as the old global "STATE: CODE" / "STATE: SPEC"
+style mood indicator. A response may carry several tags, and different
+responses in the same conversation may carry different tag combinations.
+
+EXPRESSION CONTROLLER
+---------------------
+The expression controller receives the set of detected tags and chooses an
+expression appropriate to their combination.
+
+The target is not to create a separate complete SVG illustration for every
+possible tag combination. Instead, build reusable expressive SVG parts that
+can be composed where compatible. Examples of reusable parts include:
+- Eyes
+- Eyebrows
+- Mouth
+- Optional facial details or expression accents
+
+Illustrative expression directions discussed so far:
+- EXPLANATION -> friendly and informative
+- CODE + EXPLANATION -> focused but approachable
+- DEMONSTRATION + INTERACTIVE -> curious and guiding
+- SPEC + EXPLANATION -> analytical and thoughtful
+- CODE + SPEC + DEMONSTRATION -> concentrated and technical
+
+These are examples of intended expression relationships, not a finalized
+expression matrix or final artwork specification.
+
+EXISTING MASCOT ASSET
+--------------------
+The user-designed four-face SVG is the starting reference for the expression
+work. Its existing face groups are:
+- DEFAULT
+- CODE
+- SPEC
+- FALLBACK
+
+The existing SVG and its artwork must be preserved unless a future change is
+explicitly authorized. The future combination-based system may require
+reusable facial parts or profiles; the exact SVG structure is still to be
+designed.
+
+IMPORTANT: The current four-state integration is an existing implementation
+reference. It does not limit the planned tag system to four exclusive content
+types or four final expressions.
+
+IMPLEMENTATION STATUS
+---------------------
+This document records planning decisions only. No new content-tagging system,
+signal library, tag UI, or combination-based expression controller has been
+implemented by this plan.
+
+Before implementation, future work should settle and validate details such as:
+- The exact content unit being tagged (whole article, retrieved section, or
+  another existing search-result unit).
+- The editable signal-library schema and location.
+- Context handling and test cases for the agreed language signals.
+- How tag results are attached to search results and displayed per response.
+- The compatible facial-part combinations and fallback expression behaviour.
+
+These are implementation design tasks. They do not change the agreed
+principles and boundaries documented above.
+
+NON-NEGOTIABLE DESIGN PRINCIPLE
+-------------------------------
+Detect what the author communicates to the reader — not how the author
+technically built the article.
+
+Search retrieves the content.
+The tagging system classifies the content from human-readable language.
+The expression controller uses the resulting tag combination to compose
+Luxy's expression.
+
+Keep these responsibilities separate.
