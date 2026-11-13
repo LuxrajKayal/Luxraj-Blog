@@ -1,0 +1,3885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!--
+    LUXY v3.5 MODULARIZATION MAP
+    Reference: this v3.5 file only. The v3.4 reference is intentionally outside this map.
+
+    REUSABLE ENGINE CANDIDATES
+    - luxy/core/text-utils.js
+      Pure text helpers: stemToken() and levenshteinDistance().
+    - luxy/crawler/multi-page-site-crawler.js
+      MultiPageSiteCrawler and its crawl/index data contract.
+    - luxy/search/luxy-conversational-engine.js
+      LuxyConversationalEngine, query handling, prefix resolution, ranking,
+      conversation context and the current response object contract.
+    - luxy/shared/escape-html.js
+      escapeHtml(), shared by response generation, autocomplete and UI rendering.
+
+    OPTIONAL UI FEATURES
+    - luxy/ui/autocomplete-controller.js
+      Current live vocabulary completion and section suggestions.
+    - site/assets/images/brand/luxy-static-mascot.svg
+      User-designed static mascot artwork, loaded by the v3.5 UI adapter.
+    These are not required by the crawler's indexing or BM25 ranking.
+
+    DEMO ONLY
+    - luxy/demo/styles/* and luxy/demo/ui/*
+      The embedded CSS and HTML preview shell, not the Luxraj Blog interface.
+    - luxy/demo/fixtures/virtual-static-pages.js
+      Synthetic pages used by this demo router and virtual crawler source.
+    - luxy/demo/controllers/demo-controller.js
+      Host preview routing, demo chat rendering, sample publishing controls,
+      telemetry, toast notifications and modal controls.
+    - luxy/demo/tools/module-extractor.js
+      The class-to-string clipboard demonstration. Not part of runtime search.
+
+    INTEGRATION BOUNDARIES THAT MUST BE PRESERVED
+    - The crawler publishes .index, .crawledPages, .vocabulary and .globalTermFreq.
+      Each indexed chunk carries article/page/heading/text metadata, code and table
+      content, token arrays, term-frequency maps, wordCount, hasCode and hasTable.
+    - The search engine consumes that crawler instance and its chunk fields.
+    - The autocomplete controller also consumes the crawler vocabulary, global
+      term frequency and index.
+    - The current search response includes source navigation data and, on success,
+      opener, highlightedPrimary, structuredTableHtml, structuredCodeHtml,
+      secondaryHtml, sources and followups. Preserve this contract during extraction.
+    - Some current crawler/search methods call demo globals or DOM elements directly.
+      Their dependencies are annotated at the relevant methods below.
+
+    EXTRACTION SEQUENCE
+    Extract one section at a time. After moving its implementation, replace that
+    original section with the module connection at the same runtime boundary.
+    Reconnect every dependency before testing, then test the moved feature before
+    proceeding to the next section. Do not remove shared state or caller functions
+    until their replacement connection is working.
+
+    CLASSIC-SCRIPT WARNING
+    This file currently uses a classic script and inline HTML event attributes.
+    Switching the script to type="module" changes top-level scope: inline handlers
+    will not automatically see module-local functions. Preserve a deliberate bridge
+    or replace handler wiring as a separately tested integration step.
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>NexusTech Engineering | Luxy Multi-Page Static Crawler & RAG Engine</title>
+
+  <!-- Reuse Luxraj Blog's approved UI and editorial typefaces. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap"
+    rel="stylesheet"
+  >
+  <!-- Reuse the website's shared colour, typography, spacing and radius tokens. -->
+  <link rel="stylesheet" href="../site/assets/css/tokens.css">
+  <!-- Reuse the website's theme preference and data-theme controller. -->
+  <script type="module">
+    import { initTheme } from "../site/assets/js/theme.js";
+    initTheme();
+  </script>
+  <style>
+    /*
+     * MODULARIZATION TARGET: luxy/demo/styles/theme.css
+     * Owns demo-specific base reset and scrollbar styling.
+     * Shared colours and typography come from ../site/assets/css/tokens.css;
+     * the shared ../site/assets/js/theme.js controls light/dark mode.
+     * Do not introduce a second demo palette or a separate theme state.
+     */
+    /* ==========================================================================
+       1. VISUAL DESIGN SYSTEM (STRICTLY ZERO ANIMATIONS)
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      animation: none !important;
+      transition: none !important;
+    }
+
+    html {
+      background-color: var(--color-page);
+      color: var(--color-text-primary);
+      font-family: var(--font-ui);
+      line-height: var(--line-height-body);
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--color-page); }
+    ::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--brand-crimson); }
+
+    /*
+     * MODULARIZATION TARGET: luxy/demo/styles/demo-shell.css
+     * Styles the demo header, search launcher, controls, status badge and route bar.
+     * These styles belong to the sample application shell, not the search engine.
+     */
+    /* ==========================================================================
+       2. HEADER & MULTI-PAGE NAVIGATION BAR
+       ========================================================================== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0.7rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-lg);
+      letter-spacing: var(--letter-spacing-tight);
+    }
+
+    .mascot-frame {
+      width: 38px;
+      height: 38px;
+      background: var(--brand-crimson);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--color-border-strong);
+      flex-shrink: 0;
+    }
+
+    .luxy-mascot-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .search-launcher-bar {
+      flex: 1;
+      max-width: 460px;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-md);
+      padding: 0.45rem 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+    }
+
+    .search-launcher-bar:hover {
+      border-color: var(--brand-crimson);
+      color: var(--color-text-primary);
+    }
+
+    .kbd-shortcut {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-strong);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-text-muted);
+      margin-left: auto;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background-color: var(--color-surface);
+      color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background-color: var(--color-border-strong);
+      border-color: var(--color-text-muted);
+    }
+
+    .btn-primary {
+      background: var(--color-action);
+      border-color: var(--color-action);
+      color: var(--color-on-action);
+    }
+
+    .btn-cyan {
+      background-color: var(--color-surface);
+      border-color: var(--color-action);
+      color: var(--color-action);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: var(--font-size-xs);
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-pill);
+      background: var(--color-surface);
+      border: 1px solid var(--color-success);
+      color: var(--color-success);
+      font-family: var(--font-code);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--color-success);
+    }
+
+    /* Multi-Page Sub-Navbar */
+    .multipage-nav {
+      background-color: var(--color-surface-raised);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0.45rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      overflow-x: auto;
+      font-size: var(--font-size-xs);
+    }
+
+    .nav-route-label {
+      font-family: var(--font-code);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      margin-right: 0.4rem;
+    }
+
+    .route-link {
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-sm);
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-family: var(--font-code);
+      font-size: var(--font-size-xs);
+      border: 1px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      background: transparent;
+    }
+
+    .route-link:hover {
+      background-color: var(--color-surface);
+      border-color: var(--color-border-strong);
+    }
+
+    .route-link.active {
+      background-color: var(--color-selection);
+      border-color: var(--brand-crimson);
+      color: var(--brand-crimson);
+      font-weight: var(--font-weight-bold);
+    }
+
+    /*
+     * MODULARIZATION TARGET: luxy/demo/styles/demo-content.css
+     * Styles the demo page layout, article fixtures, code/table presentation,
+     * crawler sidebar, telemetry list and form controls.
+     * The crawler reads article markup from the demo DOM; this stylesheet itself
+     * is not part of crawling, tokenization or ranking.
+     */
+    /* ==========================================================================
+       3. MAIN LAYOUT, ARTICLES & MULTI-PAGE VIEWPORT
+       ========================================================================== */
+    .container {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 1.75rem 1.5rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    .site-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 1080px) {
+      .site-layout { grid-template-columns: 1fr; }
+    }
+
+    .hero-banner {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--brand-crimson);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: 0.35rem;
+      color: var(--color-text-primary);
+    }
+
+    .hero-sub {
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      max-width: 780px;
+    }
+
+    .article-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .tech-article {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.6rem;
+      position: relative;
+    }
+
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      margin-bottom: 0.65rem;
+      font-family: var(--font-code);
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      text-transform: uppercase;
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .page-origin-pill {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      padding: 2px 7px;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+    }
+
+    .article-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-primary);
+      margin-bottom: 0.9rem;
+      line-height: var(--line-height-heading);
+    }
+
+    .article-content h2 {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--brand-crimson);
+      margin: 1.2rem 0 0.45rem 0;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px dashed var(--color-border);
+    }
+
+    .article-content p {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      margin-bottom: 0.8rem;
+    }
+
+    .article-content ul {
+      margin: 0.4rem 0 0.9rem 1.4rem;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    .code-block {
+      background-color: var(--color-page);
+      border: 1px solid var(--color-border-strong);
+      border-left: 3px solid var(--brand-crimson);
+      border-radius: var(--radius-sm);
+      padding: 0.8rem;
+      font-family: var(--font-code);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      white-space: pre;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.8rem 0;
+      font-size: var(--font-size-sm);
+    }
+
+    .spec-table th, .spec-table td {
+      border: 1px solid var(--color-border);
+      padding: 0.45rem 0.7rem;
+      text-align: left;
+    }
+
+    .spec-table th {
+      background-color: var(--color-surface);
+      color: var(--color-text-primary);
+      font-family: var(--font-code);
+    }
+
+    .spec-table td { color: var(--color-text-secondary); }
+
+    /* Static Target Highlight (Zero Animation) */
+    .dom-highlight-static {
+      outline: var(--focus-ring-width) solid var(--color-focus) !important;
+      background-color: var(--color-selection) !important;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Sidebar Widgets */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .widget-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.15rem;
+    }
+
+    .widget-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-primary);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .crawler-log-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      max-height: 210px;
+      overflow-y: auto;
+    }
+
+    .crawler-log-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.35rem 0.5rem;
+      background-color: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+
+    .form-group { margin-bottom: 0.65rem; }
+    .form-label {
+      display: block;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      margin-bottom: 0.2rem;
+      font-family: var(--font-code);
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background-color: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.6rem;
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-ui);
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--brand-crimson);
+    }
+
+    /*
+     * MODULARIZATION TARGET: luxy/demo/styles/search-ui.css
+     * Styles the demo search modal, messages, score/correction pills, sources,
+     * follow-up chips, autocomplete panel, floating launcher and toast.
+     * Response HTML currently uses classes such as spec-table, code-block,
+     * secondary-synthesis-box, source-pill and followup-chip. Preserve equivalent
+     * styling or adapt the renderer if this demo UI is not carried into Luxraj.
+     */
+    /* ==========================================================================
+       4. LUXY CONVERSATIONAL SEARCH & LIVE AUTOCOMPLETE MODAL
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background-color: rgb(0 0 0 / 0.58);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .search-modal-container {
+      width: 100%;
+      max-width: 960px;
+      height: 86vh;
+      max-height: 780px;
+      background-color: var(--color-surface);
+      border: 2px solid var(--color-border-strong);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 0.85rem 1.25rem;
+      background-color: var(--color-surface-raised);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .modal-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .luxy-status-pill {
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-weight: var(--font-weight-semibold);
+    }
+    /* Filter & Telemetry Bar inside Modal */
+    .modal-Subbar {
+      background-color: var(--color-page);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0.45rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      flex-wrap: wrap;
+    }
+
+    .scope-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .chat-messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .message-row {
+      display: flex;
+      gap: 0.85rem;
+      max-width: 94%;
+    }
+
+    .message-row.user {
+      margin-left: auto;
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      flex-shrink: 0;
+      border: 1px solid var(--color-border-strong);
+      background-color: var(--color-surface-raised);
+    }
+
+    .message-avatar .luxy-mascot-image {
+      width: 100%;
+      height: 100%;
+    }
+
+    .bot .message-avatar {
+      background: var(--brand-crimson);
+      border-color: var(--brand-crimson);
+    }
+
+    .message-bubble {
+      background-color: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 0.95rem 1.15rem;
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-body);
+      color: var(--color-text-primary);
+      width: 100%;
+    }
+
+    
+    .bot .message-bubble {
+      font-family: var(--font-editorial);
+    }
+.user .message-bubble {
+      background-color: var(--color-selection);
+      border-color: var(--brand-crimson);
+      width: auto;
+      font-family: var(--font-ui);
+    }
+
+    .telemetry-header {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.55rem;
+    }
+
+    .intent-pill {
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+    }
+    .status-error-pill {
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-error);
+      background: var(--color-surface);
+      border: 1px solid var(--color-error);
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .score-pill {
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-text-muted);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+    }
+    .Correction-pill {
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-info);
+      background: var(--color-surface);
+      border: 1px solid var(--color-info);
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+    }
+    mark {
+      background-color: var(--color-selection);
+      color: var(--color-text-primary);
+      padding: 1px 4px;
+      border-radius: var(--radius-sm);
+      font-weight: var(--font-weight-semibold);
+    }
+    .secondary-synthesis-box {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      background-color: var(--color-surface);
+      border-left: 3px solid var(--brand-crimson);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .sources-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.8rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border-strong);
+      color: var(--color-link);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      cursor: pointer;
+    }
+
+    .source-pill:hover {
+      background-color: var(--color-action);
+      color: var(--color-on-action);
+      border-color: var(--color-action);
+    }
+
+    .followups-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.7rem;
+    }
+
+    .followup-chip {
+      background: var(--color-surface);
+      border: 1px dashed var(--color-border-strong);
+      color: var(--color-text-secondary);
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-ui);
+      cursor: pointer;
+    }
+
+    .followup-chip:hover {
+      color: var(--color-text-primary);
+      border-color: var(--brand-crimson);
+    }
+
+    /* Live Static Autocomplete Bar */
+    .autocomplete-panel {
+      display: none;
+      background-color: var(--color-page);
+      border: 1px solid var(--brand-crimson);
+      border-radius: var(--radius-md);
+      padding: 0.55rem 0.75rem;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .autocomplete-panel.active {
+      display: flex;
+    }
+
+    .autocomplete-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .autocomplete-label {
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      margin-right: 0.25rem;
+    }
+
+    .ac-word-chip {
+      background-color: var(--color-surface);
+      border: 1px solid var(--brand-crimson);
+      color: var(--color-text-primary);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      cursor: pointer;
+    }
+
+    .ac-word-chip:hover, .ac-word-chip.selected {
+      background-color: var(--color-action);
+      color: var(--color-on-action);
+    }
+
+    .ac-heading-chip {
+      background-color: var(--color-surface);
+      border: 1px solid var(--brand-crimson);
+      color: var(--color-link);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      cursor: pointer;
+    }
+
+    .ac-heading-chip:hover {
+      background-color: var(--color-action);
+      color: var(--color-on-action);
+    }
+
+    .modal-footer {
+      padding: 0.85rem 1.25rem;
+      background-color: var(--color-surface-raised);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .quick-prompts {
+      display: flex;
+      gap: 0.45rem;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .prompt-tag {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: var(--font-size-xs);
+      white-space: nowrap;
+      cursor: pointer;
+      font-family: var(--font-code);
+    }
+
+    .prompt-tag:hover {
+      border-color: var(--brand-crimson);
+      color: var(--color-text-primary);
+    }
+
+    .search-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-md);
+      padding: 0.35rem 0.6rem;
+    }
+
+    .search-input-wrapper:focus-within {
+      border-color: var(--brand-crimson);
+    }
+
+    .modal-search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+      padding: 0.35rem;
+      outline: none;
+      font-family: var(--font-ui);
+    }
+
+    /* Floating Launcher Button (Static) */
+    .floating-search-fab {
+      position: fixed;
+      bottom: 1.75rem;
+      right: 1.75rem;
+      z-index: 50;
+      height: 54px;
+      padding: 0 1.1rem;
+      border-radius: 27px;
+      background: var(--brand-crimson);
+      color: var(--color-on-action);
+      border: 2px solid var(--color-border-strong);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
+    }
+
+    .fab-badge {
+      background-color: var(--color-page);
+      color: var(--brand-crimson);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      padding: 2px 7px;
+      border-radius: 10px;
+      border: 1px solid var(--brand-crimson);
+    }
+
+    /* Toast Notification (Instant Static Display) */
+    .toast {
+      position: fixed;
+      bottom: 1.75rem;
+      left: 1.75rem;
+      background-color: var(--color-surface-raised);
+      border: 2px solid var(--brand-crimson);
+      color: var(--color-text-primary);
+      padding: 0.6rem 1.1rem;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-code);
+      z-index: 250;
+      display: none;
+    }
+
+    .toast.show { display: block; }
+
+    /* ==========================================================================
+       5. ADD-ON: LUXY CONTENT TAGGING & EXPRESSION SYSTEM STYLES (NON-INVASIVE)
+       ========================================================================== */
+    .luxy-content-tags-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin: 0.35rem 0 0.6rem 0;
+      padding: 0.35rem 0.55rem;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+    }
+
+    .luxy-content-tags-label {
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      margin-right: 0.2rem;
+    }
+
+    .luxy-content-tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 2px 10px;
+      border-radius: var(--radius-pill);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      font-weight: var(--font-weight-semibold);
+      letter-spacing: 0.02em;
+      background-color: var(--color-surface-raised);
+      border: 1px solid var(--color-border-strong);
+      color: var(--color-text-primary);
+    }
+
+    .luxy-content-tag-pill[data-luxy-tag="CODE"] {
+      border-color: var(--brand-crimson);
+      color: var(--brand-crimson);
+    }
+
+    .luxy-content-tag-pill[data-luxy-tag="EXPLANATION"] {
+      border-color: var(--color-info, #0284c7);
+      color: var(--color-info, #0284c7);
+    }
+
+    .luxy-content-tag-pill[data-luxy-tag="DEMONSTRATION"] {
+      border-color: var(--color-success, #16a34a);
+      color: var(--color-success, #16a34a);
+    }
+
+    .luxy-content-tag-pill[data-luxy-tag="SPEC"] {
+      border-color: var(--color-warning, #d97706);
+      color: var(--color-warning, #d97706);
+    }
+
+    .luxy-content-tag-pill[data-luxy-tag="INTERACTIVE"] {
+      border-color: var(--color-action);
+      color: var(--color-action);
+    }
+
+    .luxy-content-tag-none {
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-text-muted);
+    }
+
+    .luxy-expression-badge {
+      margin-left: auto;
+      font-size: var(--font-size-xs);
+      font-family: var(--font-code);
+      color: var(--color-text-secondary);
+      background-color: var(--color-page);
+      border: 1px dashed var(--color-border-strong);
+      padding: 1px 8px;
+      border-radius: var(--radius-pill);
+    }
+  </style>
+</head>
+<body>
+
+  <!--
+    MODULARIZATION TARGET: luxy/demo/ui/demo-shell.html
+    Demo-only header and launcher controls. These elements call functions from the
+    classic script through inline onclick attributes. Do not copy this shell into
+    Luxraj Blog when the existing Luxraj search interface is the intended host UI.
+  -->
+  <!-- ==========================================================================
+       HEADER BAR WITH LUXY STATIC SVG MASCOT
+       ========================================================================== -->
+  <header class="app-header">
+    <a href="#" class="brand-logo" onclick="switchActivePageRoute('index.html'); return false;">
+      <div class="mascot-frame" id="header-mascot-icon"></div>
+      <div>
+        <span>LUXY</span>
+        <span style="color: var(--brand-crimson); font-weight: var(--font-weight-regular); font-size: var(--font-size-sm);">Multi-Page Spider</span>
+      </div>
+    </a>
+
+    <div class="search-launcher-bar" onclick="openSearchModal()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <span>Ask Luxy (supports partial words like "microcontrol", Tab-complete)...</span>
+      <span class="kbd-shortcut">Ctrl K</span>
+    </div>
+
+    <div class="header-controls">
+      <div class="status-badge" title="Multi-Page Index Status">
+        <span class="status-dot"></span>
+        <span id="indexed-count-label">0 Pages • 0 Chunks</span>
+      </div>
+      <button class="btn btn-cyan" onclick="runFullMultiPageCrawl()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>
+        Spider All Pages
+      </button>
+      <button class="btn" onclick="openExtractorModal()">Extract Code</button>
+      <button class="btn" type="button" data-theme-toggle>Theme</button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MULTI-PAGE SITE ROUTE SWITCHER (HOST DOM + VIRTUAL CRAWLED PAGES)
+       ========================================================================== -->
+  <nav class="multipage-nav" id="multipage-route-bar">
+    <span class="nav-route-label">Site Pages:</span>
+    <a href="index.html" class="route-link active" data-route="index.html" onclick="switchActivePageRoute('index.html'); return false;">
+      /index.html (Host DOM - 5 Articles)
+    </a>
+    <a href="/docs/risc-v-vector.html" class="route-link" data-route="/docs/risc-v-vector.html" onclick="switchActivePageRoute('/docs/risc-v-vector.html'); return false;">
+      /docs/risc-v-vector.html
+    </a>
+    <a href="/docs/fpga-timing.html" class="route-link" data-route="/docs/fpga-timing.html" onclick="switchActivePageRoute('/docs/fpga-timing.html'); return false;">
+      /docs/fpga-timing.html
+    </a>
+    <a href="/docs/can-fd-bus.html" class="route-link" data-route="/docs/can-fd-bus.html" onclick="switchActivePageRoute('/docs/can-fd-bus.html'); return false;">
+      /docs/can-fd-bus.html
+    </a>
+    <a href="/docs/usb-pd-controller.html" class="route-link" data-route="/docs/usb-pd-controller.html" onclick="switchActivePageRoute('/docs/usb-pd-controller.html'); return false;">
+      /docs/usb-pd-controller.html
+    </a>
+  </nav>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <div class="container">
+    <div class="hero-banner">
+      <div>
+        <h1 class="hero-title" id="current-page-banner-title">Host Page (/index.html): Hardware & Systems Engineering Archives</h1>
+        <p class="hero-sub" id="current-page-banner-sub">
+          Explore deep-dive technical publications on microcontroller power states, Class-D audio filtering, high-voltage multimeter protection, vector pipelines, and zero-backend web crawlers.
+        </p>
+      </div>
+      <div style="text-align: right; font-family: var(--font-code); font-size: var(--font-size-xs); color: var(--color-text-muted);">
+        <div>ACTIVE ROUTE: <strong style="color: var(--brand-crimson);" id="active-route-indicator">index.html</strong></div>
+        <div>ENGINE: <strong style="color: var(--brand-crimson);">LUXY-RAG v3.5</strong></div>
+      </div>
+    </div>
+
+    <div class="site-layout">
+      <!--
+        DEMO CORPUS FIXTURE: the host articles below are sample searchable content.
+        crawlEntireSite() reads this article-feed DOM through cachedHostDomHTML.
+        Keep these articles as test fixtures, not as part of the reusable engine.
+        Real Luxraj indexing must receive the actual site's article source instead.
+      -->
+      <!-- Primary Article Viewport -->
+      <main class="article-feed" id="article-feed">
+
+        <!-- HOST ARTICLE 1 -->
+        <article class="tech-article" id="art-esp32" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Embedded Systems</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: OCT 14, 2026 • BY ALEX MERCER</span>
+          </div>
+          <h1 class="article-title">Low-Power ESP32 Microcontroller Telemetry & Custom PCB Routing</h1>
+          <div class="article-content">
+            <h2 id="esp32-deep-sleep">Deep Sleep Microcontroller Power Optimization & Current Draw</h2>
+            <p>Achieving ultra-low current consumption in ESP32 microcontroller edge telemetry nodes requires disabling unused peripherals before invoking deep sleep. In standard deep sleep mode, the main CPU core, Wi-Fi radio, and Bluetooth baseband are completely powered down, leaving only the Real-Time Clock (RTC) controller and RTC fast memory active.</p>
+            <p>With proper power domain configuration, microcontroller current consumption drops from 240mA during Wi-Fi transmission down to approximately <strong>10µA to 15µA in deep sleep</strong>. Configure timer wake-up programmatically:</p>
+            <div class="code-block">// ESP-IDF Deep Sleep Configuration
+esp_sleep_enable_timer_wakeup(SLEEP_DURATION_SEC * 1000000ULL);
+gpio_deep_sleep_hold_dis(); // Release GPIO pins to prevent leakage
+esp_deep_sleep_start();</div>
+
+            <h2 id="esp32-ldo-power">Custom LDO Selection & Power Gating</h2>
+            <p>Standard linear regulators like the AMS1117 feature a high quiescent current (~5mA), rendering them unsuitable for battery-powered IoT microcontroller nodes. Instead, design with ultra-low quiescent current (Iq) LDO regulators such as the Texas Instruments TPS7A02, which exhibits an Iq of only 25nA.</p>
+
+            <h2 id="esp32-rf-trace">RF Trace Impedance Matching (50Ω Coplanar Waveguide)</h2>
+            <p>When routing the 2.4GHz Wi-Fi RF trace between the ESP32 chip and the PCB antenna, maintain strict 50-ohm characteristic impedance. Utilize a Grounded Coplanar Waveguide (GCPW) layout with continuous ground plane shielding on Layer 2 and ground stitching vias placed every λ/20 along the RF path.</p>
+
+            <h2 id="esp32-i2c-polling">I2C Sensor Polling Architecture</h2>
+            <p>To minimize energy spent per telemetry burst, poll environmental sensors (such as BME280 or MPU6050) over I2C operating at 400kHz Fast Mode. Read sensor data into RTC memory, evaluate threshold triggers, and immediately return to deep sleep if no critical delta is detected.</p>
+          </div>
+        </article>
+
+        <!-- HOST ARTICLE 2 -->
+        <article class="tech-article" id="art-class-d" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Audio Engineering</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: NOV 02, 2026 • BY DR. HELENA VANCE</span>
+          </div>
+          <h1 class="article-title">Class-D 2.1 Audio Amplifier Architecture & Filter Design</h1>
+          <div class="article-content">
+            <h2 id="classd-pwm-switching">High-Frequency PWM Modulation Strategy</h2>
+            <p>Class-D audio amplifiers operate output MOSFETs in switching states (fully ON or fully OFF), yielding efficiency ratings exceeding 90%. Switching frequencies typically range between 300kHz and 1.2MHz, pushing switching noise far above the 20Hz–20kHz audible spectrum.</p>
+
+            <h2 id="classd-lc-filter">LC Reconstruction Filter Inductor & Capacitor Calculation</h2>
+            <p>To convert the high-frequency PWM pulse train back into a clean analog acoustic waveform, a 2nd-order Butterworth LC low-pass filter must be placed at the output stage. The resonant cutoff frequency Fc is determined by:</p>
+            <div class="code-block">Fc = 1 / (2 * π * sqrt(L * C))
+For a 4-ohm speaker load and Fc = 30kHz:
+Inductor (L) = 10µH (Shielded ferrite core, saturation current > 15A)
+Capacitor (C) = 0.68µF (Film capacitor, Metalized Polypropylene)</div>
+
+            <h2 id="classd-subwoofer-crossover">Active Subwoofer Crossover at 80Hz</h2>
+            <p>In a 2.1 channel system, the subwoofer low-pass crossover is set at 80Hz using a 4th-order Linkwitz-Riley active filter topology, providing a flat amplitude response across the crossover region with a steep 24dB/octave attenuation slope.</p>
+
+            <h2 id="classd-thermal-dissipation">Thermal Dissipation & Copper Pour Heatsinking</h2>
+            <p>High-power peaks (e.g., 200W RMS into subwoofer) generate heat concentrated within the power stage IC. Utilize 2oz copper PCB layers with an array of thermal vias (0.3mm diameter, 0.8mm pitch) directly under the exposed thermal pad connecting to the bottom ground plane.</p>
+          </div>
+        </article>
+
+        <!-- HOST ARTICLE 3 -->
+        <article class="tech-article" id="art-multimeter" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Analog Circuits</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: NOV 19, 2026 • BY MARCUS THORN</span>
+          </div>
+          <h1 class="article-title">Digital Multimeter Protection & Circuit Sandbox Design</h1>
+          <div class="article-content">
+            <h2 id="dmm-overvoltage">Overvoltage Input Protection (PTC & MOV Clamping)</h2>
+            <p>Industrial digital multimeters (DMMs) rated for CAT III 1000V / CAT IV 600V safety standards must withstand high-voltage transient spikes without rupturing. Protection circuits utilize Positive Temperature Coefficient (PTC) thermistors in series and Metal Oxide Varistors (MOVs) in parallel.</p>
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th>Protection Component</th>
+                  <th>Primary Function</th>
+                  <th>Typical Rating / Parameter</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>PTC Thermistor</td>
+                  <td>Current Limiting / Self-Resetting Fuse</td>
+                  <td>1000V Hold Current 10mA, Cold Resistance 1kΩ</td>
+                </tr>
+                <tr>
+                  <td>Metal Oxide Varistor (MOV)</td>
+                  <td>High-Energy Voltage Clamping</td>
+                  <td>Varistor Voltage 1100V, Surge Energy >70J</td>
+                </tr>
+                <tr>
+                  <td>High-Energy HRC Fuse</td>
+                  <td>Short-Circuit Fault Interrupt</td>
+                  <td>1000V / 11A, 10kA Interrupt Capacity</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2 id="dmm-input-impedance">10MΩ High-Impedance Attenuator Network</h2>
+            <p>To avoid loading delicate active circuits during voltage measurements, DMM inputs feature a precise 10MΩ input impedance divider network built from 0.1% tolerance thin-film resistor arrays.</p>
+
+            <h2 id="dmm-nodal-solver">Kirchhoff Nodal Analysis Solver Engine</h2>
+            <p>Interactive circuit sandbox software implements Modified Nodal Analysis (MNA) to solve circuit equations dynamically using matrix <strong>[G][V] = [I]</strong>, where G represents conductances, V is unknown node voltages, and I is independent current sources.</p>
+          </div>
+        </article>
+
+        <!-- HOST ARTICLE 4 -->
+        <article class="tech-article" id="art-vector-anim" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Graphics & Vision</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: DEC 04, 2026 • BY SOPHIA CHEN</span>
+          </div>
+          <h1 class="article-title">Automated 2D Vector Animation & Rotoscoping Pipeline</h1>
+          <div class="article-content">
+            <h2 id="vec-opencv-edges">OpenCV Frame Difference Edge Detection</h2>
+            <p>Automated vector rotoscoping extracts high-contrast contours from raw video frames. Sequential frames are converted to grayscale, smoothed with a 5x5 Gaussian Blur, and processed via Canny edge detection:</p>
+            <div class="code-block">gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+edges = cv2.Canny(blurred, threshold1=50, threshold2=150)
+contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</div>
+
+            <h2 id="vec-vtracer-simplification">VTracer Path Simplification & Bézier Fitting</h2>
+            <p>Pixel-based raster edges are converted to smooth vector paths using Douglas-Peucker polygon simplification followed by cubic Bézier curve fitting to minimize SVG node count.</p>
+          </div>
+        </article>
+
+        <!-- HOST ARTICLE 5 -->
+        <article class="tech-article" id="art-rag-architecture" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Web Architecture</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: JAN 10, 2027 • BY BENJAMIN ROTH</span>
+          </div>
+          <h1 class="article-title">Zero-Backend Static Site Architecture & Client-Side Crawling</h1>
+          <div class="article-content">
+            <h2 id="rag-dom-indexing">Multi-Page Client-Side Crawling & DOMParser Retrieval</h2>
+            <p>Modern client-side engines execute 100% inside the browser without backend server overhead. The multi-page spider discovers internal links via <code>a[href]</code> and parses external HTML documents in memory using <code>fetch()</code> and <code>new DOMParser().parseFromString(html, 'text/html')</code>.</p>
+
+            <h2 id="rag-bm25-ranking">BM25+ Lexical Ranking, Prefix Expansion & Proximity Boosting</h2>
+            <p>To rank document chunks across multiple pages, Luxy implements Okapi BM25 with field weights, bi-gram proximity scoring, Porter-lite suffix/consonant stemming, prefix auto-expansion, and Levenshtein fuzzy typo correction:</p>
+            <div class="code-block">score(D, Q) = ∑ IDF(q) * ((tf * (k1 + 1)) / (tf + k1 * (1 - b + b * (dl / avgdl)))) + ProximityBoost</div>
+          </div>
+        </article>
+
+      </main>
+
+      <!--
+        DEMO-ONLY CONTROLS: crawler telemetry, manual URL crawling, virtual page
+        publishing, index export and cache rebuild. Their event handlers call
+        functions in the demo controller. They are not required for a search-only
+        Luxraj integration unless an equivalent administration UI is explicitly wanted.
+      -->
+      <!-- Sidebar Controls: Multi-Page Spider Status & Custom Page Injection -->
+      <aside class="sidebar">
+
+        <!-- Multi-Page Crawler Telemetry Widget -->
+        <div class="widget-card">
+          <h3 class="widget-title">
+            <span>Multi-Page Spider Queue</span>
+            <span style="font-size: var(--font-size-xs); color: var(--brand-crimson); font-family: var(--font-code);" id="spider-depth-badge">MAX DEPTH: 2</span>
+          </h3>
+          <ul class="crawler-log-list" id="crawler-log-list"></ul>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.4rem;">
+            <input type="text" id="custom-crawl-url" class="form-input" placeholder="Crawl URL (e.g. /docs/fpga-timing.html)">
+            <button class="btn btn-primary" onclick="crawlSingleUrlFromInput()">Spider</button>
+          </div>
+        </div>
+
+        <!-- Add Custom Multi-Page or Host Section -->
+        <div class="widget-card">
+          <h3 class="widget-title">Inject New Page / Section</h3>
+          <div class="form-group">
+            <label class="form-label">TARGET PAGE ROUTE</label>
+            <select id="new-page-route" class="form-select">
+              <option value="index.html">index.html (Current Host DOM)</option>
+              <option value="/docs/risc-v-vector.html">/docs/risc-v-vector.html</option>
+              <option value="/docs/fpga-timing.html">/docs/fpga-timing.html</option>
+              <option value="/docs/can-fd-bus.html">/docs/can-fd-bus.html</option>
+              <option value="/docs/usb-pd-controller.html">/docs/usb-pd-controller.html</option>
+              <option value="/docs/custom-node.html">/docs/custom-node.html (Create New Page)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ARTICLE TITLE & TAG</label>
+            <input type="text" id="new-title" class="form-input" placeholder="e.g. GaN Half-Bridge Motor Driver">
+          </div>
+          <div class="form-group">
+            <label class="form-label">SECTION HEADING (H2)</label>
+            <input type="text" id="new-heading" class="form-input" placeholder="e.g. Dead-Time Shoot-Through Prevention">
+          </div>
+          <div class="form-group">
+            <label class="form-label">TECHNICAL CONTENT</label>
+            <textarea id="new-content" class="form-textarea" rows="3" placeholder="Enter specs, formulas, or protocols..."></textarea>
+          </div>
+          <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="injectCustomPageContent()">
+            Publish & Re-Spider Site
+          </button>
+        </div>
+
+        <!-- Index Export / Persistence -->
+        <div class="widget-card">
+          <h3 class="widget-title">Multi-Page Index Storage</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.45rem;">
+            <button class="btn" style="width: 100%; justify-content: center;" onclick="siteCrawler.exportIndexJSON()">
+              Export Multi-Page Index (.json)
+            </button>
+            <button class="btn" style="width: 100%; justify-content: center;" onclick="clearAndRebuildCache()">
+              Purge Cache & Cold Re-Crawl
+            </button>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!--
+    DEMO SEARCH UI: floating launcher and search modal markup.
+    The reusable engine should connect to Luxraj's existing search interface;
+    retain only the UI adapter behavior that Luxraj actually needs.
+    Inline event attributes below depend on globally reachable classic-script
+    functions and must be addressed when modules are connected.
+  -->
+  <!-- FLOATING LAUNCHER (LUXY MASCOT) -->
+  <button class="floating-search-fab" onclick="openSearchModal()">
+    <span id="fab-mascot-holder" style="display:flex; align-items:center;"></span>
+    <span>Ask Luxy</span>
+    <span class="fab-badge" id="fab-chunk-count">0</span>
+  </button>
+
+  <!-- ==========================================================================
+       LUXY CONVERSATIONAL MULTI-PAGE MODAL
+       ========================================================================== -->
+  <div class="modal-backdrop" id="search-modal-backdrop" onclick="if(event.target.id==='search-modal-backdrop') closeSearchModal()">
+    <div class="search-modal-container">
+
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="mascot-frame" id="modal-mascot-avatar" style="width: 42px; height: 42px;"></div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-weight: var(--font-weight-bold); font-size: var(--font-size-base);">Ask me anything about this website</span>
+              <span class="luxy-status-pill" id="luxy-mood-label">STATE: READY</span>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.45rem;">
+          <button class="btn" style="padding: 0.3rem 0.6rem; font-size: var(--font-size-xs);" onclick="clearChatHistory()">Clear Chat</button>
+          <button class="btn" style="padding: 0.3rem 0.65rem;" onclick="closeSearchModal()">✕</button>
+        </div>
+      </div>
+
+      <!-- Scope & Operator Helper Bar -->
+      <div class="modal-Subbar">
+        <div class="scope-selector">
+          <span>PAGE SCOPE:</span>
+          <select id="search-page-scope" class="form-select" style="width: auto; padding: 2px 6px; font-size: var(--font-size-xs);" onchange="handleInputAutocomplete()">
+            <option value="ALL">All Crawled Pages (Global Site)</option>
+            <option value="index.html">index.html only</option>
+            <option value="/docs/risc-v-vector.html">/docs/risc-v-vector.html</option>
+            <option value="/docs/fpga-timing.html">/docs/fpga-timing.html</option>
+            <option value="/docs/can-fd-bus.html">/docs/can-fd-bus.html</option>
+            <option value="/docs/usb-pd-controller.html">/docs/usb-pd-controller.html</option>
+          </select>
+        </div>
+        <div style="color: var(--color-text-muted);">
+          Prefix & Operators: <code>microcontrol</code> | <code>"exact phrase"</code> | <code>tag:fpga</code> | <code>has:table</code> | <code>has:code</code>
+        </div>
+      </div>
+
+      <!-- Chat Feed -->
+      <div class="chat-messages-container" id="chat-messages"></div>
+
+      <!-- Modal Footer with Live Autocomplete Bar -->
+      <div class="modal-footer">
+
+        <!-- Live Static Autocomplete Panel -->
+        <div class="autocomplete-panel" id="autocomplete-panel">
+          <div class="autocomplete-row" id="ac-words-row"></div>
+          <div class="autocomplete-row" id="ac-headings-row"></div>
+        </div>
+
+        <div class="quick-prompts">
+          <span class="prompt-tag" onclick="runQuickPrompt('microcontrol')">🔍 Test Prefix: "microcontrol"</span>
+          <span class="prompt-tag" onclick="runQuickPrompt('What is ESP32 deep sleep current draw?')">⚡ ESP32 sleep current</span>
+          <span class="prompt-tag" onclick="runQuickPrompt('How do RISC-V vector registers handle strip-mining?')">🧮 RISC-V strip-mining</span>
+          <span class="prompt-tag" onclick="runQuickPrompt('FPGA setup and hold time violation fixes has:table')">⏱️ FPGA timing table</span>
+          <span class="prompt-tag" onclick="runQuickPrompt('CAN-FD arbitration vs data phase bit rate')">🚗 CAN-FD bit rates</span>
+          <span class="prompt-tag" onclick="runQuickPrompt('USB-PD 240W Extended Power Range EPR negotiation')">🔌 USB-PD 240W EPR</span>
+        </div>
+
+        <div class="search-input-wrapper">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--brand-crimson);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input
+            type="text"
+            id="chat-input"
+            class="modal-search-input"
+            autocomplete="off"
+            placeholder="Type partial words like 'microcontrol' (Press Tab to complete, Enter to ask)..."
+            oninput="handleInputAutocomplete()"
+            onkeydown="handleChatInputKeydown(event)"
+          >
+          <button class="btn btn-primary" onclick="sendSearchQuery()">Ask Luxy</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!--
+    DEVELOPMENT DEMO TOOL ONLY: this modal copies class source using toString().
+    It is not a crawler/search dependency and should not enter the production
+    Luxraj integration bundle.
+  -->
+  <!-- ==========================================================================
+       MODULAR CODE EXTRACTOR MODAL
+       ========================================================================== -->
+  <div class="modal-backdrop" id="extractor-modal-backdrop" onclick="if(event.target.id==='extractor-modal-backdrop') closeExtractorModal()">
+    <div class="search-modal-container" style="max-width: 860px; height: 78vh;">
+      <div class="modal-header">
+        <div style="font-weight: var(--font-weight-bold);">Luxy Multi-Page Crawler — Standalone Code Extractor</div>
+        <button class="btn" onclick="closeExtractorModal()">✕</button>
+      </div>
+      <div style="padding: 1rem; flex: 1; display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-primary" onclick="switchCodeTab('crawler')">luxy-multipage-spider.js</button>
+          <button class="btn" onclick="switchCodeTab('rag')">luxy-bm25-rag.js</button>
+        </div>
+        <textarea id="code-display-area" class="code-block" style="flex: 1; width: 100%; margin: 0; resize: none;" readonly></textarea>
+      </div>
+      <div style="padding: 0.85rem 1.25rem; border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-primary" onclick="copyExtractedCode()">Copy Module Code</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast-message">Status Normal</div>
+
+  <!-- ==========================================================================
+       5. LUXY MULTI-PAGE SPIDER, BM25+ PREFIX ENGINE & AUTOCOMPLETE CONTROLLER
+       ========================================================================== -->
+  <script>
+    /*
+     * MASCOT ASSET: site/assets/images/brand/luxy-static-mascot.svg
+     * Inline the approved SVG so JavaScript can switch its four facial groups.
+     * Every rendered copy receives unique IDs to avoid collisions between the
+     * header, modal, floating launcher and individual assistant messages.
+     * This presentation layer does not affect crawler or ranking behaviour.
+     */
+    const LUXY_MASCOT_ASSET = '../site/assets/images/brand/luxy-static-mascot.svg';
+    const LUXY_MASCOT_STATES = ['default', 'code', 'spec', 'fallback'];
+
+    let luxyMascotSvgTemplate = null;
+    let luxyMascotSvgLoadPromise = null;
+    let luxyMascotCurrentMood = 'default';
+    let luxyMascotInstanceCounter = 0;
+
+    async function loadLuxyMascotSvg() {
+      if (!luxyMascotSvgLoadPromise) {
+        luxyMascotSvgLoadPromise = (async () => {
+          try {
+            const response = await fetch(LUXY_MASCOT_ASSET);
+            if (!response.ok) throw new Error(`Mascot SVG request failed: ${response.status}`);
+
+            const svgText = await response.text();
+            const parsedDocument = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+            const svgRoot = parsedDocument.documentElement;
+
+            if (parsedDocument.querySelector('parsererror') || !svgRoot || svgRoot.localName !== 'svg') {
+              throw new Error('Mascot SVG could not be parsed as valid XML.');
+            }
+
+            for (const state of LUXY_MASCOT_STATES) {
+              if (!svgRoot.querySelector(`[id="luxy-face-${state}"]`)) {
+                throw new Error(`Mascot SVG is missing the luxy-face-${state} group.`);
+              }
+            }
+
+            luxyMascotSvgTemplate = svgRoot;
+            return true;
+          } catch (error) {
+            console.error('Luxy mascot could not be loaded for dynamic expressions:', error);
+            return false;
+          }
+        })();
+      }
+
+      return luxyMascotSvgLoadPromise;
+    }
+
+    function renderLuxyMascotMarkup() {
+      if (!luxyMascotSvgTemplate) {
+        return `<img src="${LUXY_MASCOT_ASSET}" alt="Luxy mascot" class="luxy-mascot-image">`;
+      }
+
+      const svgRoot = luxyMascotSvgTemplate.cloneNode(true);
+      const instancePrefix = `luxy-instance-${++luxyMascotInstanceCounter}`;
+      const elementsWithIds = [svgRoot, ...svgRoot.querySelectorAll('[id]')];
+      const idMap = new Map();
+
+      elementsWithIds.forEach(element => {
+        const originalId = element.getAttribute('id');
+        if (!originalId) return;
+        const uniqueId = `${instancePrefix}-${originalId}`;
+        idMap.set(originalId, uniqueId);
+        element.setAttribute('id', uniqueId);
+      });
+
+      // Keep accessibility labels and local SVG references valid after namespacing IDs.
+      const svgElements = [svgRoot, ...svgRoot.querySelectorAll('*')];
+      svgElements.forEach(element => {
+        Array.from(element.attributes).forEach(attribute => {
+          let value = attribute.value;
+          if (attribute.name === 'aria-labelledby' || attribute.name === 'aria-describedby') {
+            value = value.split(/\s+/).map(id => idMap.get(id) || id).join(' ');
+          }
+          idMap.forEach((uniqueId, originalId) => {
+            value = value.replaceAll(`url(#${originalId})`, `url(#${uniqueId})`);
+            if ((attribute.name === 'href' || attribute.name === 'xlink:href') && value === `#${originalId}`) {
+              value = `#${uniqueId}`;
+            }
+          });
+          if (value !== attribute.value) element.setAttribute(attribute.name, value);
+        });
+      });
+
+      LUXY_MASCOT_STATES.forEach(state => {
+        const face = svgRoot.querySelector(`[id="${instancePrefix}-luxy-face-${state}"]`);
+        if (!face) return;
+        if (state === luxyMascotCurrentMood) face.removeAttribute('style');
+        else face.setAttribute('style', 'display:none;');
+      });
+
+      svgRoot.setAttribute('class', 'luxy-mascot-image');
+      svgRoot.setAttribute('width', '100%');
+      svgRoot.setAttribute('height', '100%');
+      svgRoot.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+      svgRoot.setAttribute('focusable', 'false');
+      svgRoot.setAttribute('data-luxy-mood', luxyMascotCurrentMood);
+
+      return new XMLSerializer().serializeToString(svgRoot);
+    }
+
+    /*
+     * MODULARIZATION TARGET: luxy/demo/fixtures/virtual-static-pages.js
+     * Export candidate: VIRTUAL_STATIC_PAGES.
+     * These HTML strings simulate separate documentation routes for this demo.
+     * Consumers: MultiPageSiteCrawler.fetchAndParsePage(), switchActivePageRoute()
+     * and injectCustomPageContent().
+     * This is fixture data, not a required storage layer for real static-site crawling.
+     */
+    /* ==========================================================================
+       PART B: VIRTUAL MULTI-PAGE STATIC FILESYSTEM
+       ========================================================================== */
+    const VIRTUAL_STATIC_PAGES = {
+      '/docs/risc-v-vector.html': `
+        <!DOCTYPE html><html><head><title>RISC-V Vector Extension (RVV 1.0) Architecture</title></head><body>
+          <nav><a href="index.html">Home</a><a href="/docs/fpga-timing.html">FPGA Timing</a></nav>
+          <article id="art-riscv" data-crawlable="true">
+            <div class="article-meta"><span class="tag">Computer Architecture</span><span>PUBLISHED: FEB 02, 2027 • BY DR. KENJI SATO</span></div>
+            <h1 class="article-title">RISC-V Vector Extension (RVV 1.0) & Strip-Mining</h1>
+            <div class="article-content">
+              <h2 id="rvv-registers">Vector Length Agnostic (VLA) Register File (v0–v31)</h2>
+              <p>Unlike fixed-width SIMD architectures (such as x86 AVX-512), the RISC-V Vector Extension (RVV 1.0) utilizes Vector Length Agnostic (VLA) programming. The hardware implementation defines 32 vector registers (<code>v0</code> through <code>v31</code>) with a hardware bit-length parameter <strong>VLEN</strong> ranging from 128 bits up to 65,536 bits.</p>
+              <p>Register grouping (<strong>LMUL</strong>) allows combining up to 8 adjacent vector registers into a single logical vector operand, maximizing arithmetic intensity during matrix-multiply workloads.</p>
+
+              <h2 id="rvv-strip-mining">Hardware Strip-Mining Loop & vsetvli Instruction</h2>
+              <p>Strip-mining in RVV eliminates manual scalar tail-loop cleanup code. The <code>vsetvli</code> instruction dynamically computes the active vector length (<code>vl</code>) based on remaining application elements (<code>AVL</code>) and the Selected Element Width (<code>SEW</code>):</p>
+              <div class="code-block">// RVV 1.0 Vector SAXPY Strip-Mining Assembly Loop
+loop_saxpy:
+  vsetvli t0, a0, e32, m4, ta, ma  // Set vl (t0) for 32-bit floats, LMUL=4
+  vle32.v v4, (a1)                 // Vector load X[]
+  vle32.v v8, (a2)                 // Vector load Y[]
+  vfmacc.vf v8, fa0, v4            // Y[i] = (a * X[i]) + Y[i]
+  vse32.v v8, (a2)                 // Vector store Y[]
+  sub a0, a0, t0                   // Decrement remaining count
+  sh2add a1, t0, a1                // Advance pointer X by t0 * 4 bytes
+  sh2add a2, t0, a2                // Advance pointer Y by t0 * 4 bytes
+  bnez a0, loop_saxpy</div>
+            </div>
+          </article>
+        </body></html>
+      `,
+      '/docs/fpga-timing.html': `
+        <!DOCTYPE html><html><head><title>FPGA Static Timing Analysis & Clock Domain Crossing</title></head><body>
+          <nav><a href="index.html">Home</a><a href="/docs/can-fd-bus.html">CAN-FD Bus</a></nav>
+          <article id="art-fpga" data-crawlable="true">
+            <div class="article-meta"><span class="tag">FPGA & RTL</span><span>PUBLISHED: FEB 14, 2027 • BY CLAIRE VANDENBERG</span></div>
+            <h1 class="article-title">FPGA Static Timing Closure, Setup/Hold Slack & CDC</h1>
+            <div class="article-content">
+              <h2 id="fpga-setup-hold">Setup Time & Hold Time Slack Equations</h2>
+              <p>Closing timing on high-speed Xilinx UltraScale+ or Intel Agilex FPGAs at 400MHz+ requires positive Worst Negative Slack (WNS) and Total Negative Slack (TNS) across all synchronous register-to-register paths. Setup slack ensures data arrives before the capture clock edge, while hold slack prevents data corruption from fast paths:</p>
+              <table class="spec-table">
+                <thead>
+                  <tr><th>Timing Metric</th><th>Governing Inequality</th><th>Primary Mitigation Strategy</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Setup Slack (WNS)</td><td>T_clk + T_skew ≥ T_cq + T_logic + T_route + T_setup</td><td>Pipeline combinational LUT chains, retiming, floorplan Pblocks</td></tr>
+                  <tr><td>Hold Slack (WHS)</td><td>T_cq + T_logic + T_route ≥ T_hold + T_skew</td><td>Insert routing delay buffers (automated by router), fix clock skew</td></tr>
+                  <tr><td>Clock-to-Out (T_co)</td><td>Pad delay budget ≤ System I/O margin</td><td>Pack registers into dedicated IOB (Input/Output Block) flip-flops</td></tr>
+                </tbody>
+              </table>
+
+              <h2 id="fpga-cdc-fifo">Clock Domain Crossing (CDC) & Gray-Code Asynchronous FIFOs</h2>
+              <p>Transferring multi-bit buses across unrelated asynchronous clock domains causes metastability if synchronized via simple 2-FF synchronizers. Multi-bit pointers in an Asynchronous FIFO must be encoded in <strong>Gray Code</strong> (where only 1 bit transitions per increment) before crossing clock domains.</p>
+            </div>
+          </article>
+        </body></html>
+      `,
+      '/docs/can-fd-bus.html': `
+        <!DOCTYPE html><html><head><title>Automotive CAN-FD Bus Arbitration & Transceiver Termination</title></head><body>
+          <nav><a href="index.html">Home</a><a href="/docs/usb-pd-controller.html">USB-PD 3.1</a></nav>
+          <article id="art-canfd" data-crawlable="true">
+            <div class="article-meta"><span class="tag">Automotive Networks</span><span>PUBLISHED: FEB 21, 2027 • BY DIETER KRAUSE</span></div>
+            <h1 class="article-title">CAN-FD Protocol Bit-Rate Switching & Split Termination</h1>
+            <div class="article-content">
+              <h2 id="canfd-bitrate">Arbitration Phase (1Mbps) vs. Data Phase (5Mbps–8Mbps)</h2>
+              <p>Controller Area Network Flexible Data-Rate (CAN-FD, ISO 11898-1) overcomes classic CAN's 8-byte payload and 1Mbps speed limit. During the arbitration phase, all nodes communicate at up to <strong>1Mbps</strong> to accommodate bus propagation delay. Once the winning node asserts the <strong>BRS (Bit Rate Switch)</strong> recessive bit, the clock prescaler shifts to the fast Data Phase at <strong>5Mbps to 8Mbps</strong>, carrying up to <strong>64 bytes</strong> per frame.</p>
+
+              <h2 id="canfd-split-termination">120Ω Split Termination & Common-Mode Choke Filtering</h2>
+              <p>To suppress common-mode electromagnetic emissions on differential CANH/CANL twisted pairs, split termination divides the standard 120-ohm termination resistor into two <strong>60Ω resistors</strong> in series, with a <strong>4.7nF capacitor</strong> tied from their center tap to chassis ground.</p>
+            </div>
+          </article>
+        </body></html>
+      `,
+      '/docs/usb-pd-controller.html': `
+        <!DOCTYPE html><html><head><title>USB-C Power Delivery 3.1 (240W EPR) Firmware Architecture</title></head><body>
+          <nav><a href="index.html">Home</a></nav>
+          <article id="art-usbpd" data-crawlable="true">
+            <div class="article-meta"><span class="tag">Power Electronics</span><span>PUBLISHED: MAR 01, 2027 • BY PRIYA NAIR</span></div>
+            <h1 class="article-title">USB-PD 3.1 Extended Power Range (240W EPR) & BMC Encoding</h1>
+            <div class="article-content">
+              <h2 id="usbpd-epr-240w">240W Extended Power Range (48V @ 5A) & AVS Microcontroller Negotiation</h2>
+              <p>USB Power Delivery 3.1 expands the legacy 100W (20V @ 5A) Standard Power Range (SPR) up to <strong>240W Extended Power Range (EPR)</strong> using fixed voltage steps of 28V, 36V, and <strong>48V at 5A</strong>. It also introduces Adjustable Voltage Supply (AVS), allowing the sink microcontroller to request fine 100mV increments between 15V and 48V.</p>
+              <div class="code-block">// USB-PD 3.1 EPR Source_Capabilities PDO Bitfield (48V / 5A)
+uint32_t pdo_epr_48v = (0b00 << 30)          | // Fixed Supply PDO
+                       ((48000 / 50) << 10)  | // Voltage in 50mV units (960)
+                       (5000 / 10);            // Max Current in 10mA units (500)</div>
+
+              <h2 id="usbpd-cc-bmc">CC Pin Biphase Mark Coding (BMC) & E-Marker Sniffing</h2>
+              <p>PD protocol messages are transmitted across the Configuration Channel (CC1/CC2) wire at 300kbps using Biphase Mark Coding (BMC). Before entering 240W EPR mode, the source controller must query the cable's integrated Electronic Marker (E-Marker) IC via SOP' packets to verify 50V/5A rating and arc-mitigation compliance.</p>
+            </div>
+          </article>
+        </body></html>
+      `
+    };
+
+    /*
+     * MODULARIZATION TARGET: luxy/core/text-utils.js
+     * Export candidates: stemToken() and levenshteinDistance().
+     * Dependency direction: no browser or application dependencies.
+     * Consumers: crawler.registerChunk() stores stem frequencies; the search engine
+     * uses stemming for document-frequency/scoring/highlighting and Levenshtein
+     * distance for its final typo-recovery stage. Preserve the exact v3.5 behavior.
+     */
+    /* ==========================================================================
+       PART C: ENHANCED PORTER-LITE STEMMER (STRIPS -ER/-OR & DOUBLED CONSONANTS)
+       ========================================================================== */
+    function stemToken(word) {
+      if (word.length < 4) return word;
+      return word
+        .replace(/(ing|ed|ly|es|s|tion|ations|ment|er|or)$/i, '')
+        .replace(/([bcdfghjklmnpqrstvwxyz])\1$/i, '$1') // e.g. "microcontroll" -> "microcontrol"
+        .replace(/ies$/i, 'y');
+    }
+
+    function levenshteinDistance(a, b) {
+      if (!a.length) return b.length;
+      if (!b.length) return a.length;
+      const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          const cost = b.charAt(i - 1) === a.charAt(j - 1) ? 0 : 1;
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j - 1] + cost
+          );
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
+    /*
+     * MODULARIZATION TARGET: luxy/crawler/multi-page-site-crawler.js
+     * Export candidate: MultiPageSiteCrawler.
+     *
+     * PUBLIC DATA CONTRACT consumed by the search engine and autocomplete:
+     * - index: chunk records with id, pageUrl, articleId, articleTitle, heading,
+     *   tag, text, bulletPoints, codeSnippets, tableRows and elementId, plus tokens,
+     *   stemmedTokens, termFreq, stemFreq, wordCount, hasCode and hasTable.
+     * - crawledPages: Map of page URL to crawl status/metadata.
+     * - vocabulary: Set of indexed raw tokens.
+     * - globalTermFreq: raw-token occurrence counts used to rank prefix completions.
+     * - tokenize(), fetchAndParsePage() and crawlEntireSite() are called by other
+     *   parts of this application.
+     *
+     * EXTRACTION DEPENDENCIES: import stemToken(); retain DOMParser/fetch support.
+     * Current demo coupling: VIRTUAL_STATIC_PAGES supplies fixture HTML, while
+     * crawlEntireSite() reads cachedHostDomHTML/currentDisplayedRoute and updates
+     * DOM telemetry. Keep the first extraction behavior-compatible; isolate or
+     * inject those host-page inputs and UI callbacks only as separately tested seams.
+     */
+    /* ==========================================================================
+       PART D: MultiPageSiteCrawler - BFS SPIDER + DOMPARSER + VOCABULARY FREQUENCY
+       ========================================================================== */
+    class MultiPageSiteCrawler {
+      /*
+       * CRAWLER STATE: initializes the public index/vocabulary/page maps listed
+       * in the module contract above. The search engine and autocomplete retain
+       * references to these exact fields, so names and shapes are compatibility
+       * boundaries during extraction.
+       */
+      constructor() {
+        this.index = [];
+        this.crawledPages = new Map();
+        this.vocabulary = new Set();
+        this.globalTermFreq = {}; // Tracks global word frequency for smart prefix ranking
+        this.maxDepth = 2;
+        this.stopWords = new Set([
+          "a", "an", "the", "and", "or", "but", "about", "above", "after", "along",
+          "among", "as", "at", "by", "for", "from", "in", "into", "of", "on", "onto",
+          "over", "through", "to", "under", "with", "within", "without", "what",
+          "is", "how", "do", "i", "can", "you", "tell", "me", "please", "why", "where",
+          "which", "when", "does", "are", "would", "should", "could", "this", "that"
+        ]);
+      }
+
+      tokenize(text) {
+        return text.toLowerCase()
+          .replace(/[^\w\s\-]/g, ' ')
+          .split(/\s+/)
+          .filter(t => t.length > 1 && !this.stopWords.has(t));
+      }
+
+      cleanText(text) {
+        return text.replace(/\s+/g, ' ').trim();
+      }
+
+      /*
+       * EXTRACTION BOUNDARY: DOM-to-chunk parser.
+       * Reads article/data-crawlable elements and turns each H2/H3 section into a
+       * chunk with source page and element IDs. This establishes the chunk schema
+       * consumed by LuxyConversationalEngine and used for cross-page citations.
+       */
+      extractChunksFromRoot(rootNode, pageUrl = 'index.html') {
+        const targetElements = rootNode.querySelectorAll('article, [data-crawlable="true"]');
+        let pageChunkCount = 0;
+
+        targetElements.forEach((art, artIdx) => {
+          const articleId = art.id || `art-${pageUrl.replace(/\W/g, '')}-${artIdx}`;
+          const articleTitle = art.querySelector('h1, .article-title')?.textContent.trim() || 'Untitled Document';
+          const tag = art.querySelector('.tag')?.textContent.trim() || 'Engineering';
+          const contentContainer = art.querySelector('.article-content') || art;
+          const headers = contentContainer.querySelectorAll('h2, h3');
+
+          if (headers.length === 0) {
+            const rawText = this.cleanText(contentContainer.textContent);
+            this.registerChunk({
+              id: articleId,
+              pageUrl,
+              articleId,
+              articleTitle,
+              heading: articleTitle,
+              tag,
+              text: rawText,
+              bulletPoints: [],
+              codeSnippets: [],
+              tableRows: [],
+              elementId: articleId
+            });
+            pageChunkCount++;
+          } else {
+            headers.forEach((h, hIdx) => {
+              const headingText = h.textContent.trim();
+              const headingId = h.id || `${articleId}-sec-${hIdx}`;
+              if (!h.id) h.id = headingId;
+
+              let siblingText = '';
+              let bulletPoints = [];
+              let codeSnippets = [];
+              let tableRows = [];
+              let curr = h.nextElementSibling;
+
+              while (curr && !['H2', 'H3'].includes(curr.tagName)) {
+                if (curr.tagName === 'UL' || curr.tagName === 'OL') {
+                  curr.querySelectorAll('li').forEach(li => bulletPoints.push(li.textContent.trim()));
+                  siblingText += ' ' + curr.textContent.trim();
+                } else if (curr.classList && curr.classList.contains('code-block')) {
+                  const codeRaw = curr.textContent.trim();
+                  codeSnippets.push(codeRaw);
+                  siblingText += ' ' + codeRaw;
+                } else if (curr.tagName === 'TABLE' || (curr.classList && curr.classList.contains('spec-table'))) {
+                  const rows = [];
+                  curr.querySelectorAll('tr').forEach(tr => {
+                    const cells = Array.from(tr.querySelectorAll('th, td')).map(c => c.textContent.trim());
+                    if (cells.length) rows.push(cells);
+                  });
+                  tableRows = rows;
+                  siblingText += ' ' + rows.map(r => r.join(' ')).join(' ');
+                } else {
+                  siblingText += ' ' + curr.textContent.trim();
+                }
+                curr = curr.nextElementSibling;
+              }
+
+              this.registerChunk({
+                id: `${pageUrl}#${headingId}`,
+                pageUrl,
+                articleId,
+                articleTitle,
+                heading: headingText,
+                tag,
+                text: this.cleanText(siblingText),
+                bulletPoints,
+                codeSnippets,
+                tableRows,
+                elementId: headingId
+              });
+              pageChunkCount++;
+            });
+          }
+        });
+
+        return pageChunkCount;
+      }
+
+      /*
+       * EXTRACTION BOUNDARY: index-record builder.
+       * Adds raw/stemmed tokens, per-chunk term frequencies, vocabulary entries,
+       * globalTermFreq counts and code/table flags. Requires stemToken() from
+       * core/text-utils.js. Preserve token and chunk field semantics.
+       */
+      registerChunk(data) {
+        const rawTokens = this.tokenize(`${data.articleTitle} ${data.heading} ${data.tag} ${data.text}`);
+        const stemmedTokens = rawTokens.map(t => stemToken(t));
+        const termFreq = {};
+        const stemFreq = {};
+
+        rawTokens.forEach((t, i) => {
+          termFreq[t] = (termFreq[t] || 0) + 1;
+          const st = stemmedTokens[i];
+          stemFreq[st] = (stemFreq[st] || 0) + 1;
+          this.vocabulary.add(t);
+          this.globalTermFreq[t] = (this.globalTermFreq[t] || 0) + 1;
+        });
+
+        this.index = this.index.filter(c => c.id !== data.id);
+
+        this.index.push({
+          ...data,
+          tokens: rawTokens,
+          stemmedTokens,
+          termFreq,
+          stemFreq,
+          wordCount: rawTokens.length,
+          hasCode: data.codeSnippets.length > 0,
+          hasTable: data.tableRows.length > 0
+        });
+      }
+
+      /*
+       * EXTRACTION BOUNDARY: page-source adapter.
+       * Reads the demo's VIRTUAL_STATIC_PAGES first, otherwise fetches the URL,
+       * parses HTML and delegates to extractChunksFromRoot().
+       * When extracting, keep the virtual-fixture provider optional and preserve
+       * the live-fetch path for actual static pages.
+       */
+      async fetchAndParsePage(url) {
+        try {
+          let htmlText = '';
+          let sourceMode = 'VIRTUAL-FS';
+
+          if (VIRTUAL_STATIC_PAGES[url]) {
+            htmlText = VIRTUAL_STATIC_PAGES[url];
+          } else {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            htmlText = await response.text();
+            sourceMode = 'LIVE-FETCH';
+          }
+
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlText, 'text/html');
+          const chunksAdded = this.extractChunksFromRoot(doc, url);
+
+          const discoveredLinks = [];
+          doc.querySelectorAll('a[href]').forEach(a => {
+            const href = a.getAttribute('href');
+            if (href && !href.startsWith('#') && !href.startsWith('http') && !href.startsWith('mailto:')) {
+              discoveredLinks.push(href);
+            }
+          });
+
+          this.crawledPages.set(url, {
+            status: `INDEXED (${sourceMode})`,
+            chunksCount: chunksAdded,
+            discoveredLinks
+          });
+
+          return discoveredLinks;
+        } catch (err) {
+          this.crawledPages.set(url, {
+            status: 'UNREACHABLE',
+            chunksCount: 0,
+            discoveredLinks: []
+          });
+          return [];
+        }
+      }
+
+      /*
+       * EXTRACTION BOUNDARY: breadth-first crawl coordinator.
+       * Current coupling: pulls the host article-feed snapshot from
+       * cachedHostDomHTML when currentDisplayedRoute is index.html, then crawls
+       * the supplied seed URLs. Those host-page globals belong to the demo
+       * controller, not to a standalone crawler. Reconnect this input explicitly
+       * before removing or relocating either global.
+       */
+      async crawlEntireSite(seedUrls = ['/docs/risc-v-vector.html', '/docs/fpga-timing.html', '/docs/can-fd-bus.html', '/docs/usb-pd-controller.html']) {
+        this.index = [];
+        this.crawledPages.clear();
+        this.vocabulary.clear();
+        this.globalTermFreq = {};
+
+        if (currentDisplayedRoute === 'index.html') {
+          cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
+        }
+        const hostParser = new DOMParser();
+        const hostDoc = hostParser.parseFromString(`<div>${cachedHostDomHTML}</div>`, 'text/html');
+        const hostChunks = this.extractChunksFromRoot(hostDoc, 'index.html');
+        this.crawledPages.set('index.html', {
+          status: 'HOST-DOM',
+          chunksCount: hostChunks,
+          discoveredLinks: seedUrls
+        });
+
+        const queue = seedUrls.map(u => ({ url: u, depth: 1 }));
+        const visited = new Set(['index.html']);
+
+        while (queue.length > 0) {
+          const { url, depth } = queue.shift();
+          if (visited.has(url) || depth > this.maxDepth) continue;
+          visited.add(url);
+
+          const childLinks = await this.fetchAndParsePage(url);
+          childLinks.forEach(nextUrl => {
+            if (!visited.has(nextUrl)) {
+              queue.push({ url: nextUrl, depth: depth + 1 });
+            }
+          });
+        }
+
+        this.updateCrawlerTelemetryUI();
+        return this.index;
+      }
+
+      /*
+       * DEMO UI ADAPTER, not crawl/index logic.
+       * Writes crawler status into indexed-count-label, fab-chunk-count and
+       * crawler-log-list, and uses switchActivePageRoute() from an inline handler.
+       * Keep it connected for the reference demo or move this DOM work behind a
+       * callback/adapter when the crawler is extracted.
+       */
+      updateCrawlerTelemetryUI() {
+        const pageCount = this.crawledPages.size;
+        const chunkCount = this.index.length;
+        document.getElementById('indexed-count-label').textContent = `${pageCount} Pages • ${chunkCount} Chunks`;
+        document.getElementById('fab-chunk-count').textContent = `${chunkCount}`;
+
+        const logList = document.getElementById('crawler-log-list');
+        logList.innerHTML = '';
+        this.crawledPages.forEach((info, url) => {
+          const li = document.createElement('li');
+          li.className = 'crawler-log-item';
+          const color = info.chunksCount > 0 ? 'var(--color-success)' : 'var(--color-error)';
+          li.innerHTML = `
+            <span style="cursor:pointer; text-decoration:underline;" onclick="switchActivePageRoute('${url}')">${url}</span>
+            <span style="color: ${color};">${info.chunksCount} chunks [${info.status}]</span>
+          `;
+          logList.appendChild(li);
+        });
+      }
+
+      /*
+       * DEMO EXPORT ADAPTER.
+       * Serializes the crawler's pages/chunks and triggers a browser download,
+       * then calls showToast(). It is useful tooling, but not required for search.
+       * If separated, preserve the exported payload schema.
+       */
+      exportIndexJSON() {
+        const payload = {
+          engine: 'Luxy Multi-Page Spider v3.5',
+          timestamp: new Date().toISOString(),
+          pagesCrawled: Array.from(this.crawledPages.entries()),
+          chunks: this.index
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'luxy-multipage-index.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Exported luxy-multipage-index.json');
+      }
+    }
+
+    /*
+     * MODULARIZATION TARGET: luxy/search/luxy-conversational-engine.js
+     * Export candidate: LuxyConversationalEngine.
+     * Constructor input: the MultiPageSiteCrawler instance. This engine reads
+     * crawler.index, crawler.tokenize(), crawler.vocabulary and
+     * crawler.globalTermFreq, and stores conversationMemory on the engine.
+     * It also imports stemToken() and levenshteinDistance() from core/text-utils.js.
+     *
+     * BEHAVIOR CONTRACT: preserve query operators, intent classification, exact
+     * phrase/exclusion/tag/page/code/table filters, prefix then substring then
+     * Levenshtein resolution, synonym expansion, BM25+ scoring, conversation
+     * context and the current synthesizeResponse() return shape.
+     *
+     * CURRENT UI COUPLING: parseQueryOperators() reads search-page-scope directly;
+     * synthesizeResponse() calls setLuxyMascotMood() and escapeHtml(), and returns
+     * pre-rendered HTML fragments. Keep these connections explicit during extraction.
+     */
+    /* ==========================================================================
+       PART E: LuxyConversationalEngine - BM25+, PREFIX AUTO-EXPANSION & RAG
+       ========================================================================== */
+    class LuxyConversationalEngine {
+      constructor(crawler) {
+        this.crawler = crawler;
+        this.k1 = 1.5;
+        this.b = 0.75;
+        this.conversationMemory = [];
+
+        this.synonymGraph = {
+          'mcu': ['esp32', 'microcontroller', 'riscv', 'firmware'],
+          'microcontroller': ['esp32', 'mcu', 'sleep', 'telemetry', 'usbpd'],
+          'esp32': ['mcu', 'microcontroller', 'sleep', 'rtc', 'telemetry'],
+          'power': ['current', 'draw', 'consumption', 'ldo', 'quiescent', 'epr', '240w', 'watt'],
+          'current': ['power', 'draw', 'ua', 'ma', 'ampere', 'quiescent'],
+          'audio': ['classd', 'amplifier', 'speaker', 'subwoofer', 'crossover', 'pwm'],
+          'filter': ['butterworth', 'linkwitz', 'inductor', 'capacitor', 'cutoff', 'lc'],
+          'protection': ['overvoltage', 'ptc', 'mov', 'varistor', 'fuse', 'dmm', 'multimeter'],
+          'fpga': ['timing', 'setup', 'hold', 'slack', 'cdc', 'metastability', 'fifo'],
+          'can': ['canfd', 'arbitration', 'automotive', 'transceiver', 'termination'],
+          'usb': ['usbpd', 'epr', '240w', 'bmc', 'emarker'],
+          'vector': ['riscv', 'rvv', 'stripmining', 'vsetvli', 'opencv', 'bezier']
+        };
+      }
+
+      /*
+       * UI INPUT DEPENDENCY: pageFilter is read from #search-page-scope.
+       * When this engine is connected to a different UI, preserve the page-scope
+       * behavior by passing that value through an explicit option/adapter rather
+       * than silently dropping the filter.
+       */
+      parseQueryOperators(rawQuery) {
+        let q = rawQuery.trim();
+        const filters = {
+          exactPhrases: [],
+          excludedTerms: [],
+          tagFilter: null,
+          pageFilter: document.getElementById('search-page-scope')?.value || 'ALL',
+          requireCode: false,
+          requireTable: false
+        };
+
+        q = q.replace(/"([^"]+)"/g, (_, phrase) => {
+          filters.exactPhrases.push(phrase.toLowerCase().trim());
+          return ' ';
+        });
+
+        q = q.replace(/\btag:(\S+)/gi, (_, t) => { filters.tagFilter = t.toLowerCase(); return ' '; });
+        q = q.replace(/\bpage:(\S+)/gi, (_, p) => { filters.pageFilter = p.toLowerCase(); return ' '; });
+        q = q.replace(/\bhas:code\b/gi, () => { filters.requireCode = true; return ' '; });
+        q = q.replace(/\bhas:table\b/gi, () => { filters.requireTable = true; return ' '; });
+
+        q = q.replace(/(?:^|\s)-(\w+)/g, (_, ex) => {
+          filters.excludedTerms.push(ex.toLowerCase());
+          return ' ';
+        });
+
+        return { cleanedQuery: q.trim(), filters };
+      }
+
+      detectIntent(query) {
+        const q = query.toLowerCase();
+        if (q.includes('code') || q.includes('assembly') || q.includes('snippet') || q.includes('how to') || q.includes('configure') || q.includes('loop')) {
+          return 'procedural';
+        }
+        if (q.includes('current') || q.includes('voltage') || q.includes('rate') || q.includes('frequency') || q.includes('table') || q.includes('spec') || q.includes('rating')) {
+          return 'specification';
+        }
+        if (q.includes('vs') || q.includes('versus') || q.includes('compare') || q.includes('difference') || q.includes('why')) {
+          return 'analytical';
+        }
+        return 'definitional';
+      }
+
+      /**
+       * Resolve partial prefixes (e.g. "microcontrol" -> "microcontroller"), substrings, and typos
+       */
+      /*
+       * MATCH-RESOLUTION ORDER IS A FEATURE CONTRACT:
+       * exact vocabulary, then startsWith prefix expansion, then substring match
+       * for longer tokens, then Levenshtein typo fallback. Prefix expansion is what
+       * lets an incomplete word such as "microcontrol" resolve to "microcontroller".
+       * Do not reorder these stages during extraction.
+       */
+      resolveTokenWithPrefixAndFuzzy(token) {
+        if (this.crawler.vocabulary.has(token)) {
+          return { resolved: token, type: 'exact' };
+        }
+
+        if (token.length < 3) {
+          return { resolved: token, type: 'raw' };
+        }
+
+        const vocabArray = Array.from(this.crawler.vocabulary);
+
+        // 1. Prefix Match (startsWith) - e.g. "microcontrol" -> "microcontroller"
+        const prefixMatches = vocabArray
+          .filter(v => v.startsWith(token))
+          .sort((a, b) => (this.crawler.globalTermFreq[b] || 0) - (this.crawler.globalTermFreq[a] || 0) || a.length - b.length);
+
+        if (prefixMatches.length > 0) {
+          return { resolved: prefixMatches[0], type: 'prefix', allMatches: prefixMatches.slice(0, 3) };
+        }
+
+        // 2. Substring Match (includes) for tokens >= 4 chars
+        if (token.length >= 4) {
+          const substringMatches = vocabArray
+            .filter(v => v.includes(token))
+            .sort((a, b) => (this.crawler.globalTermFreq[b] || 0) - (this.crawler.globalTermFreq[a] || 0));
+
+          if (substringMatches.length > 0) {
+            return { resolved: substringMatches[0], type: 'substring' };
+          }
+        }
+
+        // 3. Levenshtein Distance Typo Fallback
+        if (token.length >= 4) {
+          let bestMatch = null;
+          let minDistance = 99;
+          const maxAllowed = token.length >= 7 ? 2 : 1;
+
+          for (const vocabWord of vocabArray) {
+            if (Math.abs(vocabWord.length - token.length) <= maxAllowed) {
+              const dist = levenshteinDistance(token, vocabWord);
+              if (dist <= maxAllowed && dist < minDistance) {
+                minDistance = dist;
+                bestMatch = vocabWord;
+              }
+            }
+          }
+          if (bestMatch) {
+            return { resolved: bestMatch, type: 'fuzzy' };
+          }
+        }
+
+        return { resolved: token, type: 'raw' };
+      }
+
+      /**
+       * Execute Multi-Page BM25+ Search with Prefix Expansion, Stemming, Synonym Graph & Levenshtein Recovery
+       */
+      /*
+       * CORE RETRIEVAL PIPELINE:
+       * query operators and tokenization -> contextual memory -> token resolution
+       * -> synonym expansion -> document frequency/IDF -> BM25+ scoring and boosts
+       * -> filters -> ranked chunks -> conversationMemory update.
+       * This is the search engine's primary behavior path.
+       */
+      search(rawUserQuery) {
+        const { cleanedQuery, filters } = this.parseQueryOperators(rawUserQuery);
+        let baseTokens = this.crawler.tokenize(cleanedQuery);
+
+        const isContextualFollowup = /\b(it|its|this|that|more|elaborate|code|table)\b/i.test(cleanedQuery) && baseTokens.length <= 3;
+        if (isContextualFollowup && this.conversationMemory.length > 0) {
+          const lastChunk = this.conversationMemory[0];
+          baseTokens = baseTokens.concat(this.crawler.tokenize(lastChunk.heading));
+        }
+
+        const corrections = [];
+        const resolvedTokens = [];
+
+        baseTokens.forEach(token => {
+          const res = this.resolveTokenWithPrefixAndFuzzy(token);
+          resolvedTokens.push(res.resolved);
+          if (res.type === 'prefix') {
+            corrections.push(`PREFIX: ${token} → ${res.resolved}`);
+          } else if (res.type === 'substring') {
+            corrections.push(`SUBSTRING: ${token} → ${res.resolved}`);
+          } else if (res.type === 'fuzzy') {
+            corrections.push(`TYPO-FIX: ${token} → ${res.resolved}`);
+          }
+        });
+
+        const synonymTokens = new Set();
+        resolvedTokens.forEach(t => {
+          if (this.synonymGraph[t]) {
+            this.synonymGraph[t].forEach(syn => {
+              if (!resolvedTokens.includes(syn)) synonymTokens.add(syn);
+            });
+          }
+        });
+
+        const chunks = this.crawler.index;
+        if (chunks.length === 0) return { results: [], corrections, filters };
+
+        const totalDocs = chunks.length;
+        const avgdl = chunks.reduce((sum, c) => sum + c.wordCount, 0) / totalDocs;
+
+        const allQueryTerms = [...resolvedTokens, ...Array.from(synonymTokens)];
+        const idf = {};
+        allQueryTerms.forEach(term => {
+          const stem = stemToken(term);
+          const docCount = chunks.filter(c => c.termFreq[term] || c.stemFreq[stem]).length;
+          idf[term] = Math.log((totalDocs - docCount + 0.5) / (docCount + 0.5) + 1);
+        });
+
+        const scored = chunks.map(chunk => {
+          if (filters.pageFilter !== 'ALL' && !chunk.pageUrl.toLowerCase().includes(filters.pageFilter.toLowerCase())) {
+            return { chunk, score: 0, matchedTokens: [] };
+          }
+          if (filters.tagFilter && !chunk.tag.toLowerCase().includes(filters.tagFilter)) {
+            return { chunk, score: 0, matchedTokens: [] };
+          }
+          if (filters.requireCode && !chunk.hasCode) {
+            return { chunk, score: 0, matchedTokens: [] };
+          }
+          if (filters.requireTable && !chunk.hasTable) {
+            return { chunk, score: 0, matchedTokens: [] };
+          }
+          for (const ex of filters.excludedTerms) {
+            if (chunk.termFreq[ex] || chunk.text.toLowerCase().includes(ex)) {
+              return { chunk, score: 0, matchedTokens: [] };
+            }
+          }
+
+          let score = 0;
+          const matchedTokens = new Set();
+
+          if (resolvedTokens.length === 0 && (filters.requireCode || filters.requireTable || filters.tagFilter)) {
+            score += 5.0;
+          }
+
+          resolvedTokens.forEach(token => {
+            const stem = stemToken(token);
+            const exactTf = chunk.termFreq[token] || 0;
+            const stemTf = chunk.stemFreq[stem] || 0;
+            const effectiveTf = exactTf > 0 ? exactTf : stemTf * 0.85;
+
+            if (effectiveTf > 0) {
+              matchedTokens.add(token);
+              const num = effectiveTf * (this.k1 + 1);
+              const den = effectiveTf + this.k1 * (1 - this.b + this.b * (chunk.wordCount / avgdl));
+              score += (idf[token] || 1.0) * (num / den);
+
+              if (chunk.articleTitle.toLowerCase().includes(token)) score += 3.0;
+              if (chunk.heading.toLowerCase().includes(token)) score += 2.5;
+              if (chunk.tag.toLowerCase().includes(token)) score += 2.0;
+            }
+          });
+
+          synonymTokens.forEach(syn => {
+            const tf = chunk.termFreq[syn] || 0;
+            if (tf > 0) {
+              matchedTokens.add(syn);
+              score += 0.55 * (idf[syn] || 0.8) * ((tf * (this.k1 + 1)) / (tf + this.k1));
+            }
+          });
+
+          const lowerBody = `${chunk.heading} ${chunk.text}`.toLowerCase();
+          filters.exactPhrases.forEach(phrase => {
+            if (lowerBody.includes(phrase)) {
+              score += 8.0;
+              phrase.split(/\s+/).forEach(w => matchedTokens.add(w));
+            } else {
+              score = 0;
+            }
+          });
+
+          if (resolvedTokens.length >= 2) {
+            for (let i = 0; i < resolvedTokens.length - 1; i++) {
+              const bigram = `${resolvedTokens[i]} ${resolvedTokens[i + 1]}`;
+              if (lowerBody.includes(bigram)) score += 3.2;
+            }
+          }
+
+          return { chunk, score, matchedTokens: Array.from(matchedTokens) };
+        });
+
+        const results = scored
+          .filter(r => r.score > 0.35)
+          .sort((a, b) => b.score - a.score);
+
+        if (results.length > 0) {
+          this.conversationMemory.unshift(results[0].chunk);
+          if (this.conversationMemory.length > 3) this.conversationMemory.pop();
+        }
+
+        return { results, corrections, filters };
+      }
+
+      /*
+       * RESPONSE-ASSEMBLY BOUNDARY:
+       * Calls search(), chooses intent/mood, highlights text, formats code/table
+       * output, correlated insight, citations and follow-ups.
+       * Current output is partly presentation HTML, not only raw search data.
+       * Preserve the exact success/fallback response fields while extracting;
+       * do not make the engine's caller adapt until an explicit contract change.
+       */
+      synthesizeResponse(userQuery) {
+        const intent = this.detectIntent(userQuery);
+        const { results, corrections, filters } = this.search(userQuery);
+
+        if (results.length === 0) {
+          setLuxyMascotMood('fallback');
+          return {
+            intent: 'fallback',
+            corrections,
+            textHtml: `I searched across all <strong>${this.crawler.crawledPages.size} crawled pages (${this.crawler.index.length} chunks)</strong> but found no match for <strong>"${escapeHtml(userQuery)}"</strong>. Try partial prefixes like <em>microcontrol</em>, <em>subwoof</em>, <em>arbitr</em>, or <em>varist</em>.`,
+            sources: [],
+            followups: [
+              'What is ESP32 deep sleep current draw?',
+              'How do RISC-V vector registers handle strip-mining?',
+              'FPGA setup and hold time violation fixes has:table',
+              'USB-PD 240W Extended Power Range EPR negotiation'
+            ]
+          };
+        }
+
+        const top = results[0];
+        const topChunk = top.chunk;
+
+        if (topChunk.hasCode || intent === 'procedural') setLuxyMascotMood('code');
+        else if (topChunk.hasTable || intent === 'specification') setLuxyMascotMood('spec');
+        else setLuxyMascotMood('default');
+
+        const highlightTokens = (text, tokens) => {
+          let safe = escapeHtml(text);
+          tokens.forEach(tok => {
+            if (tok.length < 2) return;
+            const stem = stemToken(tok);
+            const pattern = stem.length >= 4 ? stem : tok;
+            const regex = new RegExp(`\\b(${pattern}\\w*)\\b`, 'gi');
+            safe = safe.replace(regex, '<mark>$1</mark>');
+          });
+          return safe;
+        };
+
+        const highlightedPrimary = highlightTokens(topChunk.text, top.matchedTokens);
+
+        let structuredTableHtml = '';
+        if (topChunk.tableRows && topChunk.tableRows.length > 1) {
+          const headers = topChunk.tableRows[0];
+          const bodyRows = topChunk.tableRows.slice(1);
+          structuredTableHtml = `
+            <table class="spec-table" style="margin-top:0.65rem;">
+              <thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>
+              <tbody>
+                ${bodyRows.map(r => `<tr>${r.map(c => `<td>${highlightTokens(c, top.matchedTokens)}</td>`).join('')}</tr>`).join('')}
+              </tbody>
+            </table>
+          `;
+        }
+
+        let structuredCodeHtml = '';
+        if (topChunk.codeSnippets && topChunk.codeSnippets.length > 0) {
+          structuredCodeHtml = topChunk.codeSnippets.map(code => `
+            <div class="code-block">${escapeHtml(code)}</div>
+          `).join('');
+        }
+
+        let secondaryHtml = '';
+        if (results.length > 1 && results[1].score >= top.score * 0.45) {
+          const sec = results[1].chunk;
+          secondaryHtml = `
+            <div class="secondary-synthesis-box">
+              <div style="font-family:var(--font-code); font-size:var(--font-size-xs); color:var(--brand-crimson); margin-bottom:0.25rem;">
+                + CORRELATED INSIGHT FROM [${escapeHtml(sec.pageUrl)}] → ${escapeHtml(sec.heading)} (BM25: ${results[1].score.toFixed(2)})
+              </div>
+              <div>${highlightTokens(sec.text.slice(0, 260) + (sec.text.length > 260 ? '...' : ''), results[1].matchedTokens)}</div>
+            </div>
+          `;
+        }
+
+        const sources = results.slice(0, 4).map(r => ({
+          pageUrl: r.chunk.pageUrl,
+          articleTitle: r.chunk.articleTitle,
+          heading: r.chunk.heading,
+          elementId: r.chunk.elementId,
+          score: r.score.toFixed(2)
+        }));
+
+        return {
+          intent,
+          topScore: top.score.toFixed(2),
+          pageOrigin: topChunk.pageUrl,
+          corrections,
+          opener: `Retrieved from <strong>${escapeHtml(topChunk.articleTitle)}</strong> (<code>${escapeHtml(topChunk.pageUrl)}</code> → <em>${escapeHtml(topChunk.heading)}</em>):`,
+          highlightedPrimary,
+          structuredTableHtml,
+          structuredCodeHtml,
+          secondaryHtml,
+          sources,
+          followups: this.buildContextualFollowups(topChunk)
+        };
+      }
+
+      /*
+       * DEMO CORPUS RULES:
+       * These follow-up prompts are hard-coded to the sample RISC-V, FPGA, CAN-FD
+       * and USB-PD routes. They are separate from BM25 ranking and should be
+       * isolated as configurable/demo content if the engine is generalized.
+       */
+      buildContextualFollowups(chunk) {
+        if (chunk.pageUrl.includes('risc-v')) {
+          return ['Show the RVV 1.0 strip-mining assembly loop', 'What is VLEN and LMUL register grouping?'];
+        }
+        if (chunk.pageUrl.includes('fpga')) {
+          return ['How do Gray-code asynchronous FIFOs prevent metastability?', 'What is the governing equation for Setup Slack?'];
+        }
+        if (chunk.pageUrl.includes('can-fd')) {
+          return ['Why use 60-ohm split termination with 4.7nF capacitor?', 'What is the CAN-FD Bit Rate Switch (BRS) speed?'];
+        }
+        if (chunk.pageUrl.includes('usb-pd')) {
+          return ['How is the 48V 5A EPR PDO bitfield encoded?', 'Why does USB-PD 3.1 query the cable E-Marker IC?'];
+        }
+        return [
+          'How do RISC-V vector registers handle strip-mining?',
+          'FPGA setup and hold time violation fixes has:table',
+          'USB-PD 240W Extended Power Range EPR negotiation'
+        ];
+      }
+    }
+
+    /*
+     * MODULARIZATION TARGET: luxy/ui/autocomplete-controller.js
+     * Owns currentAutocompleteWords, handleInputAutocomplete(),
+     * applyWordAutocomplete() and handleChatInputKeydown().
+     * Dependencies: siteCrawler.vocabulary/globalTermFreq/index, the chat-input,
+     * autocomplete-panel, ac-words-row, ac-headings-row and search-page-scope DOM
+     * elements, escapeHtml(), and the runQuickPrompt() callback.
+     * UI feature only; it is not required by direct Enter-key search or BM25 ranking.
+     * The generated suggestion buttons also use inline global onclick handlers.
+     */
+    /* ==========================================================================
+       PART F: LIVE AUTOCOMPLETE ENGINE & KEYBOARD NAVIGATION
+       ========================================================================== */
+    let currentAutocompleteWords = [];
+
+    function handleInputAutocomplete() {
+      const inputEl = document.getElementById('chat-input');
+      const panel = document.getElementById('autocomplete-panel');
+      const wordsRow = document.getElementById('ac-words-row');
+      const headingsRow = document.getElementById('ac-headings-row');
+
+      const rawVal = inputEl.value;
+      const trimmed = rawVal.trim();
+
+      if (trimmed.length < 2 || !siteCrawler) {
+        panel.classList.remove('active');
+        currentAutocompleteWords = [];
+        return;
+      }
+
+      const words = trimmed.split(/\s+/);
+      const lastWord = words[words.length - 1].toLowerCase().replace(/[^\w\-]/g, '');
+      const pageScope = document.getElementById('search-page-scope')?.value || 'ALL';
+
+      // 1. Find Vocabulary Prefix Completions for the active word
+      let matchedVocab = [];
+      if (lastWord.length >= 2) {
+        matchedVocab = Array.from(siteCrawler.vocabulary)
+          .filter(v => v.startsWith(lastWord) && v !== lastWord)
+          .sort((a, b) => (siteCrawler.globalTermFreq[b] || 0) - (siteCrawler.globalTermFreq[a] || 0) || a.length - b.length)
+          .slice(0, 6);
+      }
+      currentAutocompleteWords = matchedVocab;
+
+      // 2. Find Matching Section Headings across Crawled Pages
+      const queryLower = trimmed.toLowerCase();
+      const matchedChunks = siteCrawler.index
+        .filter(c => {
+          if (pageScope !== 'ALL' && c.pageUrl !== pageScope) return false;
+          return (
+            c.heading.toLowerCase().includes(lastWord) ||
+            c.articleTitle.toLowerCase().includes(lastWord) ||
+            (lastWord.length >= 3 && c.tokens.some(t => t.startsWith(lastWord)))
+          );
+        })
+        .slice(0, 3);
+
+      if (matchedVocab.length === 0 && matchedChunks.length === 0) {
+        panel.classList.remove('active');
+        return;
+      }
+
+      // Render Vocabulary Word Completions
+      if (matchedVocab.length > 0) {
+        wordsRow.style.display = 'flex';
+        wordsRow.innerHTML = `<span class="autocomplete-label">Tab Complete Word:</span>` +
+          matchedVocab.map((w, idx) => `
+            <button type="button" class="ac-word-chip ${idx === 0 ? 'selected' : ''}" onclick="applyWordAutocomplete('${escapeHtml(w)}')">
+              ${escapeHtml(w)} ${idx === 0 ? '⇥' : ''}
+            </button>
+          `).join('');
+      } else {
+        wordsRow.style.display = 'none';
+        wordsRow.innerHTML = '';
+      }
+
+      // Render Cross-Page Section Suggestions
+      if (matchedChunks.length > 0) {
+        headingsRow.style.display = 'flex';
+        headingsRow.innerHTML = `<span class="autocomplete-label">Matching Sections:</span>` +
+          matchedChunks.map(c => `
+            <button type="button" class="ac-heading-chip" onclick="runQuickPrompt('${escapeHtml(c.heading)}')">
+              [${escapeHtml(c.pageUrl)}] ${escapeHtml(c.heading)}
+            </button>
+          `).join('');
+      } else {
+        headingsRow.style.display = 'none';
+        headingsRow.innerHTML = '';
+      }
+
+      panel.classList.add('active');
+    }
+
+    function applyWordAutocomplete(completedWord) {
+      const inputEl = document.getElementById('chat-input');
+      const parts = inputEl.value.trimEnd().split(/\s+/);
+      parts[parts.length - 1] = completedWord;
+      inputEl.value = parts.join(' ') + ' ';
+      inputEl.focus();
+      handleInputAutocomplete();
+    }
+
+    function handleChatInputKeydown(event) {
+      if (event.key === 'Tab' && currentAutocompleteWords.length > 0) {
+        event.preventDefault();
+        applyWordAutocomplete(currentAutocompleteWords[0]);
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        document.getElementById('autocomplete-panel').classList.remove('active');
+        sendSearchQuery();
+      }
+    }
+
+    /*
+     * MODULARIZATION TARGET: luxy/demo/controllers/demo-controller.js
+     * This section is the demo application shell and integration wiring, not the
+     * reusable crawler/search implementation.
+     *
+     * Shared demo state: siteCrawler, ragEngine, cachedHostDomHTML and
+     * currentDisplayedRoute. The crawler currently reads some of this state.
+     * Runtime wiring: DOMContentLoaded constructs the crawler, runs the crawl,
+     * constructs the search engine and then registers keyboard listeners.
+     *
+     * Function groups:
+     * - setLuxyMascotMood/renderInitialGreeting: demo mascot and initial UI.
+     * - switchActivePageRoute/jumpToCrossPageSource: virtual route and citation UI.
+     * - sendSearchQuery/runQuickPrompt: input-to-engine bridge.
+     * - appendUserMessage/appendBotResponse: demo response renderer.
+     * - crawl/inject/clear functions: demo crawler administration and publishing.
+     * - modal/theme functions: demo interaction controls.
+     *
+     * For Luxraj Blog, build a narrow integration adapter around the existing
+     * Luxraj UI. Do not transplant this sample route router, host preview, custom
+     * publishing panel or chat markup merely to reuse the search engine.
+     */
+    /* ==========================================================================
+       PART G: UI CONTROLLER, MULTI-PAGE ROUTER & CROSS-PAGE CITATION JUMPER
+       ========================================================================== */
+    let siteCrawler;
+    let ragEngine;
+    let cachedHostDomHTML = '';
+    let currentDisplayedRoute = 'index.html';
+
+    function setLuxyMascotMood(mood = 'default') {
+      luxyMascotCurrentMood = LUXY_MASCOT_STATES.includes(mood) ? mood : 'default';
+
+      const headerMascot = document.getElementById('header-mascot-icon');
+      const modalMascot = document.getElementById('modal-mascot-avatar');
+      const fabMascot = document.getElementById('fab-mascot-holder');
+
+      if (headerMascot) headerMascot.innerHTML = renderLuxyMascotMarkup();
+      if (modalMascot) modalMascot.innerHTML = renderLuxyMascotMarkup();
+      if (fabMascot) {
+        const mascotMarkup = renderLuxyMascotMarkup();
+        fabMascot.innerHTML = `<div style="width:28px;height:28px;overflow:hidden;">${mascotMarkup}</div>`;
+      }
+
+      const moodLabel = document.getElementById('luxy-mood-label');
+      if (moodLabel) moodLabel.textContent = `STATE: ${luxyMascotCurrentMood.toUpperCase()}`;
+    }
+
+    /*
+     * DEMO BOOTSTRAP / INITIALIZATION ORDER:
+     * 1. Snapshot host article-feed markup.
+     * 2. Create crawler and complete its initial crawl.
+     * 3. Create the search engine with that crawler instance.
+     * 4. Render the initial greeting and attach global keyboard listeners.
+     * Preserve this order or provide an equivalent ready-state contract when
+     * these components are loaded as separate modules.
+     */
+    window.addEventListener('DOMContentLoaded', async () => {
+      cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
+      await loadLuxyMascotSvg();
+      setLuxyMascotMood('default');
+
+      siteCrawler = new MultiPageSiteCrawler();
+      await siteCrawler.crawlEntireSite();
+      ragEngine = new LuxyConversationalEngine(siteCrawler);
+
+      renderInitialGreeting();
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          openSearchModal();
+        }
+        if (e.key === 'Escape') {
+          closeSearchModal();
+          closeExtractorModal();
+        }
+      });
+    });
+
+    function renderInitialGreeting() {
+      const container = document.getElementById('chat-messages');
+      container.innerHTML = `
+        <div class="message-row bot">
+          <div class="message-avatar">${renderLuxyMascotMarkup()}</div>
+          <div class="message-bubble">
+            <div class="telemetry-header">
+              <span class="intent-pill">MASCOT: LUXY v3.5</span>
+              <span class="score-pill">${siteCrawler.crawledPages.size} PAGES SPIDERED</span>
+              <span class="Correction-pill">${siteCrawler.vocabulary.size} VOCAB TERMS</span>
+            </div>
+            <div style="font-weight: var(--font-weight-bold); margin-bottom: 0.35rem;">
+              Multi-Page Static Site Index & Prefix Autocomplete Online.
+            </div>
+            <div style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+              I have indexed <code>index.html</code> and all linked static pages. Partial prefixes (such as typing <code>microcontrol</code> for <code>microcontroller</code>) are automatically expanded, and you can press <strong>Tab</strong> while typing to autocomplete technical vocabulary.
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /*
+     * DEMO ROUTER ONLY: displays the host page or a VIRTUAL_STATIC_PAGES route.
+     * jumpToCrossPageSource() depends on this function to navigate citation links.
+     * A real multi-page Luxraj integration should navigate to the real source URL
+     * and section ID instead of importing this virtual preview router.
+     */
+    function switchActivePageRoute(routeUrl, targetElementId = null) {
+      if (currentDisplayedRoute === 'index.html') {
+        cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
+      }
+
+      currentDisplayedRoute = routeUrl;
+      document.getElementById('active-route-indicator').textContent = routeUrl;
+
+      document.querySelectorAll('.route-link').forEach(link => {
+        link.classList.toggle('active', link.getAttribute('data-route') === routeUrl);
+      });
+
+      const feed = document.getElementById('article-feed');
+
+      if (routeUrl === 'index.html') {
+        document.getElementById('current-page-banner-title').textContent = 'Host Page (/index.html): Hardware & Systems Engineering Archives';
+        feed.innerHTML = cachedHostDomHTML;
+      } else if (VIRTUAL_STATIC_PAGES[routeUrl]) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(VIRTUAL_STATIC_PAGES[routeUrl], 'text/html');
+        const pageTitle = doc.querySelector('title')?.textContent || routeUrl;
+        document.getElementById('current-page-banner-title').textContent = `Crawled Page (${routeUrl}): ${pageTitle}`;
+
+        const articles = doc.querySelectorAll('article, [data-crawlable="true"]');
+        feed.innerHTML = Array.from(articles).map(a => a.outerHTML).join('');
+      } else {
+        showToast(`Route ${routeUrl} not found in virtual router.`);
+        return;
+      }
+
+      if (targetElementId) {
+        const targetEl = document.getElementById(targetElementId);
+        if (targetEl) {
+          document.querySelectorAll('.dom-highlight-static').forEach(el => el.classList.remove('dom-highlight-static'));
+          targetEl.scrollIntoView({ behavior: 'auto', block: 'center' });
+          targetEl.classList.add('dom-highlight-static');
+          showToast(`Jumped to ${routeUrl}#${targetElementId}`);
+        }
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function jumpToCrossPageSource(pageUrl, elementId) {
+      closeSearchModal();
+      switchActivePageRoute(pageUrl, elementId);
+    }
+
+    /*
+     * UI-TO-ENGINE BRIDGE:
+     * Reads #chat-input, calls ragEngine.synthesizeResponse(query), then forwards
+     * the result to appendBotResponse(). When connecting Luxraj's existing search
+     * UI, this is the behavior boundary to adapt; keep the engine response contract.
+     */
+    function sendSearchQuery() {
+      const input = document.getElementById('chat-input');
+      const query = input.value.trim();
+      if (!query) return;
+
+      document.getElementById('autocomplete-panel').classList.remove('active');
+      appendUserMessage(query);
+      input.value = '';
+
+      const response = ragEngine.synthesizeResponse(query);
+      appendBotResponse(response);
+    }
+
+    function runQuickPrompt(text) {
+      document.getElementById('chat-input').value = text;
+      sendSearchQuery();
+    }
+
+    function appendUserMessage(text) {
+      const container = document.getElementById('chat-messages');
+      const row = document.createElement('div');
+      row.className = 'message-row user';
+      row.innerHTML = `
+        <div class="message-avatar">YOU</div>
+        <div class="message-bubble">${escapeHtml(text)}</div>
+      `;
+      container.appendChild(row);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function appendBotResponse(resp) {
+      const container = document.getElementById('chat-messages');
+      const row = document.createElement('div');
+      row.className = 'message-row bot';
+
+      const avatarSvg = renderLuxyMascotMarkup();
+
+      const correctionHtml = (resp.corrections && resp.corrections.length > 0)
+        ? `<span class="Correction-pill">${escapeHtml(resp.corrections.join(' | '))}</span>`
+        : '';
+
+      if (resp.intent === 'fallback') {
+        row.innerHTML = `
+          <div class="message-avatar">${avatarSvg}</div>
+          <div class="message-bubble">
+            <div class="telemetry-header">
+              <span class="status-error-pill">STATUS: NO MATCH</span>
+              ${correctionHtml}
+            </div>
+            <div>${resp.textHtml}</div>
+            <div class="followups-container">
+              ${resp.followups.map(f => `<button class="followup-chip" onclick="runQuickPrompt('${escapeHtml(f)}')">↳ ${escapeHtml(f)}</button>`).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        const sourcesHtml = resp.sources.map(s => `
+          <button class="source-pill" onclick="jumpToCrossPageSource('${escapeHtml(s.pageUrl)}', '${escapeHtml(s.elementId)}')">
+            <span>[${escapeHtml(s.pageUrl)}]</span>
+            <span>${escapeHtml(s.heading)}</span>
+            <span style="opacity:0.75;">(BM25: ${s.score})</span>
+          </button>
+        `).join('');
+
+        const followupsHtml = resp.followups.map(f => `
+          <button class="followup-chip" onclick="runQuickPrompt('${escapeHtml(f)}')">↳ ${escapeHtml(f)}</button>
+        `).join('');
+
+        row.innerHTML = `
+          <div class="message-avatar">${avatarSvg}</div>
+          <div class="message-bubble">
+            <div class="telemetry-header">
+              <span class="intent-pill">INTENT: ${escapeHtml(resp.intent)}</span>
+              <span class="score-pill">BM25+: ${resp.topScore}</span>
+              <span class="score-pill">PAGE: ${escapeHtml(resp.pageOrigin)}</span>
+              ${correctionHtml}
+            </div>
+            <div style="margin-bottom: 0.45rem;">${resp.opener}</div>
+            <div style="color: var(--color-text-secondary);">${resp.highlightedPrimary}</div>
+            ${resp.structuredTableHtml}
+            ${resp.structuredCodeHtml}
+            ${resp.secondaryHtml}
+            <div class="sources-container">${sourcesHtml}</div>
+            <div class="followups-container">${followupsHtml}</div>
+          </div>
+        `;
+      }
+
+      container.appendChild(row);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function runFullMultiPageCrawl() {
+      await siteCrawler.crawlEntireSite(Array.from(siteCrawler.crawledPages.keys()).filter(k => k !== 'index.html'));
+      ragEngine = new LuxyConversationalEngine(siteCrawler);
+      showToast(`Spider complete: ${siteCrawler.crawledPages.size} pages, ${siteCrawler.index.length} chunks indexed.`);
+    }
+
+    async function crawlSingleUrlFromInput() {
+      const urlInput = document.getElementById('custom-crawl-url');
+      const url = urlInput.value.trim();
+      if (!url) return;
+      await siteCrawler.fetchAndParsePage(url);
+      siteCrawler.updateCrawlerTelemetryUI();
+      ragEngine = new LuxyConversationalEngine(siteCrawler);
+      urlInput.value = '';
+      showToast(`Crawled ${url} (${siteCrawler.index.length} total chunks)`);
+    }
+
+    /*
+     * DEMO-ONLY VIRTUAL PUBLISHING:
+     * Builds article markup and inserts it into cachedHostDomHTML or a
+     * VIRTUAL_STATIC_PAGES route, then re-crawls and rebuilds ragEngine.
+     * This is not a production blog publishing API and does not write an HTML file.
+     * Known v3.5 issue, intentionally not changed in this annotation pass:
+     * the existing-route replace() result is not assigned back to the map,
+     * so appended markup is discarded for an already-existing virtual route.
+     */
+    async function injectCustomPageContent() {
+      const targetRoute = document.getElementById('new-page-route').value;
+      const title = document.getElementById('new-title').value.trim();
+      const heading = document.getElementById('new-heading').value.trim();
+      const content = document.getElementById('new-content').value.trim();
+
+      if (!title || !heading || !content) {
+        showToast('Please complete Title, Heading, and Content fields.');
+        return;
+      }
+
+      const artId = 'art-custom-' + Date.now();
+      const headId = 'sec-custom-' + Date.now();
+      const articleMarkup = `
+        <article class="tech-article" id="${artId}" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Live Injected Spec</span>
+            <span class="page-origin-pill">PAGE: ${escapeHtml(targetRoute)}</span>
+            <span>JUST PUBLISHED</span>
+          </div>
+          <h1 class="article-title">${escapeHtml(title)}</h1>
+          <div class="article-content">
+            <h2 id="${headId}">${escapeHtml(heading)}</h2>
+            <p>${escapeHtml(content)}</p>
+          </div>
+        </article>
+      `;
+
+      if (targetRoute === 'index.html') {
+        cachedHostDomHTML = articleMarkup + cachedHostDomHTML;
+      } else {
+        if (!VIRTUAL_STATIC_PAGES[targetRoute]) {
+          VIRTUAL_STATIC_PAGES[targetRoute] = `<!DOCTYPE html><html><head><title>${escapeHtml(title)}</title></head><body>${articleMarkup}</body></html>`;
+          const navBar = document.getElementById('multipage-route-bar');
+          const link = document.createElement('a');
+          link.href = targetRoute;
+          link.className = 'route-link';
+          link.setAttribute('data-route', targetRoute);
+          link.textContent = targetRoute;
+          link.onclick = () => { switchActivePageRoute(targetRoute); return false; };
+          navBar.appendChild(link);
+        } else {
+          VIRTUAL_STATIC_PAGES[targetRoute].replace('</body>', `${articleMarkup}</body>`);
+        }
+      }
+
+      document.getElementById('new-title').value = '';
+      document.getElementById('new-heading').value = '';
+      document.getElementById('new-content').value = '';
+
+      const allSeeds = Object.keys(VIRTUAL_STATIC_PAGES);
+      await siteCrawler.crawlEntireSite(allSeeds);
+      ragEngine = new LuxyConversationalEngine(siteCrawler);
+      switchActivePageRoute(targetRoute, headId);
+      showToast(`Published to ${targetRoute} & re-spidered site!`);
+    }
+
+    async function clearAndRebuildCache() {
+      await runFullMultiPageCrawl();
+      renderInitialGreeting();
+    }
+
+    function clearChatHistory() {
+      ragEngine.conversationMemory = [];
+      renderInitialGreeting();
+    }
+
+    function openSearchModal() {
+      document.getElementById('search-modal-backdrop').classList.add('active');
+      document.getElementById('chat-input').focus();
+    }
+
+    function closeSearchModal() {
+      document.getElementById('search-modal-backdrop').classList.remove('active');
+    }
+
+    /*
+     * MODULARIZATION TARGET: luxy/demo/tools/module-extractor.js
+     * Development/demo utility only. It exposes the current class source through
+     * toString() for clipboard copying; it is not used by crawling, autocomplete
+     * or search execution. Exclude from the production Luxraj runtime.
+     */
+    /* ==========================================================================
+       PART H: STANDALONE MODULE EXTRACTOR
+       ========================================================================== */
+    function openExtractorModal() {
+      document.getElementById('extractor-modal-backdrop').classList.add('active');
+      switchCodeTab('crawler');
+    }
+
+    function closeExtractorModal() {
+      document.getElementById('extractor-modal-backdrop').classList.remove('active');
+    }
+
+    function switchCodeTab(tab) {
+      const area = document.getElementById('code-display-area');
+      if (tab === 'crawler') {
+        area.value = MultiPageSiteCrawler.toString();
+      } else {
+        area.value = LuxyConversationalEngine.toString();
+      }
+    }
+
+    function copyExtractedCode() {
+      const code = document.getElementById('code-display-area').value;
+      navigator.clipboard.writeText(code).then(() => showToast('Copied module class to clipboard!'));
+    }
+
+    /*
+     * MODULARIZATION TARGET: luxy/demo/ui/toast.js
+     * Demo-only DOM notification helper. Current callers include crawler export
+     * and several demo controller actions. Pass it as a callback or import it only
+     * in the demo shell; the reusable engine should not require toast UI.
+     */
+    function showToast(msg) {
+      const t = document.getElementById('toast-message');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    /*
+     * MODULARIZATION TARGET: luxy/shared/escape-html.js
+     * Shared HTML escaping helper used by search response formatting, autocomplete
+     * suggestions and demo UI renderers. Import it explicitly wherever those
+     * functions move; do not duplicate or omit escaping during extraction.
+     */
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /* ==========================================================================
+       PART I: LUXY CONTENT TAGGING & EXPRESSION SYSTEM (NON-INVASIVE ADD-ON)
+       --------------------------------------------------------------------------
+       Responsibilities kept strictly separate:
+       1. Search / Retrieval: Handled untouched by MultiPageSiteCrawler & LuxyConversationalEngine.
+       2. Standalone Article Fetch & Human-Readable Text Extractor: Fetches article via URL
+          handoff and strips all code syntax, DOM attributes, and markup.
+       3. Signal Library & Content Tagger: Evaluates only author-facing human prose
+          to assign independent tags (CODE, EXPLANATION, DEMONSTRATION, SPEC, INTERACTIVE).
+       4. Composable Expression Controller: Maps detected tag combinations to reusable
+          facial SVG parts while preserving the existing 4-face SVG mascot asset.
+       ========================================================================== */
+
+    /* --------------------------------------------------------------------------
+       MODULE 1: INDEPENDENTLY EDITABLE SIGNAL LIBRARY
+       Holds human-readable words, phrases, and context rules separate from the
+       tagging engine. Exposes window.LuxySignalLibrary for external editing.
+       -------------------------------------------------------------------------- */
+    const LUXY_SIGNAL_LIBRARY = {
+      version: '1.0.0',
+      tags: ['CODE', 'EXPLANATION', 'DEMONSTRATION', 'SPEC', 'INTERACTIVE'],
+      rules: {
+        CODE: {
+          description: 'Author-facing language communicating that code, scripts, functions, or programs are provided, written, run, pasted, or used.',
+          directPhrases: [
+            'here is the python code',
+            'paste this into your ide',
+            'this is the javascript script',
+            'write the following function',
+            'run this python program',
+            'follow this coding pattern',
+            'here is the code',
+            'run the following script',
+            'copy and paste this snippet',
+            'configure timer wake-up programmatically',
+            'programmatically',
+            'assembly loop',
+            'tail-loop cleanup code',
+            'source_capabilities pdo bitfield',
+            'processed via canny edge detection'
+          ],
+          contextualTerms: [
+            {
+              term: 'code',
+              requireCompanion: /\b(write|run|paste|here|follow|example|sample|source|cleanup|pattern|snippet|below|above|program|script|function|compile|execute)\b/i,
+              excludeContext: /\b(gray code|morse code|bar code|qr code|zip code|postal code|color code|error code|status code)\b/i
+            },
+            {
+              term: 'program',
+              requireCompanion: /\b(run|write|compile|execute|python|c\+\+|rust|javascript|firmware|assembly|ide)\b/i
+            },
+            {
+              term: 'script',
+              requireCompanion: /\b(run|write|paste|execute|javascript|python|bash|shell|automation|below)\b/i
+            },
+            {
+              term: 'function',
+              requireCompanion: /\b(write|call|define|invoke|return|parameter|argument|following|callback)\b/i,
+              excludeContext: /\b(primary function|transfer function|wave function|step function)\b/i
+            },
+            {
+              term: 'instruction',
+              requireCompanion: /\b(assembly|loop|register|computes|vsetvli|operand|scalar|vector|opcode|compiler)\b/i
+            }
+          ]
+        },
+
+        EXPLANATION: {
+          description: 'Author-facing language communicating that a concept, process, reason, or principle is being explained.',
+          directPhrases: [
+            'here is an explanation of',
+            'this is how it works',
+            'the underlying principle is',
+            'why this happens',
+            'explained in detail',
+            'how it works',
+            'the reason is',
+            'is determined by',
+            'to avoid loading',
+            'to minimize energy',
+            'to convert the',
+            'to suppress common-mode',
+            'overcomes classic',
+            'eliminates manual',
+            'causes metastability if',
+            'ensures data arrives before',
+            'prevents data corruption',
+            'unlike fixed-width',
+            'implements modified nodal analysis',
+            'without backend server overhead'
+          ],
+          contextualTerms: [
+            {
+              term: 'explanation',
+              requireCompanion: /\b(here|detail|concept|principle|how|why|process|architecture|below|overview)\b/i
+            },
+            {
+              term: 'principle',
+              requireCompanion: /\b(underlying|operating|fundamental|basic|works|governed|physics|circuit)\b/i
+            },
+            {
+              term: 'because',
+              requireCompanion: /\b(when|if|since|causes|prevents|allows|reduces|increases|requires)\b/i
+            },
+            {
+              term: 'architecture',
+              requireCompanion: /\b(operates|utilizes|implements|defines|expands|executes|discovers|ranks)\b/i
+            }
+          ]
+        },
+
+        DEMONSTRATION: {
+          description: 'Author-facing language guiding the reader through an action, example, step, or practical demonstration.',
+          directPhrases: [
+            'follow the path',
+            'type it',
+            'mark the corresponding point',
+            'write down the value',
+            'write down this value',
+            'try this',
+            'follow these steps',
+            'step by step',
+            'for example',
+            'configure timer wake-up',
+            'maintain strict',
+            'utilize a grounded coplanar waveguide',
+            'poll environmental sensors',
+            'read sensor data into',
+            'evaluate threshold triggers',
+            'return to deep sleep',
+            'utilize 2oz copper pcb layers',
+            'insert routing delay buffers',
+            'pack registers into dedicated',
+            'pipeline combinational lut chains'
+          ],
+          contextualTerms: [
+            {
+              term: 'follow',
+              requireCompanion: /\b(path|steps|procedure|guide|walkthrough|example|sequence|instructions)\b/i
+            },
+            {
+              term: 'mark',
+              requireCompanion: /\b(point|value|position|node|location|graph|chart|corresponding)\b/i
+            },
+            {
+              term: 'configure',
+              requireCompanion: /\b(wakeup|wake-up|register|pin|timer|mode|peripheral|setting|domain)\b/i
+            },
+            {
+              term: 'measure',
+              requireCompanion: /\b(voltage|current|resistance|signal|probe|output|input|waveform|point)\b/i
+            }
+          ]
+        },
+
+        SPEC: {
+          description: 'Author-facing language communicating specifications, technical values, product/goods info, prices, ratings, buying guidance, recommendations, or warnings against buying.',
+          directPhrases: [
+            'typical rating / parameter',
+            'safety standards',
+            'unsuitable for battery-powered',
+            'instead, design with',
+            'recommended for',
+            'do not buy',
+            'avoid buying',
+            'buying guidance',
+            'price range',
+            'rated for cat iii',
+            'quiescent current',
+            'characteristic impedance',
+            'input impedance',
+            'efficiency ratings exceeding',
+            'attenuation slope',
+            'interrupt capacity',
+            'surge energy',
+            'hold current',
+            'extended power range',
+            'standard power range',
+            'arc-mitigation compliance'
+          ],
+          contextualTerms: [
+            {
+              // Generic word "current" requires explicit electrical/spec context, never standalone
+              term: 'current',
+              requireCompanion: /\b(\d+(\.\d+)?\s*(µa|ua|ma|na|a|amp|amps|amperes)|consumption|draw|quiescent|hold|saturation|limiting|rating|max)\b/i,
+              excludeContext: /\b(current page|current route|current state|current time|current version|currently)\b/i
+            },
+            {
+              term: 'voltage',
+              requireCompanion: /\b(\d+(\.\d+)?\s*(mv|v|kv|volts)|rating|clamping|varistor|steps|supply|increments|overvoltage|transient)\b/i
+            },
+            {
+              term: 'frequency',
+              requireCompanion: /\b(\d+(\.\d+)?\s*(hz|khz|mhz|ghz)|cutoff|switching|resonant|range|spectrum)\b/i
+            },
+            {
+              term: 'impedance',
+              requireCompanion: /\b(\d+(\.\d+)?\s*(Ω|ohm|ohms|kΩ|mΩ|mohm)|characteristic|input|matching|divider|tolerance)\b/i
+            },
+            {
+              term: 'rating',
+              requireCompanion: /\b(cat|efficiency|voltage|current|power|safety|temperature|maximum|typical|parameter|compliance)\b/i
+            },
+            {
+              term: 'price',
+              requireCompanion: /\b(\$\d+|usd|inr|cost|budget|retail|msrp|affordable|expensive|worth|buy|purchase)\b/i
+            },
+            {
+              term: 'recommend',
+              requireCompanion: /\b(buy|buying|avoid|instead|select|regulator|component|model|grade|unsuitable|suitable)\b/i
+            }
+          ]
+        },
+
+        INTERACTIVE: {
+          description: 'Author-facing language communicating that the reader can or should interact with an element or feature.',
+          directPhrases: [
+            'interact with the diagram',
+            'click inside this page',
+            'drag the slider',
+            'select an option',
+            'enter the value below',
+            'toggle the switch',
+            'press calculate',
+            'click the button',
+            'adjust the slider',
+            'use the interactive calculator',
+            'try the interactive',
+            'move the probe',
+            'click on the node',
+            'drag and drop'
+          ],
+          contextualTerms: [
+            {
+              term: 'interact',
+              requireCompanion: /\b(diagram|widget|sandbox|canvas|control|page|slider|panel|element|below|above)\b/i
+            },
+            {
+              term: 'click',
+              requireCompanion: /\b(inside|button|diagram|page|element|switch|toggle|node|here|below|calculate)\b/i
+            },
+            {
+              term: 'drag',
+              requireCompanion: /\b(slider|handle|knob|probe|node|component|cursor|across|left|right)\b/i
+            },
+            {
+              term: 'toggle',
+              requireCompanion: /\b(switch|button|state|mode|control|checkbox|option|pin)\b/i
+            },
+            {
+              term: 'slider',
+              requireCompanion: /\b(drag|move|adjust|set|change|use|control|value)\b/i
+            }
+          ]
+        }
+      }
+    };
+
+    const LuxySignalLibraryManager = {
+      getLibrary() {
+        return LUXY_SIGNAL_LIBRARY;
+      },
+      addDirectPhrase(tag, phrase) {
+        const normalizedTag = String(tag || '').toUpperCase();
+        if (!LUXY_SIGNAL_LIBRARY.rules[normalizedTag] || !phrase) return false;
+        const clean = String(phrase).toLowerCase().trim();
+        if (!LUXY_SIGNAL_LIBRARY.rules[normalizedTag].directPhrases.includes(clean)) {
+          LUXY_SIGNAL_LIBRARY.rules[normalizedTag].directPhrases.push(clean);
+        }
+        return true;
+      },
+      addContextualRule(tag, ruleObj) {
+        const normalizedTag = String(tag || '').toUpperCase();
+        if (!LUXY_SIGNAL_LIBRARY.rules[normalizedTag] || !ruleObj || !ruleObj.term) return false;
+        LUXY_SIGNAL_LIBRARY.rules[normalizedTag].contextualTerms.push(ruleObj);
+        return true;
+      }
+    };
+    window.LuxySignalLibrary = LuxySignalLibraryManager;
+
+    /* --------------------------------------------------------------------------
+       MODULE 2: SOURCE SELECTION & STANDALONE ARTICLE FETCHER / TEXT PREPARER
+       Operates strictly on the search result URL handoff. Never reads or mutates
+       siteCrawler.index or chunk flags. Strips all code blocks, DOM attributes,
+       and technical markup so only author-facing human prose is analyzed.
+       -------------------------------------------------------------------------- */
+    class LuxyStandaloneArticleProcessor {
+      constructor() {
+        this.fetchTimeoutMs = 2500;
+        this.selectionPolicy = 'PRIMARY_TOP_SOURCE';
+      }
+
+      /**
+       * Rule for selecting which article to process when a search response has multiple sources:
+       * Selects the primary top-ranked source (resp.sources[0]) that drives the main answer.
+       */
+      selectTargetArticleHandoff(searchResponse) {
+        if (!searchResponse || searchResponse.intent === 'fallback') return null;
+        const sources = Array.isArray(searchResponse.sources) ? searchResponse.sources : [];
+        if (sources.length === 0) {
+          if (!searchResponse.pageOrigin) return null;
+          return {
+            pageUrl: searchResponse.pageOrigin,
+            elementId: null,
+            articleTitle: null,
+            heading: null,
+            articleUrl: searchResponse.pageOrigin
+          };
+        }
+
+        const primary = sources[0];
+        const pageUrl = primary.pageUrl || searchResponse.pageOrigin || 'index.html';
+        const elementId = primary.elementId || null;
+
+        return {
+          pageUrl,
+          elementId,
+          articleTitle: primary.articleTitle || null,
+          heading: primary.heading || null,
+          articleUrl: elementId ? `${pageUrl}#${elementId}` : pageUrl
+        };
+      }
+
+      async fetchRawArticleHtml(pageUrl) {
+        // 1. Attempt independent network fetch when served over HTTP/HTTPS
+        if (typeof window !== 'undefined' && /^https?:$/i.test(window.location.protocol)) {
+          try {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), this.fetchTimeoutMs);
+            const response = await fetch(pageUrl, { signal: controller.signal });
+            clearTimeout(timer);
+            if (response.ok) {
+              const text = await response.text();
+              if (text && text.trim().length > 0) {
+                return { html: text, origin: 'LIVE-FETCH' };
+              }
+            }
+          } catch (_) {
+            // Fall through gracefully to local static route resolution
+          }
+        }
+
+        // 2. Resolve virtual static pages or host document HTML without touching crawler index
+        if (typeof VIRTUAL_STATIC_PAGES === 'object' && VIRTUAL_STATIC_PAGES && VIRTUAL_STATIC_PAGES[pageUrl]) {
+          return { html: VIRTUAL_STATIC_PAGES[pageUrl], origin: 'STATIC-ROUTE' };
+        }
+
+        if (pageUrl === 'index.html' || pageUrl === '/index.html') {
+          const hostHtml = (typeof cachedHostDomHTML === 'string' && cachedHostDomHTML.trim())
+            ? cachedHostDomHTML
+            : (document.getElementById('article-feed')?.innerHTML || '');
+          if (hostHtml) {
+            return { html: `<!DOCTYPE html><html><body><main>${hostHtml}</main></body></html>`, origin: 'HOST-DOCUMENT' };
+          }
+        }
+
+        throw new Error(`Unable to fetch article HTML for URL: ${pageUrl}`);
+      }
+
+      /**
+       * Extracts ONLY author-facing, human-readable language from the fetched article.
+       * Explicitly strips code blocks, inline syntax blocks, scripts, styles, SVGs,
+       * comments, and metadata pills before reading prose sentences.
+       */
+      extractAuthorFacingProse(htmlString, handoff) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, 'text/html');
+
+        // Locate the target article within the fetched page
+        let targetArticle = null;
+        if (handoff && handoff.elementId) {
+          const targetEl = doc.getElementById(handoff.elementId);
+          if (targetEl) {
+            targetArticle = targetEl.closest('article, [data-crawlable="true"]') || targetEl;
+          }
+        }
+        if (!targetArticle && handoff && handoff.articleTitle) {
+          const candidates = Array.from(doc.querySelectorAll('article, [data-crawlable="true"]'));
+          targetArticle = candidates.find(art => {
+            const t = art.querySelector('h1, .article-title')?.textContent.trim();
+            return t && t.toLowerCase() === handoff.articleTitle.toLowerCase();
+          }) || null;
+        }
+        if (!targetArticle) {
+          targetArticle = doc.querySelector('article, [data-crawlable="true"]') || doc.body;
+        }
+
+        if (!targetArticle) {
+          return { fullText: '', sentences: [] };
+        }
+
+        const cleanClone = targetArticle.cloneNode(true);
+
+        // NON-NEGOTIABLE: Strip all code blocks, preformatted syntax, scripts, styles, SVGs, and metadata tags
+        const excludedSelectors = [
+          'pre',
+          'code',
+          '.code-block',
+          'script',
+          'style',
+          'svg',
+          'noscript',
+          'iframe',
+          'template',
+          '.article-meta',
+          '.tag',
+          '.page-origin-pill'
+        ];
+        cleanClone.querySelectorAll(excludedSelectors.join(', ')).forEach(node => {
+          if (node.tagName === 'CODE' && node.parentElement && ['P', 'LI', 'H2', 'H3', 'TD'].includes(node.parentElement.tagName)) {
+            const textNode = doc.createTextNode(' ');
+            node.replaceWith(textNode);
+          } else {
+            node.remove();
+          }
+        });
+
+        const proseSegments = [];
+        const proseNodes = cleanClone.querySelectorAll('h1, h2, h3, p, li, th, td, caption, blockquote');
+
+        if (proseNodes.length > 0) {
+          proseNodes.forEach(node => {
+            const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
+            if (text) proseSegments.push(text);
+          });
+        } else {
+          const fallbackText = (cleanClone.textContent || '').replace(/\s+/g, ' ').trim();
+          if (fallbackText) proseSegments.push(fallbackText);
+        }
+
+        const fullText = proseSegments.join('. ');
+        const sentences = fullText
+          .split(/(?<=[.!?])\s+|\n+/)
+          .map(s => s.replace(/\s+/g, ' ').trim())
+          .filter(Boolean);
+
+        return {
+          fullText,
+          sentences
+        };
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       MODULE 3: HUMAN-LANGUAGE CONTENT TAGGING ENGINE
+       Applies LUXY_SIGNAL_LIBRARY to the extracted author-facing prose.
+       Never inspects the search query or technical DOM/code implementation.
+       -------------------------------------------------------------------------- */
+    class LuxyContentTaggingEngine {
+      constructor(signalLibrary = LUXY_SIGNAL_LIBRARY) {
+        this.signalLibrary = signalLibrary;
+      }
+
+      classifyArticleProse(extractedProse) {
+        const fullText = (extractedProse?.fullText || '').toLowerCase();
+        const sentences = Array.isArray(extractedProse?.sentences)
+          ? extractedProse.sentences
+          : [fullText];
+
+        if (!fullText.trim()) {
+          return { contentTags: [], matchedEvidence: {} };
+        }
+
+        const detectedTags = [];
+        const matchedEvidence = {};
+        const tagOrder = this.signalLibrary.tags || ['CODE', 'EXPLANATION', 'DEMONSTRATION', 'SPEC', 'INTERACTIVE'];
+
+        tagOrder.forEach(tagName => {
+          const ruleSet = this.signalLibrary.rules?.[tagName];
+          if (!ruleSet) return;
+
+          const reasons = [];
+
+          // 1. Check direct human-readable phrase signals
+          if (Array.isArray(ruleSet.directPhrases)) {
+            for (const phrase of ruleSet.directPhrases) {
+              const normalizedPhrase = String(phrase).toLowerCase().trim();
+              if (normalizedPhrase && fullText.includes(normalizedPhrase)) {
+                reasons.push(`phrase:"${normalizedPhrase}"`);
+              }
+            }
+          }
+
+          // 2. Check context-dependent word signals at sentence level
+          if (Array.isArray(ruleSet.contextualTerms)) {
+            for (const ctxRule of ruleSet.contextualTerms) {
+              const wordRegex = new RegExp(`\\b${ctxRule.term}\\b`, 'i');
+              for (const sentence of sentences) {
+                if (!wordRegex.test(sentence)) continue;
+                if (ctxRule.excludeContext && ctxRule.excludeContext.test(sentence)) continue;
+                if (!ctxRule.requireCompanion || ctxRule.requireCompanion.test(sentence)) {
+                  reasons.push(`context:${ctxRule.term}`);
+                  break;
+                }
+              }
+            }
+          }
+
+          if (reasons.length > 0) {
+            detectedTags.push(tagName);
+            matchedEvidence[tagName] = reasons;
+          }
+        });
+
+        return {
+          contentTags: detectedTags,
+          matchedEvidence
+        };
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       MODULE 4: COMPOSABLE MASCOT EXPRESSION CONTROLLER
+       Preserves the existing 4-face SVG artwork (DEFAULT, CODE, SPEC, FALLBACK)
+       and composes reusable SVG expression parts (eyebrows, eyes, mouth, accents)
+       based on the detected content tag combination.
+       -------------------------------------------------------------------------- */
+    class LuxyExpressionController {
+      constructor() {
+        this.reusableSvgParts = {
+          eyebrows: {
+            friendly: '<g class="luxy-part-brows" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M18 19 Q22 16.5 26 18.5"/><path d="M38 18.5 Q42 16.5 46 19"/></g>',
+            focused: '<g class="luxy-part-brows" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"><path d="M18 17.5 L26 19.5"/><path d="M46 17.5 L38 19.5"/></g>',
+            curious: '<g class="luxy-part-brows" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M18 19 Q22 18 26 19"/><path d="M38 17 Q42 14.5 46 17.5"/></g>',
+            analytical: '<g class="luxy-part-brows" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M18 18.5 L26 18.5"/><path d="M38 17.2 Q42 15.5 46 18"/></g>',
+            concentrated: '<g class="luxy-part-brows" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"><path d="M17.5 17 L26.5 20"/><path d="M46.5 17 L37.5 20"/></g>'
+          },
+          eyes: {
+            bright: '<g class="luxy-part-eyes" fill="currentColor"><circle cx="22" cy="24" r="1.4" opacity="0.85"/><circle cx="42" cy="24" r="1.4" opacity="0.85"/></g>',
+            attentive: '<g class="luxy-part-eyes" stroke="currentColor" stroke-width="1.2" fill="none"><circle cx="22" cy="24" r="3.2" opacity="0.55"/><circle cx="42" cy="24" r="3.2" opacity="0.55"/></g>',
+            scanning: '<g class="luxy-part-eyes" stroke="currentColor" stroke-width="1.2" fill="none"><rect x="18.2" y="21" width="7.6" height="5.8" rx="1.4" opacity="0.65"/><rect x="38.2" y="21" width="7.6" height="5.8" rx="1.4" opacity="0.65"/></g>'
+          },
+          mouth: {
+            warmSmile: '<g class="luxy-part-mouth" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M26 36 Q32 40.5 38 36"/></g>',
+            approachableSmile: '<g class="luxy-part-mouth" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M27 36.5 Q32 39 37 36.5"/></g>',
+            guidingOpen: '<g class="luxy-part-mouth" stroke="currentColor" stroke-width="1.5" fill="none"><ellipse cx="32" cy="37" rx="3.2" ry="2.1"/></g>',
+            thoughtfulLine: '<g class="luxy-part-mouth" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M27.5 37 L36.5 36.2"/></g>',
+            determinedLine: '<g class="luxy-part-mouth" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"><path d="M26.5 37 L34.5 37 L37.5 35.5"/></g>'
+          },
+          accents: {
+            none: '',
+            codePrompt: '<g class="luxy-part-accent" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none" opacity="0.8"><path d="M9 12 L6 15 L9 18"/><path d="M12 18 L15 12"/></g>',
+            sparkleGuide: '<g class="luxy-part-accent" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none" opacity="0.85"><path d="M54 10 L54 16 M51 13 L57 13"/></g>',
+            specGrid: '<g class="luxy-part-accent" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.75"><rect x="49" y="10" width="7" height="7" rx="1"/><path d="M49 13.5 H56 M52.5 10 V17"/></g>',
+            technicalBadge: '<g class="luxy-part-accent" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"><path d="M8 12 L5 15 L8 18"/><rect x="50" y="11" width="6" height="6" rx="1"/></g>'
+          }
+        };
+      }
+
+      resolveExpression(contentTags = [], isFallback = false) {
+        if (isFallback) {
+          return {
+            id: 'fallback-recovery',
+            label: 'attentive fallback',
+            baseFace: 'fallback',
+            parts: { eyebrows: 'curious', eyes: 'attentive', mouth: 'thoughtfulLine', accents: 'none' },
+            tagsKey: 'FALLBACK'
+          };
+        }
+
+        const tagSet = new Set((contentTags || []).map(t => String(t).toUpperCase()));
+        const has = t => tagSet.has(t);
+        const sortedKey = Array.from(tagSet).sort().join('+') || 'NONE';
+
+        // 1. CODE + SPEC + DEMONSTRATION -> concentrated and technical
+        if (has('CODE') && has('SPEC') && has('DEMONSTRATION')) {
+          return {
+            id: 'concentrated-technical',
+            label: 'concentrated & technical',
+            baseFace: 'code',
+            parts: { eyebrows: 'concentrated', eyes: 'scanning', mouth: 'determinedLine', accents: 'technicalBadge' },
+            tagsKey: sortedKey
+          };
+        }
+
+        // 2. DEMONSTRATION + INTERACTIVE -> curious and guiding
+        if (has('DEMONSTRATION') && has('INTERACTIVE')) {
+          return {
+            id: 'curious-guiding',
+            label: 'curious & guiding',
+            baseFace: 'default',
+            parts: { eyebrows: 'curious', eyes: 'bright', mouth: 'guidingOpen', accents: 'sparkleGuide' },
+            tagsKey: sortedKey
+          };
+        }
+
+        // 3. CODE + EXPLANATION -> focused but approachable
+        if (has('CODE') && has('EXPLANATION') && !has('SPEC')) {
+          return {
+            id: 'focused-approachable',
+            label: 'focused & approachable',
+            baseFace: 'code',
+            parts: { eyebrows: 'focused', eyes: 'bright', mouth: 'approachableSmile', accents: 'codePrompt' },
+            tagsKey: sortedKey
+          };
+        }
+
+        // 4. SPEC + EXPLANATION -> analytical and thoughtful
+        if (has('SPEC') && has('EXPLANATION') && !has('CODE')) {
+          return {
+            id: 'analytical-thoughtful',
+            label: 'analytical & thoughtful',
+            baseFace: 'spec',
+            parts: { eyebrows: 'analytical', eyes: 'scanning', mouth: 'thoughtfulLine', accents: 'specGrid' },
+            tagsKey: sortedKey
+          };
+        }
+
+        // 5. CODE + SPEC (with or without EXPLANATION) -> precision engineering
+        if (has('CODE') && has('SPEC')) {
+          return {
+            id: 'focused-analytical',
+            label: 'focused & analytical',
+            baseFace: 'code',
+            parts: { eyebrows: 'concentrated', eyes: 'scanning', mouth: 'approachableSmile', accents: 'technicalBadge' },
+            tagsKey: sortedKey
+          };
+        }
+
+        // 6. INTERACTIVE (standalone or with other tags) -> engaging & responsive
+        if (has('INTERACTIVE')) {
+          return {
+            id: 'interactive-engaging',
+            label: 'curious & interactive',
+            baseFace: 'default',
+            parts: { eyebrows: 'curious', eyes: 'bright', mouth: 'warmSmile', accents: 'sparkleGuide' },
+            tagsKey: sortedKey
+          };
+        }
+
+        // 7. DEMONSTRATION (standalone or with EXPLANATION/SPEC) -> practical & guiding
+        if (has('DEMONSTRATION')) {
+          return {
+            id: 'practical-guiding',
+            label: 'practical & guiding',
+            baseFace: has('SPEC') ? 'spec' : (has('CODE') ? 'code' : 'default'),
+            parts: { eyebrows: 'curious', eyes: 'attentive', mouth: 'approachableSmile', accents: has('SPEC') ? 'specGrid' : 'sparkleGuide' },
+            tagsKey: sortedKey
+          };
+        }
+
+        // 8. CODE only -> focused coder
+        if (has('CODE')) {
+          return {
+            id: 'focused-code',
+            label: 'focused & technical',
+            baseFace: 'code',
+            parts: { eyebrows: 'focused', eyes: 'attentive', mouth: 'determinedLine', accents: 'codePrompt' },
+            tagsKey: sortedKey
+          };
+        }
+
+        // 9. SPEC only -> analytical spec inspector
+        if (has('SPEC')) {
+          return {
+            id: 'analytical-spec',
+            label: 'analytical & precise',
+            baseFace: 'spec',
+            parts: { eyebrows: 'analytical', eyes: 'scanning', mouth: 'thoughtfulLine', accents: 'specGrid' },
+            tagsKey: sortedKey
+          };
+        }
+
+        // 10. EXPLANATION -> friendly and informative
+        if (has('EXPLANATION')) {
+          return {
+            id: 'friendly-informative',
+            label: 'friendly & informative',
+            baseFace: 'default',
+            parts: { eyebrows: 'friendly', eyes: 'bright', mouth: 'warmSmile', accents: 'none' },
+            tagsKey: sortedKey
+          };
+        }
+
+        // Default neutral expression
+        return {
+          id: 'default-ready',
+          label: 'ready & attentive',
+          baseFace: 'default',
+          parts: { eyebrows: 'friendly', eyes: 'bright', mouth: 'approachableSmile', accents: 'none' },
+          tagsKey: 'NONE'
+        };
+      }
+
+      /**
+       * Renders the mascot SVG preserving the original 4-face SVG artwork while
+       * composing the selected reusable expression parts onto a dedicated overlay layer.
+       */
+      renderComposedMascotSvg(expressionProfile) {
+        const profile = expressionProfile || this.resolveExpression([]);
+        const previousMood = luxyMascotCurrentMood;
+        luxyMascotCurrentMood = LUXY_MASCOT_STATES.includes(profile.baseFace) ? profile.baseFace : 'default';
+        const baseMarkup = renderLuxyMascotMarkup();
+        luxyMascotCurrentMood = previousMood;
+
+        if (!baseMarkup || !baseMarkup.trim().startsWith('<svg')) {
+          return baseMarkup;
+        }
+
+        try {
+          const parsed = new DOMParser().parseFromString(baseMarkup, 'image/svg+xml');
+          const svgEl = parsed.documentElement;
+          if (!svgEl || svgEl.localName !== 'svg' || parsed.querySelector('parsererror')) {
+            return baseMarkup;
+          }
+
+          svgEl.setAttribute('data-luxy-expression', profile.id);
+          svgEl.setAttribute('data-luxy-tags', profile.tagsKey);
+
+          const overlayGroup = parsed.createElementNS('http://www.w3.org/2000/svg', 'g');
+          overlayGroup.setAttribute('class', 'luxy-composed-expression-parts');
+          overlayGroup.setAttribute('data-expression-id', profile.id);
+          overlayGroup.setAttribute('style', 'pointer-events:none; color: var(--color-on-action, #ffffff);');
+
+          const partsMarkup = [
+            this.reusableSvgParts.eyebrows[profile.parts?.eyebrows] || '',
+            this.reusableSvgParts.eyes[profile.parts?.eyes] || '',
+            this.reusableSvgParts.mouth[profile.parts?.mouth] || '',
+            this.reusableSvgParts.accents[profile.parts?.accents] || ''
+          ].join('');
+
+          if (partsMarkup) {
+            const fragmentDoc = new DOMParser().parseFromString(
+              `<svg xmlns="http://www.w3.org/2000/svg">${partsMarkup}</svg>`,
+              'image/svg+xml'
+            );
+            Array.from(fragmentDoc.documentElement.childNodes).forEach(node => {
+              overlayGroup.appendChild(parsed.importNode(node, true));
+            });
+            svgEl.appendChild(overlayGroup);
+          }
+
+          return new XMLSerializer().serializeToString(svgEl);
+        } catch (_) {
+          return baseMarkup;
+        }
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       MODULE 5: RESPONSE ENRICHMENT INTEGRATION BOUNDARY (FAILURE-ISOLATED)
+       Hooks into appendBotResponse(resp) without altering sendSearchQuery(),
+       synthesizeResponse(), crawler indexing, or BM25+ ranking.
+       -------------------------------------------------------------------------- */
+    const luxyArticleProcessor = new LuxyStandaloneArticleProcessor();
+    const luxyContentTagger = new LuxyContentTaggingEngine(LUXY_SIGNAL_LIBRARY);
+    const luxyExpressionController = new LuxyExpressionController();
+
+    function renderResponseContentTagsBarHtml(contentTags, expressionProfile) {
+      const hasTags = Array.isArray(contentTags) && contentTags.length > 0;
+      const pillsHtml = hasTags
+        ? contentTags.map(tag => `<span class="luxy-content-tag-pill" data-luxy-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>`).join('')
+        : `<span class="luxy-content-tag-none">UNCLASSIFIED PROSE</span>`;
+
+      const exprLabel = expressionProfile?.label
+        ? `<span class="luxy-expression-badge" title="Composed Mascot Expression">EXPR: ${escapeHtml(expressionProfile.label.toUpperCase())}</span>`
+        : '';
+
+      return `
+        <div class="luxy-content-tags-bar" data-enrichment-role="content-tags">
+          <span class="luxy-content-tags-label">Content Tags:</span>
+          ${pillsHtml}
+          ${exprLabel}
+        </div>
+      `;
+    }
+
+    function applyEnrichmentToBotRow(botRowElement, searchResponse, enrichment) {
+      if (!botRowElement || !enrichment) return;
+
+      // Attach non-destructive enrichment metadata to the response object
+      searchResponse.contentTags = enrichment.contentTags;
+      searchResponse.expressionProfile = enrichment.expressionProfile;
+      searchResponse.articleHandoff = enrichment.handoff;
+
+      // 1. Insert or update the per-response rounded content tag pills inside the message bubble
+      const bubble = botRowElement.querySelector('.message-bubble');
+      if (bubble && searchResponse.intent !== 'fallback') {
+        const existingBar = bubble.querySelector('[data-enrichment-role="content-tags"]');
+        const barMarkup = renderResponseContentTagsBarHtml(enrichment.contentTags, enrichment.expressionProfile);
+        if (existingBar) {
+          existingBar.outerHTML = barMarkup;
+        } else {
+          const telemetryHeader = bubble.querySelector('.telemetry-header');
+          if (telemetryHeader) {
+            telemetryHeader.insertAdjacentHTML('afterend', barMarkup);
+          } else {
+            bubble.insertAdjacentHTML('afterbegin', barMarkup);
+          }
+        }
+      }
+
+      // 2. Update the response's mascot avatar and header/modal mascot with the composed expression
+      const composedSvg = luxyExpressionController.renderComposedMascotSvg(enrichment.expressionProfile);
+      const rowAvatar = botRowElement.querySelector('.message-avatar');
+      if (rowAvatar && composedSvg) {
+        rowAvatar.innerHTML = composedSvg;
+      }
+
+      const modalMascot = document.getElementById('modal-mascot-avatar');
+      const headerMascot = document.getElementById('header-mascot-icon');
+      if (modalMascot && composedSvg) modalMascot.innerHTML = composedSvg;
+      if (headerMascot && composedSvg) headerMascot.innerHTML = composedSvg;
+
+      const moodLabel = document.getElementById('luxy-mood-label');
+      if (moodLabel && enrichment.expressionProfile) {
+        moodLabel.textContent = `EXPR: ${enrichment.expressionProfile.label.toUpperCase()}`;
+      }
+    }
+
+    async function enrichSearchResponseIndependently(searchResponse, botRowElement) {
+      try {
+        if (!searchResponse || searchResponse.intent === 'fallback') {
+          const fallbackExpr = luxyExpressionController.resolveExpression([], true);
+          applyEnrichmentToBotRow(botRowElement, searchResponse || {}, {
+            contentTags: [],
+            expressionProfile: fallbackExpr,
+            handoff: null
+          });
+          return;
+        }
+
+        // Step 4: Receive the selected result's article URL handoff
+        const handoff = luxyArticleProcessor.selectTargetArticleHandoff(searchResponse);
+        if (!handoff || !handoff.pageUrl) return;
+
+        // Step 5: Independently fetch the article using the supplied URL
+        const fetched = await luxyArticleProcessor.fetchRawArticleHtml(handoff.pageUrl);
+
+        // Step 6: Prepare human-readable author-facing prose (excluding code/DOM/markup)
+        const extractedProse = luxyArticleProcessor.extractAuthorFacingProse(fetched.html, handoff);
+
+        // Step 7: Produce the article's independent content tags
+        const classification = luxyContentTagger.classifyArticleProse(extractedProse);
+
+        // Step 8: Expression controller determines suitable Luxy expression from tag combination
+        const expressionProfile = luxyExpressionController.resolveExpression(classification.contentTags, false);
+
+        // Step 9: Provide enrichment to the response/UI integration
+        applyEnrichmentToBotRow(botRowElement, searchResponse, {
+          contentTags: classification.contentTags,
+          matchedEvidence: classification.matchedEvidence,
+          expressionProfile,
+          handoff
+        });
+      } catch (err) {
+        // FAILURE ISOLATION: Never break, block, or invalidate the existing v3.5 search response
+        console.warn('Luxy content-tagging add-on skipped enrichment safely:', err);
+      }
+    }
+
+    // Non-invasive integration wrapper around appendBotResponse(resp)
+    const _originalAppendBotResponseV35 = appendBotResponse;
+    appendBotResponse = function(resp) {
+      _originalAppendBotResponseV35(resp);
+      try {
+        const container = document.getElementById('chat-messages');
+        const botRows = container ? container.querySelectorAll('.message-row.bot') : [];
+        const latestBotRow = botRows.length > 0 ? botRows[botRows.length - 1] : null;
+        if (latestBotRow) {
+          enrichSearchResponseIndependently(resp, latestBotRow);
+        }
+      } catch (integrationError) {
+        console.warn('Luxy enrichment handoff isolated error:', integrationError);
+      }
+    };
+  </script>
+</body>
+</html>
