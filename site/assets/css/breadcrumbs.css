@@ -24,3 +24,8 @@
     color: var(--brand-crimson);
     text-decoration: underline;
 }
+
+/* Keep the native hidden attribute authoritative over the flex layout above. */
+.breadcrumbs[hidden] {
+    display: none !important;
+}
