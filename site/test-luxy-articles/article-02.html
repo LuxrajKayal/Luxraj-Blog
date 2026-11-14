@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <title>Class-D 2.1 Audio Amplifier Architecture & Filter Design — Luxy Test Article</title>
+  <style>
+  :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #172033; background: #f3f5f8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 28px 16px 56px; }
+  .test-page { width: min(920px, 100%); margin: 0 auto; }
+  .test-page-header { margin: 0 0 18px; }
+  .test-page-header h1 { margin: 0 0 6px; font-size: 1.35rem; }
+  .test-page-header p { margin: 0; color: #596579; font-size: .92rem; }
+  .test-navigation { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 0 0 18px; padding: 12px 14px; background: #fff; border: 1px solid #dce2ea; border-radius: 10px; }
+  .test-navigation a { color: #1457a6; font-size: .9rem; }
+  .tech-article { background: #fff; border: 1px solid #dce2ea; border-radius: 12px; padding: clamp(18px, 4vw, 32px); }
+  .article-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; color: #647086; font-size: .82rem; }
+  .tag { display: inline-block; padding: 4px 9px; border-radius: 999px; background: #e9f1fb; color: #244e7d; font-weight: 650; }
+  .article-title { margin: 0 0 24px; font-size: clamp(1.65rem, 4vw, 2.3rem); line-height: 1.2; }
+  .article-content { line-height: 1.7; overflow-wrap: anywhere; }
+  .article-content h2 { margin: 1.8em 0 .55em; font-size: 1.25rem; line-height: 1.35; }
+  .article-content h2:first-child { margin-top: 0; }
+  .article-content p { margin: .7em 0; }
+  .article-content code { padding: .08em .28em; background: #eef1f5; border-radius: 4px; }
+  .article-content .code-block { overflow-x: auto; padding: 14px; background: #172033; color: #f4f7fb; border-radius: 8px; font: .88rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre; }
+  .article-content .spec-table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+  .article-content .spec-table th, .article-content .spec-table td { padding: 9px 10px; border: 1px solid #dce2ea; text-align: left; }
+  .article-content .spec-table th { background: #eef2f7; }
+  @media (max-width: 560px) { body { padding: 16px 10px 36px; } .tech-article { padding: 17px; } }
+</style>
+</head>
+<body>
+  <main class="test-page">
+    <header class="test-page-header">
+      <h1>Luxy Temporary Test Corpus</h1>
+      <p>Independent test page 2 of 5. This temporary article exists only for crawler and search testing.</p>
+    </header>
+    <nav class="test-navigation" aria-label="Test article pages">
+      <a href="./index.html">Test article index</a>
+      <a href="./article-01.html">1. Low-Power ESP32 Microcontroller Telemetry & Custom PCB Routing</a>
+        <a href="./article-02.html">2. Class-D 2.1 Audio Amplifier Architecture & Filter Design</a>
+        <a href="./article-03.html">3. Digital Multimeter Protection & Circuit Sandbox Design</a>
+        <a href="./article-04.html">4. Automated 2D Vector Animation & Rotoscoping Pipeline</a>
+        <a href="./article-05.html">5. Zero-Backend Static Site Architecture & Client-Side Crawling</a>
+    </nav>
+    <article class="tech-article" id="art-class-d" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Audio Engineering</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: NOV 02, 2026 • BY DR. HELENA VANCE</span>
+          </div>
+          <h1 class="article-title">Class-D 2.1 Audio Amplifier Architecture & Filter Design</h1>
+          <div class="article-content">
+            <h2 id="classd-pwm-switching">High-Frequency PWM Modulation Strategy</h2>
+            <p>Class-D audio amplifiers operate output MOSFETs in switching states (fully ON or fully OFF), yielding efficiency ratings exceeding 90%. Switching frequencies typically range between 300kHz and 1.2MHz, pushing switching noise far above the 20Hz–20kHz audible spectrum.</p>
+
+            <h2 id="classd-lc-filter">LC Reconstruction Filter Inductor & Capacitor Calculation</h2>
+            <p>To convert the high-frequency PWM pulse train back into a clean analog acoustic waveform, a 2nd-order Butterworth LC low-pass filter must be placed at the output stage. The resonant cutoff frequency Fc is determined by:</p>
+            <div class="code-block">Fc = 1 / (2 * π * sqrt(L * C))
+For a 4-ohm speaker load and Fc = 30kHz:
+Inductor (L) = 10µH (Shielded ferrite core, saturation current > 15A)
+Capacitor (C) = 0.68µF (Film capacitor, Metalized Polypropylene)</div>
+
+            <h2 id="classd-subwoofer-crossover">Active Subwoofer Crossover at 80Hz</h2>
+            <p>In a 2.1 channel system, the subwoofer low-pass crossover is set at 80Hz using a 4th-order Linkwitz-Riley active filter topology, providing a flat amplitude response across the crossover region with a steep 24dB/octave attenuation slope.</p>
+
+            <h2 id="classd-thermal-dissipation">Thermal Dissipation & Copper Pour Heatsinking</h2>
+            <p>High-power peaks (e.g., 200W RMS into subwoofer) generate heat concentrated within the power stage IC. Utilize 2oz copper PCB layers with an array of thermal vias (0.3mm diameter, 0.8mm pitch) directly under the exposed thermal pad connecting to the bottom ground plane.</p>
+          </div>
+        </article>
+  </main>
+</body>
+</html>

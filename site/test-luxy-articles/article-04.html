@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <title>Automated 2D Vector Animation & Rotoscoping Pipeline — Luxy Test Article</title>
+  <style>
+  :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #172033; background: #f3f5f8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 28px 16px 56px; }
+  .test-page { width: min(920px, 100%); margin: 0 auto; }
+  .test-page-header { margin: 0 0 18px; }
+  .test-page-header h1 { margin: 0 0 6px; font-size: 1.35rem; }
+  .test-page-header p { margin: 0; color: #596579; font-size: .92rem; }
+  .test-navigation { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 0 0 18px; padding: 12px 14px; background: #fff; border: 1px solid #dce2ea; border-radius: 10px; }
+  .test-navigation a { color: #1457a6; font-size: .9rem; }
+  .tech-article { background: #fff; border: 1px solid #dce2ea; border-radius: 12px; padding: clamp(18px, 4vw, 32px); }
+  .article-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; color: #647086; font-size: .82rem; }
+  .tag { display: inline-block; padding: 4px 9px; border-radius: 999px; background: #e9f1fb; color: #244e7d; font-weight: 650; }
+  .article-title { margin: 0 0 24px; font-size: clamp(1.65rem, 4vw, 2.3rem); line-height: 1.2; }
+  .article-content { line-height: 1.7; overflow-wrap: anywhere; }
+  .article-content h2 { margin: 1.8em 0 .55em; font-size: 1.25rem; line-height: 1.35; }
+  .article-content h2:first-child { margin-top: 0; }
+  .article-content p { margin: .7em 0; }
+  .article-content code { padding: .08em .28em; background: #eef1f5; border-radius: 4px; }
+  .article-content .code-block { overflow-x: auto; padding: 14px; background: #172033; color: #f4f7fb; border-radius: 8px; font: .88rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre; }
+  .article-content .spec-table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+  .article-content .spec-table th, .article-content .spec-table td { padding: 9px 10px; border: 1px solid #dce2ea; text-align: left; }
+  .article-content .spec-table th { background: #eef2f7; }
+  @media (max-width: 560px) { body { padding: 16px 10px 36px; } .tech-article { padding: 17px; } }
+</style>
+</head>
+<body>
+  <main class="test-page">
+    <header class="test-page-header">
+      <h1>Luxy Temporary Test Corpus</h1>
+      <p>Independent test page 4 of 5. This temporary article exists only for crawler and search testing.</p>
+    </header>
+    <nav class="test-navigation" aria-label="Test article pages">
+      <a href="./index.html">Test article index</a>
+      <a href="./article-01.html">1. Low-Power ESP32 Microcontroller Telemetry & Custom PCB Routing</a>
+        <a href="./article-02.html">2. Class-D 2.1 Audio Amplifier Architecture & Filter Design</a>
+        <a href="./article-03.html">3. Digital Multimeter Protection & Circuit Sandbox Design</a>
+        <a href="./article-04.html">4. Automated 2D Vector Animation & Rotoscoping Pipeline</a>
+        <a href="./article-05.html">5. Zero-Backend Static Site Architecture & Client-Side Crawling</a>
+    </nav>
+    <article class="tech-article" id="art-vector-anim" data-crawlable="true">
+          <div class="article-meta">
+            <span class="tag">Graphics & Vision</span>
+            <span class="page-origin-pill">PAGE: index.html</span>
+            <span>PUBLISHED: DEC 04, 2026 • BY SOPHIA CHEN</span>
+          </div>
+          <h1 class="article-title">Automated 2D Vector Animation & Rotoscoping Pipeline</h1>
+          <div class="article-content">
+            <h2 id="vec-opencv-edges">OpenCV Frame Difference Edge Detection</h2>
+            <p>Automated vector rotoscoping extracts high-contrast contours from raw video frames. Sequential frames are converted to grayscale, smoothed with a 5x5 Gaussian Blur, and processed via Canny edge detection:</p>
+            <div class="code-block">gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+edges = cv2.Canny(blurred, threshold1=50, threshold2=150)
+contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)</div>
+
+            <h2 id="vec-vtracer-simplification">VTracer Path Simplification & Bézier Fitting</h2>
+            <p>Pixel-based raster edges are converted to smooth vector paths using Douglas-Peucker polygon simplification followed by cubic Bézier curve fitting to minimize SVG node count.</p>
+          </div>
+        </article>
+  </main>
+</body>
+</html>

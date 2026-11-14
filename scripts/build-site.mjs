@@ -389,6 +389,12 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
     const outputPath = path.join(OUTPUT_DIR, relativePath);
 
     if (entry.isDirectory()) {
+      // Temporary Luxy test articles are standalone fixtures, not editorial Blog pages.
+      // Copy them unchanged so they bypass shared-shell injection and article-page validation.
+      if (normalizedRelativePath === 'test-luxy-articles') {
+        await cp(sourcePath, outputPath, { recursive: true });
+        continue;
+      }
       await mkdir(outputPath, { recursive: true });
       await walkAndBuild(sourcePath, relativePath, partialContents, stats);
       continue;
