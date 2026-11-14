@@ -3,7 +3,8 @@
  * Luxraj Blog static-site build.
  *
  * This builder stitches explicit shared-component markers into complete HTML.
- * It does not detect, replace, hide, or repair legacy inline components.
+ * It does not detect, replace, hide, or repair legacy inline shared-shell components.
+ * Breadcrumb navigation is handled separately by the dedicated build policy.
  * Populated source pages must already use the shared markers; invalid source
  * fails the build so duplicated markup cannot silently reach the public site.
  * Source partials are excluded from the public output.
@@ -251,7 +252,7 @@ function ensureBreadcrumbClass(block) {
 
 function ensureBreadcrumbHidden(block) {
   const openingTag = block.match(/^<nav\b[^>]*>/i)?.[0];
-  if (!openingTag || /\bhidden(?:\s|=|>)/i.test(openingTag)) return block;
+  if (!openingTag || /\shidden(?:\s|=|>)/i.test(openingTag)) return block;
 
   const updatedOpeningTag = openingTag.replace(/^<nav\b/i, '<nav hidden');
   return updatedOpeningTag + block.slice(openingTag.length);
@@ -276,7 +277,7 @@ function insertBreadcrumbMarkup(html, markup, relativeFile) {
 function homepageBreadcrumb() {
   return [
     '<nav class="breadcrumbs" aria-label="Breadcrumb" hidden>',
-    '  <span aria-current="page">Home</span>',
+    '  <a href="/">Home</a>',
     '</nav>'
   ].join('\n');
 }
