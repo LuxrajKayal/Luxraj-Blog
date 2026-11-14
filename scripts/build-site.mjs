@@ -191,6 +191,156 @@ function injectFooterStylesheet(html, rootPrefix, relativeFile) {
   return html.slice(0, headEnd) + link + html.slice(headEnd);
 }
 
+function breadcrumbNavBlocks(html) {
+  return Array.from(html.matchAll(/<nav\b[^>]*>[\s\S]*?<\/nav\s*>/gi))
+    .filter(([block]) => {
+      const openingTag = block.match(/^<nav\b[^>]*>/i)?.[0] || '';
+      const ariaLabel = openingTag.match(/\baria-label\s*=\s*(["'])(.*?)\1/i)?.[2] || '';
+      const className = openingTag.match(/\bclass\s*=\s*(["'])(.*?)\1/i)?.[2] || '';
+      return ariaLabel.trim().toLowerCase() === 'breadcrumb' ||
+        className.split(/\s+/).includes('breadcrumbs');
+    });
+}
+
+function breadcrumbIsPopulated(block) {
+  // Any unresolved template token means the breadcrumb still needs manual work.
+  if (/\{\{\s*[^{}]+\s*\}\}|<%[\s\S]*?%>|\[\[\s*[\w.-]+\s*\]\]/.test(block)) {
+    return false;
+  }
+
+  const anchors = Array.from(block.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi));
+  for (const [, attributes, labelHtml] of anchors) {
+    const href = attributes.match(/\bhref\s*=\s*(["'])(.*?)\1/i)?.[2]?.trim() || '';
+    const label = labelHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!href || href === '#' || !label) return false;
+  }
+
+  const visibleText = block
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;|&#160;|&#xA0;/gi, ' ')
+    .replace(/[\/|›»>·•–—-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return visibleText.length > 0;
+}
+
+function ensureBreadcrumbClass(block) {
+  const openingTag = block.match(/^<nav\b[^>]*>/i)?.[0];
+  if (!openingTag) return block;
+
+  const classMatch = openingTag.match(/\bclass\s*=\s*(["'])(.*?)\1/i);
+  let updatedOpeningTag = openingTag;
+
+  if (classMatch) {
+    const classes = classMatch[2].split(/\s+/).filter(Boolean);
+    if (!classes.includes('breadcrumbs')) {
+      const quote = classMatch[1];
+      updatedOpeningTag = openingTag.replace(
+        classMatch[0],
+        'class=' + quote + [...classes, 'breadcrumbs'].join(' ') + quote
+      );
+    }
+  } else {
+    updatedOpeningTag = openingTag.replace(/^<nav\b/i, '<nav class="breadcrumbs"');
+  }
+
+  return updatedOpeningTag + block.slice(openingTag.length);
+}
+
+function ensureBreadcrumbHidden(block) {
+  const openingTag = block.match(/^<nav\b[^>]*>/i)?.[0];
+  if (!openingTag || /\bhidden(?:\s|=|>)/i.test(openingTag)) return block;
+
+  const updatedOpeningTag = openingTag.replace(/^<nav\b/i, '<nav hidden');
+  return updatedOpeningTag + block.slice(openingTag.length);
+}
+
+function insertBreadcrumbMarkup(html, markup, relativeFile) {
+  const mainTag = html.match(/<main\b[^>]*>/i)?.[0];
+  if (mainTag) {
+    const index = html.indexOf(mainTag) + mainTag.length;
+    return html.slice(0, index) + '\n' + markup + '\n' + html.slice(index);
+  }
+
+  const bodyTag = html.match(/<body\b[^>]*>/i)?.[0];
+  if (bodyTag) {
+    const index = html.indexOf(bodyTag) + bodyTag.length;
+    return html.slice(0, index) + '\n' + markup + '\n' + html.slice(index);
+  }
+
+  throw new Error(relativeFile + ' has no <main> or <body> insertion point for breadcrumbs.');
+}
+
+function homepageBreadcrumb() {
+  return [
+    '<nav class="breadcrumbs" aria-label="Breadcrumb" hidden>',
+    '  <span aria-current="page">Home</span>',
+    '</nav>'
+  ].join('\n');
+}
+
+function placeholderBreadcrumb() {
+  return [
+    '<nav class="breadcrumbs" aria-label="Breadcrumb" hidden>',
+    '  <a href="{{HOME_URL}}">{{HOME_LABEL}}</a>',
+    '  <span aria-hidden="true">/</span>',
+    '  <span>{{SECTION_LABEL}}</span>',
+    '  <span aria-hidden="true">/</span>',
+    '  <span aria-current="page">{{PAGE_LABEL}}</span>',
+    '</nav>'
+  ].join('\n');
+}
+
+function injectBreadcrumbNavigation(html, relativeFile) {
+  const isHomepage = relativeFile === 'index.html';
+  const matches = breadcrumbNavBlocks(html);
+
+  if (matches.length > 1) {
+    throw new Error(relativeFile + ' contains multiple breadcrumb navigation blocks; keep exactly one.');
+  }
+
+  if (matches.length === 1) {
+    const [match] = matches;
+    const existingBlock = match[0];
+    let updatedBlock = ensureBreadcrumbClass(existingBlock);
+
+    if (isHomepage) {
+      if (breadcrumbIsPopulated(updatedBlock)) {
+        updatedBlock = ensureBreadcrumbHidden(updatedBlock);
+      } else {
+        updatedBlock = homepageBreadcrumb();
+      }
+    } else if (!breadcrumbIsPopulated(updatedBlock)) {
+      updatedBlock = ensureBreadcrumbHidden(updatedBlock);
+    }
+
+    return html.slice(0, match.index) + updatedBlock +
+      html.slice(match.index + existingBlock.length);
+  }
+
+  return insertBreadcrumbMarkup(
+    html,
+    isHomepage ? homepageBreadcrumb() : placeholderBreadcrumb(),
+    relativeFile
+  );
+}
+
+function injectBreadcrumbStylesheet(html, rootPrefix, relativeFile) {
+  if (/href\s*=\s*(["'])[^"']*assets\/css\/breadcrumbs\.css\1/i.test(html)) {
+    return html;
+  }
+
+  const headEnd = html.toLowerCase().lastIndexOf('</head>');
+  if (headEnd < 0) {
+    throw new Error(relativeFile + ' has no closing </head> tag for the shared breadcrumb stylesheet.');
+  }
+
+  const link = '  <link rel="stylesheet" href="' + rootPrefix + 'assets/css/breadcrumbs.css">\n';
+  return html.slice(0, headEnd) + link + html.slice(headEnd);
+}
+
 function injectNewsletterPlaceholder(html, relativeFile) {
   if (/id\s*=\s*(['"])house-popup-backdrop\1/i.test(html)) {
     throw new Error(relativeFile + ' already contains the newsletter popup target.');
@@ -337,6 +487,8 @@ function expandSharedComponents(sourceHtml, relativeFile, partialContents) {
     throw new Error(relativeFile + ' contains an unresolved shared marker or root token after assembly.');
   }
   html = injectFooterStylesheet(html, rootPrefix, relativeFile);
+  html = injectBreadcrumbStylesheet(html, rootPrefix, relativeFile);
+  html = injectBreadcrumbNavigation(html, relativeFile);
   html = injectNewsletterPlaceholder(html, relativeFile);
   validateBuiltPage(html, relativeFile, usesArticleLayout);
   return html;
