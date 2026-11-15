@@ -2741,13 +2741,12 @@
     }
 
     /*
-     * DEMO BOOTSTRAP / INITIALIZATION ORDER:
-     * 1. Snapshot host article-feed markup.
-     * 2. Create crawler and complete its initial crawl.
-     * 3. Create the search engine with that crawler instance.
-     * 4. Render the initial greeting and attach global keyboard listeners.
-     * Preserve this order or provide an equivalent ready-state contract when
-     * these components are loaded as separate modules.
+     * PHASE 1 BOOTSTRAP / INITIALIZATION ORDER:
+     * 1. Load the mascot presentation asset.
+     * 2. Read sitemap candidates and finish the breadcrumb audit.
+     * 3. Construct the existing search-engine shell without populating its index.
+     * 4. Render the Phase 1 audit summary and attach keyboard listeners.
+     * Content extraction and searchable indexing are deferred to Phase 2.
      */
     window.addEventListener('DOMContentLoaded', async () => {
       await loadLuxyMascotSvg();
@@ -2777,14 +2776,15 @@
 
     function renderInitialGreeting() {
       const container = document.getElementById('chat-messages');
+      const crawlSummary = siteCrawler.getCrawlSummary();
       container.innerHTML = `
         <div class="message-row bot">
           <div class="message-avatar">${renderLuxyMascotMarkup()}</div>
           <div class="message-bubble">
             <div class="telemetry-header">
-              <span class="intent-pill">MASCOT: LUXY v3.5</span>
-              <span class="score-pill">${siteCrawler.crawledPages.size} PAGES SPIDERED</span>
-              <span class="Correction-pill">${siteCrawler.vocabulary.size} VOCAB TERMS</span>
+              <span class="intent-pill">LUXY PHASE 1</span>
+              <span class="score-pill">${crawlSummary.checked}/${crawlSummary.candidates} URLS CHECKED</span>
+              <span class="Correction-pill">${crawlSummary.crawled} BREADCRUMB PASSED</span>
             </div>
             <div style="font-weight: var(--font-weight-bold); margin-bottom: 0.35rem;">
               Phase 1 Sitemap and Breadcrumb Check.
@@ -2969,12 +2969,9 @@
 
     /*
      * DEMO-ONLY VIRTUAL PUBLISHING:
-     * Builds article markup and inserts it into cachedHostDomHTML or a
-     * VIRTUAL_STATIC_PAGES route, then re-crawls and rebuilds ragEngine.
+     * Builds temporary article markup for the virtual preview router.
+     * These pages are not added to the sitemap audit or Phase 1 crawl report.
      * This is not a production blog publishing API and does not write an HTML file.
-     * Known v3.5 issue, intentionally not changed in this annotation pass:
-     * the existing-route replace() result is not assigned back to the map,
-     * so appended markup is discarded for an already-existing virtual route.
      */
     async function injectCustomPageContent() {
       const targetRoute = document.getElementById('new-page-route').value;
