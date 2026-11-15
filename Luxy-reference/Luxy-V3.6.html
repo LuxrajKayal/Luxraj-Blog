@@ -1081,7 +1081,7 @@
       <div class="mascot-frame" id="header-mascot-icon"></div>
       <div>
         <span>LUXY</span>
-        <span style="color: var(--brand-crimson); font-weight: var(--font-weight-regular); font-size: var(--font-size-sm);">Multi-Page Spider</span>
+        <span style="color: var(--brand-crimson); font-weight: var(--font-weight-regular); font-size: var(--font-size-sm);">Phase 1 Sitemap Checker</span>
       </div>
     </a>
 
@@ -1094,11 +1094,11 @@
     <div class="header-controls">
       <div class="status-badge" title="Multi-Page Index Status">
         <span class="status-dot"></span>
-        <span id="indexed-count-label">0 Pages • 0 Chunks</span>
+        <span id="indexed-count-label">0/0 Checked • 0 Passed</span>
       </div>
       <button class="btn btn-cyan" onclick="runFullMultiPageCrawl()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>
-        Spider All Pages
+        Check Sitemap Pages
       </button>
       <button class="btn" onclick="openExtractorModal()">Extract Code</button>
       <button class="btn" type="button" data-theme-toggle>Theme</button>
@@ -1203,19 +1203,31 @@
         <!-- Multi-Page Crawler Telemetry Widget -->
         <div class="widget-card">
           <h3 class="widget-title">
-            <span>Multi-Page Spider Queue</span>
-            <span style="font-size: var(--font-size-xs); color: var(--brand-crimson); font-family: var(--font-code);" id="spider-depth-badge">MAX DEPTH: 2</span>
+            <span>Sitemap Breadcrumb Audit</span>
+            <span style="font-size: var(--font-size-xs); color: var(--brand-crimson); font-family: var(--font-code);" id="spider-depth-badge">PHASE 1</span>
           </h3>
           <ul class="crawler-log-list" id="crawler-log-list"></ul>
-          <div style="margin-top: 0.75rem; display: flex; gap: 0.4rem;">
-            <input type="text" id="custom-crawl-url" class="form-input" placeholder="Crawl URL (e.g. /docs/fpga-timing.html)">
-            <button class="btn btn-primary" onclick="crawlSingleUrlFromInput()">Spider</button>
+          <div class="form-group" style="margin-top: 0.75rem;">
+            <label class="form-label" for="crawler-page-base-url">OPTIONAL PAGE FETCH BASE OVERRIDE</label>
+            <input
+              type="text"
+              id="crawler-page-base-url"
+              class="form-input"
+              placeholder="Leave blank for sitemap URLs; local build example: /_site/"
+            >
+            <p style="margin-top: 0.35rem; color: var(--color-text-muted); font-size: var(--font-size-xs);">
+              Use this only when testing against a local built site. The sitemap URLs remain the report's source URLs.
+            </p>
+          </div>
+          <div style="display: flex; justify-content: space-between; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <span id="crawl-progress-label" style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Waiting for sitemap check.</span>
+            <button class="btn btn-primary" onclick="runFullMultiPageCrawl()">Recheck Sitemap</button>
           </div>
         </div>
 
         <!-- Add Custom Multi-Page or Host Section -->
         <div class="widget-card">
-          <h3 class="widget-title">Inject New Page / Section</h3>
+          <h3 class="widget-title">Virtual Demo Page (Not in Phase 1)</h3>
           <div class="form-group">
             <label class="form-label">TARGET PAGE ROUTE</label>
             <select id="new-page-route" class="form-select">
@@ -1246,13 +1258,13 @@
 
         <!-- Index Export / Persistence -->
         <div class="widget-card">
-          <h3 class="widget-title">Multi-Page Index Storage</h3>
+          <h3 class="widget-title">Phase 1 Crawl Report</h3>
           <div style="display: flex; flex-direction: column; gap: 0.45rem;">
             <button class="btn" style="width: 100%; justify-content: center;" onclick="siteCrawler.exportIndexJSON()">
-              Export Multi-Page Index (.json)
+              Export Phase 1 Crawl Report (.json)
             </button>
             <button class="btn" style="width: 100%; justify-content: center;" onclick="clearAndRebuildCache()">
-              Purge Cache & Cold Re-Crawl
+              Clear & Recheck Sitemap
             </button>
           </div>
         </div>
@@ -1502,6 +1514,18 @@
     const VIRTUAL_STATIC_PAGES = {};
 
     /*
+     * PHASE 1 CRAWL SETTINGS
+     * V3.6 is stored in Luxy-reference, so the repository sitemap is one level up.
+     * A page-fetch base override can map sitemap production URLs to a local built
+     * site during testing. Leave the UI field empty to fetch the exact sitemap URLs.
+     */
+    const LUXY_CRAWL_SETTINGS = Object.freeze({
+      sitemapUrl: new URL('../site/sitemap.xml', window.location.href).href,
+      requestTimeoutMs: 15000,
+      maxConcurrentRequests: 4
+    });
+
+    /*
      * MODULARIZATION TARGET: luxy/core/text-utils.js
      * Export candidates: stemToken() and levenshteinDistance().
      * Dependency direction: no browser or application dependencies.
@@ -1573,7 +1597,14 @@
         this.crawledPages = new Map();
         this.vocabulary = new Set();
         this.globalTermFreq = {}; // Tracks global word frequency for smart prefix ranking
-        this.maxDepth = 2;
+        this.sitemapUrl = LUXY_CRAWL_SETTINGS.sitemapUrl;
+        this.requestTimeoutMs = LUXY_CRAWL_SETTINGS.requestTimeoutMs;
+        this.maxConcurrentRequests = LUXY_CRAWL_SETTINGS.maxConcurrentRequests;
+        this.candidateCount = 0;
+        this.processedCount = 0;
+        this.sitemapStatus = 'NOT_STARTED';
+        this.sitemapError = null;
+        this.crawlCompletedAt = null;
         this.stopWords = new Set([
           "a", "an", "the", "and", "or", "but", "about", "above", "after", "along",
           "among", "as", "at", "by", "for", "from", "in", "into", "of", "on", "onto",
@@ -1592,6 +1623,144 @@
 
       cleanText(text) {
         return text.replace(/\s+/g, ' ').trim();
+      }
+
+      async fetchText(url) {
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(
+          () => controller.abort(),
+          this.requestTimeoutMs
+        );
+
+        try {
+          const response = await fetch(url, {
+            signal: controller.signal,
+            cache: 'no-store'
+          });
+
+          if (!response.ok) {
+            throw new Error(('HTTP ' + response.status + ' ' + (response.statusText || '')).trim());
+          }
+
+          return {
+            text: await response.text(),
+            responseUrl: response.url || url,
+            httpStatus: response.status
+          };
+        } catch (error) {
+          if (error && error.name === 'AbortError') {
+            throw new Error('Request timed out after ' + this.requestTimeoutMs + ' ms.');
+          }
+          throw error;
+        } finally {
+          window.clearTimeout(timeoutId);
+        }
+      }
+
+      getPageFetchUrl(pageUrl) {
+        const sourceUrl = new URL(pageUrl, this.sitemapUrl);
+        const overrideValue = document.getElementById('crawler-page-base-url')?.value.trim();
+
+        if (!overrideValue) return sourceUrl.href;
+
+        const baseUrl = new URL(overrideValue, window.location.href);
+        if (!baseUrl.pathname.endsWith('/')) baseUrl.pathname += '/';
+
+        const relativePath = sourceUrl.pathname.replace(/^\/+/, '');
+        const mappedUrl = new URL(relativePath, baseUrl);
+        mappedUrl.search = sourceUrl.search;
+        return mappedUrl.href;
+      }
+
+      async loadSitemapUrls() {
+        const sitemapResponse = await this.fetchText(this.sitemapUrl);
+        const sitemapDocument = new DOMParser().parseFromString(
+          sitemapResponse.text,
+          'application/xml'
+        );
+
+        if (sitemapDocument.querySelector('parsererror')) {
+          throw new Error('The sitemap XML could not be parsed.');
+        }
+
+        const rootName = sitemapDocument.documentElement?.localName?.toLowerCase();
+        if (rootName !== 'urlset') {
+          throw new Error('The configured sitemap must contain a standard <urlset>.');
+        }
+
+        let locationNodes = Array.from(sitemapDocument.getElementsByTagNameNS('*', 'loc'));
+        if (locationNodes.length === 0) {
+          locationNodes = Array.from(sitemapDocument.getElementsByTagName('loc'));
+        }
+
+        const urls = locationNodes
+          .map(node => (node.textContent || '').trim())
+          .filter(Boolean)
+          .map(value => {
+            const url = new URL(value, this.sitemapUrl);
+            if (!['http:', 'https:'].includes(url.protocol)) {
+              throw new Error('Unsupported sitemap URL protocol: ' + url.protocol);
+            }
+            return url.href;
+          });
+
+        if (urls.length === 0) {
+          throw new Error('The sitemap contains no <loc> URLs.');
+        }
+
+        return urls;
+      }
+
+      findBreadcrumbElement(documentNode) {
+        return Array.from(documentNode.querySelectorAll('nav')).find(nav => {
+          const ariaLabel = (nav.getAttribute('aria-label') || '').trim().toLowerCase();
+          return ariaLabel === 'breadcrumb' || nav.classList.contains('breadcrumbs');
+        }) || null;
+      }
+
+      isBreadcrumbPopulated(breadcrumb) {
+        const markup = breadcrumb.outerHTML || '';
+        const unresolvedTemplateToken =
+          /\{\{\s*[^{}]+\s*\}\}|<%[\s\S]*?%>|\[\[\s*[\w.-]+\s*\]\]/;
+
+        if (unresolvedTemplateToken.test(markup)) return false;
+
+        const links = Array.from(breadcrumb.querySelectorAll('a'));
+        for (const link of links) {
+          const href = (link.getAttribute('href') || '').trim();
+          const label = this.cleanText(link.textContent || '');
+          if (!href || href === '#' || !label) return false;
+        }
+
+        const breadcrumbText = this.cleanText(breadcrumb.textContent || '')
+          .replace(/[\/|›»>·•–—-]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        return breadcrumbText.length > 0;
+      }
+
+      getBreadcrumbPath(breadcrumb) {
+        return this.cleanText(breadcrumb.textContent || '');
+      }
+
+      getCrawlSummary() {
+        const records = Array.from(this.crawledPages.values());
+        const count = status => records.filter(record => record.status === status).length;
+
+        return {
+          sitemapUrl: this.sitemapUrl,
+          sitemapStatus: this.sitemapStatus,
+          candidates: this.candidateCount,
+          checked: records.filter(record => record.status !== 'PENDING').length,
+          crawled: count('CRAWLED'),
+          skippedNoBreadcrumb: count('SKIPPED_NO_BREADCRUMB'),
+          skippedPlaceholder: count('SKIPPED_PLACEHOLDER'),
+          fetchFailed: count('FETCH_FAILED'),
+          pending: count('PENDING'),
+          sitemapError: this.sitemapError,
+          completedAt: this.crawlCompletedAt
+        };
       }
 
       /*
@@ -1717,150 +1886,266 @@
       }
 
       /*
-       * EXTRACTION BOUNDARY: page-source adapter.
-       * Reads the demo's VIRTUAL_STATIC_PAGES first, otherwise fetches the URL,
-       * parses HTML and delegates to extractChunksFromRoot().
-       * When extracting, keep the virtual-fixture provider optional and preserve
-       * the live-fetch path for actual static pages.
+       * PHASE 1 PAGE INSPECTOR
+       * Fetches one sitemap candidate and applies the two breadcrumb gates only.
+       * It deliberately does not extract content or register search chunks.
        */
       async fetchAndParsePage(url) {
-        try {
-          let htmlText = '';
-          let sourceMode = 'VIRTUAL-FS';
+        let fetchUrl = url;
 
-          if (VIRTUAL_STATIC_PAGES[url]) {
-            htmlText = VIRTUAL_STATIC_PAGES[url];
+        try {
+          fetchUrl = this.getPageFetchUrl(url);
+          const response = await this.fetchText(fetchUrl);
+          const documentNode = new DOMParser().parseFromString(response.text, 'text/html');
+          const breadcrumb = this.findBreadcrumbElement(documentNode);
+
+          let status = 'CRAWLED';
+          let breadcrumbPath = '';
+
+          if (!breadcrumb) {
+            status = 'SKIPPED_NO_BREADCRUMB';
+          } else if (!this.isBreadcrumbPopulated(breadcrumb)) {
+            status = 'SKIPPED_PLACEHOLDER';
           } else {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            htmlText = await response.text();
-            sourceMode = 'LIVE-FETCH';
+            breadcrumbPath = this.getBreadcrumbPath(breadcrumb);
           }
 
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(htmlText, 'text/html');
-          const chunksAdded = this.extractChunksFromRoot(doc, url);
+          const record = {
+            url,
+            fetchUrl,
+            finalUrl: response.responseUrl,
+            httpStatus: response.httpStatus,
+            status,
+            breadcrumbPath,
+            error: null,
+            checkedAt: new Date().toISOString()
+          };
 
-          const discoveredLinks = [];
-          doc.querySelectorAll('a[href]').forEach(a => {
-            const href = a.getAttribute('href');
-            if (href && !href.startsWith('#') && !href.startsWith('http') && !href.startsWith('mailto:')) {
-              discoveredLinks.push(href);
-            }
-          });
+          this.crawledPages.set(url, record);
+          return record;
+        } catch (error) {
+          const record = {
+            url,
+            fetchUrl,
+            finalUrl: null,
+            httpStatus: null,
+            status: 'FETCH_FAILED',
+            breadcrumbPath: '',
+            error: error && error.message ? error.message : String(error),
+            checkedAt: new Date().toISOString()
+          };
 
-          this.crawledPages.set(url, {
-            status: `INDEXED (${sourceMode})`,
-            chunksCount: chunksAdded,
-            discoveredLinks
-          });
-
-          return discoveredLinks;
-        } catch (err) {
-          this.crawledPages.set(url, {
-            status: 'UNREACHABLE',
-            chunksCount: 0,
-            discoveredLinks: []
-          });
-          return [];
+          this.crawledPages.set(url, record);
+          return record;
         }
       }
 
       /*
-       * EXTRACTION BOUNDARY: breadth-first crawl coordinator.
-       * Current coupling: pulls the host article-feed snapshot from
-       * cachedHostDomHTML when currentDisplayedRoute is index.html, then crawls
-       * the supplied seed URLs. Those host-page globals belong to the demo
-       * controller, not to a standalone crawler. Reconnect this input explicitly
-       * before removing or relocating either global.
+       * PHASE 1 SITEMAP COORDINATOR
+       * The sitemap supplies candidates, not permission to index. Each candidate
+       * is fetched and checked for a populated breadcrumb. hidden, canonical,
+       * robots and other metadata are intentionally not inspected here.
        */
-      async crawlEntireSite(seedUrls = ['/docs/risc-v-vector.html', '/docs/fpga-timing.html', '/docs/can-fd-bus.html', '/docs/usb-pd-controller.html']) {
+      async crawlEntireSite() {
         this.index = [];
         this.crawledPages.clear();
         this.vocabulary.clear();
         this.globalTermFreq = {};
-
-        if (currentDisplayedRoute === 'index.html') {
-          cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
-        }
-        const hostParser = new DOMParser();
-        const hostDoc = hostParser.parseFromString(`<div>${cachedHostDomHTML}</div>`, 'text/html');
-        const hostChunks = this.extractChunksFromRoot(hostDoc, 'index.html');
-        this.crawledPages.set('index.html', {
-          status: 'HOST-DOM',
-          chunksCount: hostChunks,
-          discoveredLinks: seedUrls
-        });
-
-        const queue = seedUrls.map(u => ({ url: u, depth: 1 }));
-        const visited = new Set(['index.html']);
-
-        while (queue.length > 0) {
-          const { url, depth } = queue.shift();
-          if (visited.has(url) || depth > this.maxDepth) continue;
-          visited.add(url);
-
-          const childLinks = await this.fetchAndParsePage(url);
-          childLinks.forEach(nextUrl => {
-            if (!visited.has(nextUrl)) {
-              queue.push({ url: nextUrl, depth: depth + 1 });
-            }
-          });
-        }
+        this.candidateCount = 0;
+        this.processedCount = 0;
+        this.sitemapError = null;
+        this.crawlCompletedAt = null;
+        this.sitemapStatus = 'LOADING_SITEMAP';
 
         this.updateCrawlerTelemetryUI();
-        return this.index;
+
+        let sitemapUrls = [];
+        try {
+          sitemapUrls = await this.loadSitemapUrls();
+        } catch (error) {
+          this.sitemapStatus = 'SITEMAP_FAILED';
+          this.sitemapError = error && error.message ? error.message : String(error);
+          this.updateCrawlerTelemetryUI();
+          throw error;
+        }
+
+        this.candidateCount = sitemapUrls.length;
+        this.sitemapStatus = 'CHECKING_PAGES';
+
+        // Pre-create entries in sitemap order so the report remains stable even
+        // though page requests are processed concurrently.
+        sitemapUrls.forEach(url => {
+          this.crawledPages.set(url, {
+            url,
+            fetchUrl: null,
+            finalUrl: null,
+            httpStatus: null,
+            status: 'PENDING',
+            breadcrumbPath: '',
+            error: null,
+            checkedAt: null
+          });
+        });
+        this.updateCrawlerTelemetryUI();
+
+        let nextIndex = 0;
+        const worker = async () => {
+          while (true) {
+            const currentIndex = nextIndex++;
+            if (currentIndex >= sitemapUrls.length) return;
+
+            const url = sitemapUrls[currentIndex];
+            await this.fetchAndParsePage(url);
+            this.processedCount++;
+
+            if (
+              this.processedCount % this.maxConcurrentRequests === 0 ||
+              this.processedCount === sitemapUrls.length
+            ) {
+              this.updateCrawlerTelemetryUI();
+            }
+          }
+        };
+
+        const workerCount = Math.min(this.maxConcurrentRequests, sitemapUrls.length);
+        await Promise.all(Array.from({ length: workerCount }, () => worker()));
+
+        this.sitemapStatus = 'COMPLETE';
+        this.crawlCompletedAt = new Date().toISOString();
+        this.updateCrawlerTelemetryUI();
+
+        return Array.from(this.crawledPages.values());
       }
 
       /*
-       * DEMO UI ADAPTER, not crawl/index logic.
-       * Writes crawler status into indexed-count-label, fab-chunk-count and
-       * crawler-log-list, and uses switchActivePageRoute() from an inline handler.
-       * Keep it connected for the reference demo or move this DOM work behind a
-       * callback/adapter when the crawler is extracted.
+       * PHASE 1 REPORT UI
+       * Displays every sitemap candidate in sitemap order, its decision, and the
+       * breadcrumb path or failure reason. This is a page-check audit, not an index.
        */
       updateCrawlerTelemetryUI() {
-        const pageCount = this.crawledPages.size;
-        const chunkCount = this.index.length;
-        document.getElementById('indexed-count-label').textContent = `${pageCount} Pages • ${chunkCount} Chunks`;
-        document.getElementById('fab-chunk-count').textContent = `${chunkCount}`;
-
+        const summary = this.getCrawlSummary();
+        const counter = document.getElementById('indexed-count-label');
+        const fabCounter = document.getElementById('fab-chunk-count');
+        const progress = document.getElementById('crawl-progress-label');
         const logList = document.getElementById('crawler-log-list');
-        logList.innerHTML = '';
-        this.crawledPages.forEach((info, url) => {
-          const li = document.createElement('li');
-          li.className = 'crawler-log-item';
-          const color = info.chunksCount > 0 ? 'var(--color-success)' : 'var(--color-error)';
-          li.innerHTML = `
-            <span style="cursor:pointer; text-decoration:underline;" onclick="switchActivePageRoute('${url}')">${url}</span>
-            <span style="color: ${color};">${info.chunksCount} chunks [${info.status}]</span>
-          `;
-          logList.appendChild(li);
+        const depthBadge = document.getElementById('spider-depth-badge');
+
+        if (counter) {
+          counter.textContent = summary.checked + '/' + summary.candidates +
+            ' Checked • ' + summary.crawled + ' Passed';
+        }
+        if (fabCounter) fabCounter.textContent = String(summary.crawled);
+        if (progress) {
+          progress.textContent = summary.sitemapError
+            ? 'Sitemap error: ' + summary.sitemapError
+            : summary.checked + '/' + summary.candidates + ' checked • ' +
+              summary.crawled + ' passed • ' + summary.fetchFailed + ' failed';
+        }
+        if (depthBadge) {
+          depthBadge.textContent = this.sitemapStatus === 'COMPLETE'
+            ? 'PHASE 1 COMPLETE'
+            : this.sitemapStatus.replace(/_/g, ' ');
+        }
+        if (!logList) return;
+
+        logList.replaceChildren();
+
+        if (summary.sitemapError) {
+          const errorItem = document.createElement('li');
+          errorItem.className = 'crawler-log-item';
+          errorItem.textContent = 'SITEMAP_FAILED — ' + summary.sitemapError;
+          errorItem.style.color = 'var(--color-error)';
+          logList.appendChild(errorItem);
+          return;
+        }
+
+        const statusColors = {
+          CRAWLED: 'var(--color-success)',
+          SKIPPED_NO_BREADCRUMB: 'var(--color-warning, #d97706)',
+          SKIPPED_PLACEHOLDER: 'var(--color-warning, #d97706)',
+          FETCH_FAILED: 'var(--color-error)',
+          PENDING: 'var(--color-text-muted)'
+        };
+
+        this.crawledPages.forEach(record => {
+          const item = document.createElement('li');
+          item.className = 'crawler-log-item';
+          item.style.alignItems = 'stretch';
+          item.style.flexDirection = 'column';
+          item.style.gap = '0.25rem';
+
+          const header = document.createElement('div');
+          header.style.display = 'flex';
+          header.style.alignItems = 'flex-start';
+          header.style.justifyContent = 'space-between';
+          header.style.gap = '0.5rem';
+
+          const link = document.createElement('a');
+          link.href = record.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.title = record.url;
+          link.textContent = record.url;
+          link.style.overflowWrap = 'anywhere';
+          link.style.color = 'var(--color-link)';
+          header.appendChild(link);
+
+          const status = document.createElement('span');
+          status.textContent = record.status;
+          status.style.color = statusColors[record.status] || 'var(--color-text-muted)';
+          status.style.fontWeight = 'var(--font-weight-semibold)';
+          status.style.whiteSpace = 'nowrap';
+          header.appendChild(status);
+          item.appendChild(header);
+
+          const detail = document.createElement('div');
+          detail.style.color = 'var(--color-text-muted)';
+          detail.style.fontSize = 'var(--font-size-xs)';
+
+          if (record.breadcrumbPath) {
+            detail.textContent = 'Breadcrumb: ' + record.breadcrumbPath;
+          } else if (record.error) {
+            detail.textContent = 'Fetch error: ' + record.error;
+          } else if (record.status === 'SKIPPED_NO_BREADCRUMB') {
+            detail.textContent = 'Skipped: no breadcrumb element found.';
+          } else if (record.status === 'SKIPPED_PLACEHOLDER') {
+            detail.textContent = 'Skipped: breadcrumb is empty, incomplete, or contains unresolved template data.';
+          } else if (record.status === 'PENDING') {
+            detail.textContent = 'Waiting for page inspection.';
+          } else {
+            detail.textContent = 'Page fetched and breadcrumb check passed.';
+          }
+
+          detail.style.overflowWrap = 'anywhere';
+          item.appendChild(detail);
+          logList.appendChild(item);
         });
       }
 
       /*
-       * DEMO EXPORT ADAPTER.
-       * Serializes the crawler's pages/chunks and triggers a browser download,
-       * then calls showToast(). It is useful tooling, but not required for search.
-       * If separated, preserve the exported payload schema.
+       * PHASE 1 REPORT EXPORT
+       * Downloads the sitemap candidates and the result of each breadcrumb check.
        */
       exportIndexJSON() {
         const payload = {
-          engine: 'Luxy Multi-Page Spider v3.5',
+          engine: 'Luxy Phase 1 Sitemap Breadcrumb Audit',
           timestamp: new Date().toISOString(),
-          pagesCrawled: Array.from(this.crawledPages.entries()),
-          chunks: this.index
+          summary: this.getCrawlSummary(),
+          pages: Array.from(this.crawledPages.values())
         };
-        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'luxy-multipage-index.json';
-        a.click();
-        URL.revokeObjectURL(url);
-        showToast('Exported luxy-multipage-index.json');
+
+        const blob = new Blob([JSON.stringify(payload, null, 2)], {
+          type: 'application/json'
+        });
+        const downloadUrl = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = downloadUrl;
+        anchor.download = 'luxy-phase-1-crawl-report.json';
+        anchor.click();
+        URL.revokeObjectURL(downloadUrl);
+        showToast('Exported luxy-phase-1-crawl-report.json');
       }
+
     }
 
     /*
@@ -2465,12 +2750,15 @@
      * these components are loaded as separate modules.
      */
     window.addEventListener('DOMContentLoaded', async () => {
-      cachedHostDomHTML = document.getElementById('article-feed').innerHTML;
       await loadLuxyMascotSvg();
       setLuxyMascotMood('default');
 
       siteCrawler = new MultiPageSiteCrawler();
-      await siteCrawler.crawlEntireSite();
+      try {
+        await siteCrawler.crawlEntireSite();
+      } catch (error) {
+        showToast('Sitemap check failed: ' + error.message);
+      }
       ragEngine = new LuxyConversationalEngine(siteCrawler);
 
       renderInitialGreeting();
@@ -2499,10 +2787,12 @@
               <span class="Correction-pill">${siteCrawler.vocabulary.size} VOCAB TERMS</span>
             </div>
             <div style="font-weight: var(--font-weight-bold); margin-bottom: 0.35rem;">
-              Multi-Page Static Site Index & Prefix Autocomplete Online.
+              Phase 1 Sitemap and Breadcrumb Check.
             </div>
             <div style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
-              I have indexed <code>index.html</code> and all linked static pages. Partial prefixes (such as typing <code>microcontrol</code> for <code>microcontroller</code>) are automatically expanded, and you can press <strong>Tab</strong> while typing to autocomplete technical vocabulary.
+              <strong>${siteCrawler.getCrawlSummary().crawled}</strong> of
+              <strong>${siteCrawler.getCrawlSummary().candidates}</strong> sitemap pages passed the breadcrumb checks.
+              Hidden but properly populated breadcrumbs are accepted. Content extraction and search indexing are reserved for Phase 2.
             </div>
           </div>
         </div>
@@ -2662,20 +2952,19 @@
     }
 
     async function runFullMultiPageCrawl() {
-      await siteCrawler.crawlEntireSite(Array.from(siteCrawler.crawledPages.keys()).filter(k => k !== 'index.html'));
-      ragEngine = new LuxyConversationalEngine(siteCrawler);
-      showToast(`Spider complete: ${siteCrawler.crawledPages.size} pages, ${siteCrawler.index.length} chunks indexed.`);
-    }
+      try {
+        await siteCrawler.crawlEntireSite();
+        ragEngine = new LuxyConversationalEngine(siteCrawler);
 
-    async function crawlSingleUrlFromInput() {
-      const urlInput = document.getElementById('custom-crawl-url');
-      const url = urlInput.value.trim();
-      if (!url) return;
-      await siteCrawler.fetchAndParsePage(url);
-      siteCrawler.updateCrawlerTelemetryUI();
-      ragEngine = new LuxyConversationalEngine(siteCrawler);
-      urlInput.value = '';
-      showToast(`Crawled ${url} (${siteCrawler.index.length} total chunks)`);
+        const summary = siteCrawler.getCrawlSummary();
+        showToast(
+          'Sitemap check complete: ' + summary.crawled + ' passed, ' +
+          (summary.skippedNoBreadcrumb + summary.skippedPlaceholder) +
+          ' skipped, ' + summary.fetchFailed + ' failed.'
+        );
+      } catch (error) {
+        showToast('Sitemap check failed: ' + error.message);
+      }
     }
 
     /*
@@ -2737,11 +3026,8 @@
       document.getElementById('new-heading').value = '';
       document.getElementById('new-content').value = '';
 
-      const allSeeds = Object.keys(VIRTUAL_STATIC_PAGES);
-      await siteCrawler.crawlEntireSite(allSeeds);
-      ragEngine = new LuxyConversationalEngine(siteCrawler);
       switchActivePageRoute(targetRoute, headId);
-      showToast(`Published to ${targetRoute} & re-spidered site!`);
+      showToast('Created virtual demo route ' + targetRoute + '. It is not part of the Phase 1 sitemap audit.');
     }
 
     async function clearAndRebuildCache() {
