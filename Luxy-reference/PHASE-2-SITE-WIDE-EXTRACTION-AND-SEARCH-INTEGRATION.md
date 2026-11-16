@@ -8,7 +8,7 @@
 
 > **Phase isolation:** This document is valid only for Phase 2. Its decisions do not affect or constrain any other phase.
 
-> **Overarching project direction:** The owner’s explicit product principles remain relevant across the project: Luxy must remain extensible; unfinished or placeholder-filled pages must not be blocked merely because of their current content; future publications must be able to enter the same pipeline without manual article registration; no temporary “demo” or “test work” wording is to be added to Luxy’s user-facing experience; other website search engines remain independently identified add-ons or modes; and page categories receive consistent treatment. These are project-owner directions, not Phase 2 technical decisions.
+> **Overarching project direction:** The owner’s explicit product principles remain relevant across the project: the breadcrumb presence/population check is an intentional gate and must be preserved; after a page passes that gate, unfinished or placeholder-filled body content must not create additional arbitrary barriers; future publications must be able to enter the same pipeline without manual article registration; no temporary “demo” or “test work” wording is to be added to Luxy’s user-facing experience; other website search engines remain independently identified add-ons or modes; and page categories receive consistent treatment. These are project-owner directions, not Phase 2 technical decisions.
 
 ## 1. Purpose
 
@@ -40,7 +40,7 @@ The order above is the intended roadmap. Decisions recorded in this Phase 2 docu
 
 - Whole-document HTML extraction rather than extraction limited to selected article wrappers.
 - Extraction of page headings, paragraphs, lists, tables, code blocks, and hyperlinks.
-- A page record for every URL already supplied to the current crawl process, even when content is incomplete or template placeholders remain.
+- A page/fetch record for every URL supplied to the current crawl process, including its breadcrumb-gate result and fetch status. The record remains available even when the URL fails the gate or its content contains placeholders; content extraction/indexing follows the gate.
 - A compatible chunk-registration path into Luxy’s existing index.
 - Explicit capture of link information from all page regions, including navigation, breadcrumbs, cards, content, and footer.
 - Protection against repeated shared-component text distorting the search corpus.
@@ -98,7 +98,7 @@ Phase 2 must not convert this inventory difference into a permanent exclusion ru
 
 A future publication whose URL is included in the sitemap must enter the same generic fetch-and-extract pipeline on the next crawl without a new article-specific code change or manual registration. Discovering pages that are neither in the sitemap nor reached by the current crawl process is a broader discovery question for Phase 3.
 
-A previous local crawl report supplied during the project showed 114 candidates checked, 54 passed the old breadcrumb checks, 60 were skipped because of unresolved breadcrumb/template content, and zero fetch failures. That report is a diagnostic snapshot of the old check, not an acceptance target or a reason to retain that check.
+A previous local crawl report supplied during the project showed 114 candidates checked, 54 passed the breadcrumb checks, 60 were skipped because of unresolved breadcrumb/template content, and zero fetch failures. This is a diagnostic snapshot of the gate's effect. It does not authorize removing or weakening the breadcrumb gate.
 
 ### 4.4 Build and page structure
 
@@ -186,7 +186,7 @@ Phase 2 may add metadata fields, but must not silently rename or remove fields t
 - registerChunk() updates vocabulary and globalTermFreq before removing a previous chunk with the same ID. Re-registering a chunk can therefore inflate global counters. Rebuild or calculate index statistics from the final de-duplicated chunk set.
 - A full-page extractor will encounter the shared header and footer on many pages. Indexing identical shared copy as fresh independent body text on every page would distort document-frequency statistics and produce repetitive results.
 - All link records need to be retained, but repeated navigation links should not automatically become repeated full-text chunks.
-- Missing breadcrumbs, unresolved template values, or an empty content area must not be treated as a reason to skip a fetched page.
+- The breadcrumb presence/population check is an intentional gate and must be preserved. Missing or unresolved breadcrumbs remain reasons to skip content extraction/indexing. After a page passes that gate, unresolved placeholders elsewhere in the page, incomplete body content, or an empty content area must not create an additional skip rule.
 
 ## 6. Phase 2 extraction decisions
 
@@ -194,26 +194,26 @@ Phase 2 may add metadata fields, but must not silently rename or remove fields t
 
 A discovered URL, a successful HTTP fetch, the content extracted from it, and its ability to match a particular query are separate states.
 
-Every URL supplied to the current Phase 2 crawl input must receive a page record after the fetch attempt. A page record must remain present if:
+Every URL supplied to the current Phase 2 crawl input must receive a page/fetch record after the fetch attempt, regardless of whether it passes the breadcrumb gate. The record must preserve the gate result, HTTP status, and any fetch/parsing error. A successfully fetched URL remains represented in the page registry even when its breadcrumb gate fails.
 
-- it has no breadcrumb;
-- its breadcrumb contains unresolved template tokens;
-- its title or body still contains template placeholders;
-- its content is short or currently incomplete;
-- a dynamic section is still loading;
-- it contains no useful searchable prose yet.
+The existing breadcrumb gate is intentional and remains in force:
 
-A missing or incomplete breadcrumb is metadata, not a crawl gate. A placeholder is a content state, not a reason to suppress the page. Do not skip a page solely because a placeholder, loading message, missing heading, or missing breadcrumb is present.
+- A breadcrumb navigation element must be present (the current implementation recognizes a navigation element labelled `breadcrumb` or carrying the `.breadcrumbs` class).
+- The breadcrumb must pass the existing population check: it must not contain unresolved template tokens; each breadcrumb link must have a usable `href` and non-empty visible label; and the breadcrumb must contain non-empty text.
+- A page with no breadcrumb or a breadcrumb that fails this population check does not pass the gate. It remains recorded with its skip status, but its page content is not extracted into the searchable index in Phase 2.
+- Phase 2 must preserve this gate; it must not silently remove, bypass, or weaken it.
 
-When a page currently contains meaningful text, extract that text. When it does not, preserve the page identity and whatever metadata/links are available; do not invent content to make the page appear complete. A later crawl should pick up newly published content automatically through the same pipeline.
+The breadcrumb gate is the deliberate exception to the general placeholder rule. Once a page passes the breadcrumb gate, unresolved template placeholders in its title, metadata, body, or other non-breadcrumb content do not by themselves cause the page to be skipped. Short/incomplete body content, a loading message, a missing body heading, or a dynamic section that has not loaded must not create another exclusion gate.
 
-Actual HTTP or parsing failures remain diagnosable fetch failures. They must not be conflated with a page that fetched successfully but currently contains incomplete content.
+When a page that passes the gate currently contains meaningful text, extract the available text. When it does not, preserve the page identity and whatever metadata/links are available; do not invent content to make the page appear complete. A later crawl should pick up newly published content automatically through the same pipeline.
+
+Actual HTTP or parsing failures remain diagnosable fetch failures. They must not be conflated with a page that fetched successfully but failed the breadcrumb gate, or with a page that passed the gate but currently contains incomplete body content.
 
 ### 6.2 One generic extraction pipeline for all page types
 
 The extractor must not depend on an allowlist of article IDs, page filenames, category names, or named examples.
 
-Use page type and content-region information as descriptive metadata only. They may help organize chunks and source presentation, but must not become arbitrary eligibility gates.
+Use page type and content-region information as descriptive metadata only. They may help organize chunks and source presentation, but must not become arbitrary eligibility gates. The owner-defined breadcrumb presence/population check remains the deliberate gate.
 
 The same extraction foundation must work for:
 
@@ -299,7 +299,7 @@ Do not insert a synthetic ID into a fetched DOM and then claim that the live pag
 
 ### 6.8 Placeholder handling and metadata fallbacks
 
-Unresolved template tokens must never cause a whole page to be skipped. Preserve the fact that the page contains unresolved values as diagnostic metadata, but do not turn raw template syntax into fabricated article titles or useful prose.
+Unresolved template tokens outside the breadcrumb must not cause a page that has passed the breadcrumb gate to be skipped. Preserve the fact that those values remain unresolved as diagnostic metadata, but do not turn raw template syntax into fabricated article titles or useful prose. Unresolved tokens inside the breadcrumb still fail the intentional breadcrumb gate.
 
 Use actual document metadata and page headings when available. If no source tag exists, keep the tag field compatible without assigning an unrelated default category. Avoid inserting artificial content such as “Untitled Document” or a default Engineering label into the searchable text.
 
@@ -361,7 +361,7 @@ The following is the recommended sequence once Phase 2 implementation is separat
 2. Introduce the generic page/document extraction pass and verify it against the complete page taxonomy.
 3. Add structured heading, paragraph, list, table, code, image-alt, and hyperlink extraction.
 4. Add page, chunk, link, shared-component, and first-party source records while preserving the existing chunk fields.
-5. Connect successful page fetches to extraction and registration. Remove breadcrumb/placeholder status as a reason to skip a successfully fetched page.
+5. Connect successful page fetches that pass the breadcrumb gate to extraction and registration. Preserve the existing breadcrumb presence/population check and its skip statuses. Do not add further skip rules for body placeholders, incomplete text, or page type.
 6. Make registration and global index statistics deterministic across a full rebuild and repeated registration.
 7. Connect the populated index to the existing search, autocomplete, source, response, and enrichment paths.
 8. Run the regression matrix below and compare output against the baseline.
@@ -378,8 +378,8 @@ Verification must cover the site as a whole, not just individually named example
 | Category pages | All parent and nested category pages use the same extraction foundation. |
 | Article pages | Title, headings, paragraphs, lists, code, tables, metadata, and source links are retained. |
 | Informational pages | Their actual headings, paragraphs, cards, forms, and links are extracted without a page-specific allowlist. |
-| Breadcrumbs | Missing or unresolved breadcrumbs do not cause a successful fetch to be skipped. |
-| Placeholders | A page with unresolved template tokens remains in the page registry and contributes any available content. |
+| Breadcrumbs | A missing breadcrumb or one that fails the existing population check fails the intentional gate; the fetched URL remains recorded but its content is not indexed. A valid breadcrumb allows extraction to proceed. |
+| Placeholders | After the breadcrumb gate passes, unresolved tokens elsewhere in the page do not cause a skip; available content is extracted, while unresolved template strings are not presented as useful article text. |
 | Headings | H1 through H6 are recognized with heading level and hierarchy preserved. |
 | Paragraphs | Paragraphs outside article wrappers are not lost. |
 | Links | Anchors in content, header, dropdowns, breadcrumbs, cards, and footer are recorded with their destinations and context. |
@@ -398,7 +398,7 @@ Verification must cover the site as a whole, not just individually named example
 Phase 2 is complete only when:
 
 1. The current fetch pipeline actually invokes the generic extractor and registers chunks in the index.
-2. A successfully fetched page is not rejected solely because of missing breadcrumbs, unresolved placeholders, incomplete content, or page type.
+2. A fetched URL always receives a page/fetch record. Content extraction/indexing preserves the intentional breadcrumb gate: missing or unpopulated breadcrumbs fail it, while other placeholders, incomplete content, or page type do not create additional gates after it passes.
 3. Whole-document extraction captures H1–H6, paragraphs, lists, tables, code, and all hyperlinks across the page.
 4. The same extraction behavior works across all current site page categories and can accept future page types.
 5. The existing chunk contract and V3.6 engine behavior remain compatible.
