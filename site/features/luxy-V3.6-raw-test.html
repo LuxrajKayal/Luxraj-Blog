@@ -73,18 +73,18 @@
     rel="stylesheet"
   >
   <!-- Reuse the website's shared colour, typography, spacing and radius tokens. -->
-  <link rel="stylesheet" href="../site/assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/tokens.css">
   <!-- Reuse the website's theme preference and data-theme controller. -->
   <script type="module">
-    import { initTheme } from "../site/assets/js/theme.js";
+    import { initTheme } from "../assets/js/theme.js";
     initTheme();
   </script>
   <style>
     /*
      * MODULARIZATION TARGET: luxy/demo/styles/theme.css
      * Owns demo-specific base reset and scrollbar styling.
-     * Shared colours and typography come from ../site/assets/css/tokens.css;
-     * the shared ../site/assets/js/theme.js controls light/dark mode.
+     * Shared colours and typography come from ../assets/css/tokens.css;
+     * the shared ../assets/js/theme.js controls light/dark mode.
      * Do not introduce a second demo palette or a separate theme state.
      */
     /* ==========================================================================
@@ -1406,7 +1406,7 @@
      * header, modal, floating launcher and individual assistant messages.
      * This presentation layer does not affect crawler or ranking behaviour.
      */
-    const LUXY_MASCOT_ASSET = '../site/assets/images/brand/luxy-static-mascot.svg';
+    const LUXY_MASCOT_ASSET = '../assets/images/brand/luxy-static-mascot.svg';
     const LUXY_MASCOT_STATES = ['default', 'code', 'spec', 'fallback'];
 
     let luxyMascotSvgTemplate = null;
@@ -1515,12 +1515,12 @@
 
     /*
      * PHASE 1 CRAWL SETTINGS
-     * V3.6 is stored in Luxy-reference, so the repository sitemap is one level up.
+     * This copy is stored in site/features, so the site-root sitemap is one level up.
      * A page-fetch base override can map sitemap production URLs to a local built
      * site during testing. Leave the UI field empty to fetch the exact sitemap URLs.
      */
     const LUXY_CRAWL_SETTINGS = Object.freeze({
-      sitemapUrl: new URL('../site/sitemap.xml', window.location.href).href,
+      sitemapUrl: new URL('../sitemap.xml', window.location.href).href,
       requestTimeoutMs: 15000,
       maxConcurrentRequests: 4
     });
