@@ -31,6 +31,9 @@ const STANDALONE_NEWSLETTER_PAGES = new Set([
 const STANDALONE_UNSUBSCRIBE_PAGES = new Set([
   'unsubscribe.html'
 ]);
+const STANDALONE_FEATURE_PAGES = new Set([
+  'features/luxy-V3.6-raw-test.html'
+]);
 const REQUIRED_MARKER_NAMES = ['TOPBAR', 'MAIN-HEADER', 'FOOTER'];
 const MARKER_NAMES = Object.keys(PARTIALS);
 const markerFor = name => '<!-- SHARED:' + name + ' -->';
@@ -567,6 +570,14 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
     if (!sourceHtml.trim()) {
       await writeFile(outputPath, sourceHtml, 'utf8');
       stats.emptyPlaceholders += 1;
+      continue;
+    }
+
+    // Luxy is a complete standalone development tool, not a normal Blog page.
+    // Copy its raw HTML unchanged: no shared shell, favicon, breadcrumb, or newsletter injection.
+    if (STANDALONE_FEATURE_PAGES.has(normalizedRelativePath)) {
+      await writeFile(outputPath, sourceHtml, 'utf8');
+      stats.standalonePages += 1;
       continue;
     }
 
