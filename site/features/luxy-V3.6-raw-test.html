@@ -2310,6 +2310,7 @@
             pageUrl: adapter.pageUrl,
             status: 'PENDING',
             extractedChunks: 0,
+            extractedLinks: 0,
             error: null,
             checkedAt: new Date().toISOString()
           };
@@ -2350,27 +2351,12 @@
                 sourceUrl: adapter.url
               });
             } else if (adapter.type === 'javascript-url-array') {
-              const escapedName = String(adapter.arrayName || '').replace(/[.*+?^${}()|[\]\\]/g, '\\            } else if (adapter.type === 'html-fragment') {
-              const documentNode = new DOMParser().parseFromString(response.text, 'text/html');
-              const chunkCount = this.extractChunksFromRoot(documentNode, adapter.pageUrl, {
-                articleId: 'component-' + adapter.id,
-                articleTitle: adapter.title,
-                tag: adapter.tag,
-                sourceKind: 'first-party-html',
-                sourceUrl: adapter.url,
-                sourceId: adapter.id,
-                isResource: true
-              });
-              sourceRecord.status = 'INGESTED';
-              sourceRecord.extractedChunks = chunkCount;
-              const componentText = this.cleanText(documentNode.body?.textContent || '');
-              this.registerSharedComponent(adapter.componentKey || adapter.id, componentText, {
-                pageUrl: adapter.pageUrl,
-                sourceUrl: adapter.url
-              });
-            } else {');
+              const arrayName = String(adapter.arrayName || '');
+              if (!/^[A-Z0-9_]+$/.test(arrayName)) {
+                throw new Error('The configured JavaScript array name is invalid.');
+              }
               const arrayMatch = response.text.match(
-                new RegExp('(?:const|let|var)\\s+' + escapedName + '\\s*=\\s*\\[([\\s\\S]*?)\\]', 'm')
+                new RegExp('(?:const|let|var)\\s+' + arrayName + '\\s*=\\s*\\[([\\s\\S]*?)\\]', 'm')
               );
               if (!arrayMatch) throw new Error('The configured URL array was not found in the source asset.');
 
@@ -2379,7 +2365,7 @@
                 .filter(Boolean);
               references.forEach(reference => {
                 const label = reference.split('/').pop()
-                  .replace(/\\.html?(?:[?#].*)?$/i, '')
+                  .replace(/\.html?(?:[?#].*)?$/i, '')
                   .replace(/[-_]+/g, ' ');
                 this.addLinkRecord(
                   adapter.pageUrl,
