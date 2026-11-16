@@ -2285,7 +2285,7 @@
           const matchingPageUrl = Array.from(this.crawledPages.keys()).find(candidate => {
             try {
               const pathname = new URL(candidate).pathname;
-              const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\\/+$/, '');
+              const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
               return normalizedPath === adapter.pagePath;
             } catch (_) {
               return false;
