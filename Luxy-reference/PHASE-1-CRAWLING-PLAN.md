@@ -2,7 +2,11 @@
 
 **Project:** Luxy v3.6 — Luxraj Blog Integration  
 **Phase:** 1 — Crawling Scope and Eligibility Policy  
-**Status:** Approved policy
+**Status:** Historical reference — superseded for current work
+
+> **Authority note:** This plan is retained as historical reference material. Its earlier crawling-eligibility rules are outdated and are not authoritative for current Luxy design or Phase 2.
+>
+> **Phase isolation:** This document is valid only for Phase 1. Its decisions do not affect or constrain any other phase.
 
 ## 1. Core Principle
 
