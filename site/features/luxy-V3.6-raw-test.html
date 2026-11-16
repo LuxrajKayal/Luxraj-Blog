@@ -1081,7 +1081,7 @@
       <div class="mascot-frame" id="header-mascot-icon"></div>
       <div>
         <span>LUXY</span>
-        <span style="color: var(--brand-crimson); font-weight: var(--font-weight-regular); font-size: var(--font-size-sm);">Phase 1 Sitemap Checker</span>
+        <span style="color: var(--brand-crimson); font-weight: var(--font-weight-regular); font-size: var(--font-size-sm);">Phase 2 Site Crawler</span>
       </div>
     </a>
 
@@ -1204,7 +1204,7 @@
         <div class="widget-card">
           <h3 class="widget-title">
             <span>Sitemap Breadcrumb Audit</span>
-            <span style="font-size: var(--font-size-xs); color: var(--brand-crimson); font-family: var(--font-code);" id="spider-depth-badge">PHASE 1</span>
+            <span style="font-size: var(--font-size-xs); color: var(--brand-crimson); font-family: var(--font-code);" id="spider-depth-badge">PHASE 2</span>
           </h3>
           <ul class="crawler-log-list" id="crawler-log-list"></ul>
           <div class="form-group" style="margin-top: 0.75rem;">
@@ -1258,10 +1258,10 @@
 
         <!-- Index Export / Persistence -->
         <div class="widget-card">
-          <h3 class="widget-title">Phase 1 Crawl Report</h3>
+          <h3 class="widget-title">Phase 2 Crawl Report</h3>
           <div style="display: flex; flex-direction: column; gap: 0.45rem;">
             <button class="btn" style="width: 100%; justify-content: center;" onclick="siteCrawler.exportIndexJSON()">
-              Export Phase 1 Crawl Report (.json)
+              Export Phase 2 Site Index (.json)
             </button>
             <button class="btn" style="width: 100%; justify-content: center;" onclick="clearAndRebuildCache()">
               Clear & Recheck Sitemap
@@ -1605,6 +1605,33 @@
         this.sitemapStatus = 'NOT_STARTED';
         this.sitemapError = null;
         this.crawlCompletedAt = null;
+
+        // Phase 2 content stores. Existing engine-facing fields remain compatible.
+        this.linkRegistry = new Map();
+        this.linkDestinations = new Map();
+        this.sharedComponentRegistry = new Map();
+        this.firstPartySourceRecords = new Map();
+
+        const siteRoot = new URL('../', window.location.href);
+        this.firstPartySourceAdapters = [
+          {
+            id: 'editorial-notes',
+            type: 'markdown-entries',
+            url: new URL('content/editorial-notes.md', siteRoot).href,
+            pageUrl: new URL('pages/editorial.html', siteRoot).href,
+            title: "The Editor's Desk",
+            tag: 'Editorial'
+          },
+          {
+            id: 'newsletter-popup',
+            type: 'html-fragment',
+            url: new URL('assets/components/newsletter-popup.html', siteRoot).href,
+            pageUrl: siteRoot.href,
+            title: 'Newsletter',
+            tag: 'Newsletter',
+            componentKey: 'newsletter-popup'
+          }
+        ];
         this.stopWords = new Set([
           "a", "an", "the", "and", "or", "but", "about", "above", "after", "along",
           "among", "as", "at", "by", "for", "from", "in", "into", "of", "on", "onto",
@@ -1769,120 +1796,791 @@
        * chunk with source page and element IDs. This establishes the chunk schema
        * consumed by LuxyConversationalEngine and used for cross-page citations.
        */
-      extractChunksFromRoot(rootNode, pageUrl = 'index.html') {
-        const targetElements = rootNode.querySelectorAll('article, [data-crawlable="true"]');
-        let pageChunkCount = 0;
-
-        targetElements.forEach((art, artIdx) => {
-          const articleId = art.id || `art-${pageUrl.replace(/\W/g, '')}-${artIdx}`;
-          const articleTitle = art.querySelector('h1, .article-title')?.textContent.trim() || 'Untitled Document';
-          const tag = art.querySelector('.tag')?.textContent.trim() || 'Engineering';
-          const contentContainer = art.querySelector('.article-content') || art;
-          const headers = contentContainer.querySelectorAll('h2, h3');
-
-          if (headers.length === 0) {
-            const rawText = this.cleanText(contentContainer.textContent);
-            this.registerChunk({
-              id: articleId,
-              pageUrl,
-              articleId,
-              articleTitle,
-              heading: articleTitle,
-              tag,
-              text: rawText,
-              bulletPoints: [],
-              codeSnippets: [],
-              tableRows: [],
-              elementId: articleId
-            });
-            pageChunkCount++;
-          } else {
-            headers.forEach((h, hIdx) => {
-              const headingText = h.textContent.trim();
-              const headingId = h.id || `${articleId}-sec-${hIdx}`;
-              if (!h.id) h.id = headingId;
-
-              let siblingText = '';
-              let bulletPoints = [];
-              let codeSnippets = [];
-              let tableRows = [];
-              let curr = h.nextElementSibling;
-
-              while (curr && !['H2', 'H3'].includes(curr.tagName)) {
-                if (curr.tagName === 'UL' || curr.tagName === 'OL') {
-                  curr.querySelectorAll('li').forEach(li => bulletPoints.push(li.textContent.trim()));
-                  siblingText += ' ' + curr.textContent.trim();
-                } else if (curr.classList && curr.classList.contains('code-block')) {
-                  const codeRaw = curr.textContent.trim();
-                  codeSnippets.push(codeRaw);
-                  siblingText += ' ' + codeRaw;
-                } else if (curr.tagName === 'TABLE' || (curr.classList && curr.classList.contains('spec-table'))) {
-                  const rows = [];
-                  curr.querySelectorAll('tr').forEach(tr => {
-                    const cells = Array.from(tr.querySelectorAll('th, td')).map(c => c.textContent.trim());
-                    if (cells.length) rows.push(cells);
-                  });
-                  tableRows = rows;
-                  siblingText += ' ' + rows.map(r => r.join(' ')).join(' ');
-                } else {
-                  siblingText += ' ' + curr.textContent.trim();
-                }
-                curr = curr.nextElementSibling;
-              }
-
-              this.registerChunk({
-                id: `${pageUrl}#${headingId}`,
-                pageUrl,
-                articleId,
-                articleTitle,
-                heading: headingText,
-                tag,
-                text: this.cleanText(siblingText),
-                bulletPoints,
-                codeSnippets,
-                tableRows,
-                elementId: headingId
-              });
-              pageChunkCount++;
-            });
-          }
-        });
-
-        return pageChunkCount;
+      getElementRegion(element) {
+        if (!element || !element.closest) return 'document';
+        if (element.closest('aside.topbar, .topbar, [data-shared-component="topbar"]')) return 'topbar';
+        if (element.closest('header.site-header, [data-shared-component="main-header"]')) return 'main-header';
+        if (element.closest('footer.site-footer, [data-shared-component="footer"]')) return 'footer';
+        if (element.closest('nav[aria-label="Breadcrumb"], nav.breadcrumbs')) return 'breadcrumb';
+        if (element.closest('.story-card')) return 'story-card';
+        if (element.closest('nav')) return 'navigation';
+        if (element.closest('main')) return 'main-content';
+        if (element.closest('article')) return 'article';
+        return 'document-content';
       }
 
-      /*
-       * EXTRACTION BOUNDARY: index-record builder.
-       * Adds raw/stemmed tokens, per-chunk term frequencies, vocabulary entries,
-       * globalTermFreq counts and code/table flags. Requires stemToken() from
-       * core/text-utils.js. Preserve token and chunk field semantics.
-       */
+      addLinkRecord(pageUrl, sourceUrl, sourceId, href, label, context = {}) {
+        const originalHref = String(href || '').trim();
+        if (!originalHref) return null;
+
+        let destination;
+        try {
+          destination = new URL(originalHref, pageUrl).href;
+        } catch (_) {
+          return null;
+        }
+
+        let destinationUrl;
+        let pageBase;
+        try {
+          destinationUrl = new URL(destination);
+          pageBase = new URL(pageUrl);
+        } catch (_) {
+          return null;
+        }
+
+        let linkKind = 'external';
+        if (originalHref.startsWith('#') ||
+            (destinationUrl.origin === pageBase.origin &&
+             destinationUrl.pathname === pageBase.pathname &&
+             destinationUrl.search === pageBase.search &&
+             Boolean(destinationUrl.hash))) {
+          linkKind = 'same-page-fragment';
+        } else if (['http:', 'https:'].includes(destinationUrl.protocol) &&
+                   destinationUrl.origin === pageBase.origin) {
+          linkKind = 'same-origin-route';
+        } else if (!['http:', 'https:', 'mailto:', 'tel:'].includes(destinationUrl.protocol)) {
+          linkKind = 'other';
+        }
+
+        const recordsKey = pageUrl + '::' + (sourceId || 'page-html');
+        if (!this.linkRegistry.has(recordsKey)) this.linkRegistry.set(recordsKey, []);
+        const records = this.linkRegistry.get(recordsKey);
+
+        const record = {
+          id: recordsKey + '::' + records.length,
+          pageUrl,
+          sourceUrl: sourceUrl || pageUrl,
+          sourceId: sourceId || 'page-html',
+          anchorText: this.cleanText(String(label || '')),
+          originalHref,
+          destination,
+          linkKind,
+          region: context.region || 'document-content',
+          headingContext: context.headingContext || '',
+          sourceElementId: context.sourceElementId || '',
+          ariaLabel: context.ariaLabel || '',
+          title: context.title || '',
+          target: context.target || '',
+          rel: context.rel || ''
+        };
+
+        records.push(record);
+        if (!this.linkDestinations.has(destination)) {
+          this.linkDestinations.set(destination, {
+            destination,
+            linkKind,
+            occurrences: []
+          });
+        }
+        this.linkDestinations.get(destination).occurrences.push({
+          pageUrl,
+          sourceUrl: sourceUrl || pageUrl,
+          sourceId: sourceId || 'page-html',
+          anchorText: record.anchorText,
+          region: record.region,
+          headingContext: record.headingContext,
+          sourceElementId: record.sourceElementId
+        });
+
+        return record;
+      }
+
+      extractLinksFromRoot(rootNode, pageUrl, options = {}) {
+        const sourceRoot = rootNode?.body || rootNode;
+        if (!sourceRoot || !sourceRoot.querySelectorAll) return 0;
+
+        const sourceUrl = options.sourceUrl || pageUrl;
+        const sourceId = options.sourceId || 'page-html';
+        const anchors = Array.from(sourceRoot.querySelectorAll('a[href]'));
+        const headings = Array.from(sourceRoot.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+        let captured = 0;
+
+        anchors.forEach(anchor => {
+          let headingContext = '';
+          headings.forEach(heading => {
+            if (heading.compareDocumentPosition(anchor) & 4) {
+              headingContext = this.cleanText(heading.textContent || '');
+            }
+          });
+
+          const record = this.addLinkRecord(
+            pageUrl,
+            sourceUrl,
+            sourceId,
+            anchor.getAttribute('href'),
+            anchor.textContent || anchor.getAttribute('aria-label') || anchor.getAttribute('title') || '',
+            {
+              region: this.getElementRegion(anchor),
+              headingContext,
+              sourceElementId: anchor.id || '',
+              ariaLabel: anchor.getAttribute('aria-label') || '',
+              title: anchor.getAttribute('title') || '',
+              target: anchor.getAttribute('target') || '',
+              rel: anchor.getAttribute('rel') || ''
+            }
+          );
+          if (record) captured++;
+        });
+
+        return captured;
+      }
+
+      registerSharedComponent(key, text, occurrence = {}) {
+        const normalizedKey = String(key || 'shared-component');
+        const clean = this.cleanText(String(text || ''));
+        if (!this.sharedComponentRegistry.has(normalizedKey)) {
+          this.sharedComponentRegistry.set(normalizedKey, {
+            key: normalizedKey,
+            text: clean,
+            variants: [],
+            occurrences: []
+          });
+        }
+
+        const component = this.sharedComponentRegistry.get(normalizedKey);
+        if (clean && !component.variants.includes(clean)) component.variants.push(clean);
+        if (!component.text && clean) component.text = clean;
+
+        const occurrenceKey = (occurrence.pageUrl || '') + '::' +
+          (occurrence.sourceUrl || '') + '::' + (occurrence.sourceElementId || '');
+        const exists = component.occurrences.some(item =>
+          (item.pageUrl || '') + '::' + (item.sourceUrl || '') + '::' +
+          (item.sourceElementId || '') === occurrenceKey
+        );
+        if (!exists) component.occurrences.push({
+          pageUrl: occurrence.pageUrl || '',
+          sourceUrl: occurrence.sourceUrl || occurrence.pageUrl || '',
+          sourceElementId: occurrence.sourceElementId || ''
+        });
+
+        return component;
+      }
+
+      registerSharedComponentsFromRoot(rootNode, pageUrl, options = {}) {
+        const sourceRoot = rootNode?.body || rootNode;
+        if (!sourceRoot || !sourceRoot.querySelectorAll) return 0;
+
+        const sourceUrl = options.sourceUrl || pageUrl;
+        const componentSpecs = [
+          { key: 'topbar', selector: 'aside.topbar, .topbar[aria-label="Site information"], [data-shared-component="topbar"]' },
+          { key: 'main-header', selector: 'header.site-header, [data-shared-component="main-header"]' },
+          { key: 'footer', selector: 'footer.site-footer, [data-shared-component="footer"]' }
+        ];
+
+        let captured = 0;
+        componentSpecs.forEach(spec => {
+          const seen = new Set();
+          Array.from(sourceRoot.querySelectorAll(spec.selector)).forEach(element => {
+            if (seen.has(element)) return;
+            seen.add(element);
+            this.registerSharedComponent(spec.key, element.textContent || '', {
+              pageUrl,
+              sourceUrl,
+              sourceElementId: element.id || ''
+            });
+            captured++;
+          });
+        });
+
+        return captured;
+      }
+
+      extractChunksFromRoot(rootNode, pageUrl = 'index.html', options = {}) {
+        const documentNode = rootNode?.nodeType === 9 ? rootNode : rootNode?.ownerDocument;
+        const sourceRoot = options.contentRoot || rootNode?.body || rootNode;
+        if (!sourceRoot || !sourceRoot.querySelectorAll) return 0;
+
+        const sourceId = options.sourceId || 'page-html';
+        const sourceUrl = options.sourceUrl || pageUrl;
+        const isResource = Boolean(options.isResource);
+        const firstH1 = sourceRoot.querySelector('h1');
+        const documentTitle = documentNode?.title || '';
+        const pathTitle = new URL(pageUrl, this.sitemapUrl).pathname.split('/').filter(Boolean).pop() || 'Page';
+        const pageTitle = this.cleanText(String(options.articleTitle || firstH1?.textContent || documentTitle || pathTitle));
+        const pageArticleId = options.articleId || 'page-' +
+          (new URL(pageUrl, this.sitemapUrl).pathname.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'root');
+        const tagNode = sourceRoot.querySelector('article .article-category, article .article-meta .tag, article .tag, .article-meta .tag');
+        const pageTag = options.tag !== undefined
+          ? String(options.tag || '')
+          : this.cleanText(tagNode?.textContent || '');
+
+        this.extractLinksFromRoot(sourceRoot, pageUrl, { sourceUrl, sourceId });
+        this.registerSharedComponentsFromRoot(sourceRoot, pageUrl, { sourceUrl });
+
+        const contentRoot = sourceRoot.cloneNode(true);
+        const excludedSelectors = [
+          'script', 'style', 'noscript', 'svg', 'iframe', 'template', 'nav',
+          'aside.topbar', '.topbar', 'header.site-header', 'footer.site-footer',
+          '[data-newsletter-placeholder]', '#search-dialog', '.search-dialog'
+        ];
+        contentRoot.querySelectorAll(excludedSelectors.join(',')).forEach(node => node.remove());
+
+        const blockSelector = [
+          'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+          'p', 'ul', 'ol', 'blockquote', 'figure', 'table',
+          'pre', '.code-block', 'dl', 'button', 'label', 'img[alt]'
+        ].join(',');
+
+        const blocks = Array.from(contentRoot.querySelectorAll(blockSelector)).filter(node => {
+          const nestedContainer = node.parentElement?.closest('blockquote, figure, table, pre, .code-block, ul, ol, dl');
+          return !nestedContainer || nestedContainer === node;
+        });
+
+        let chunkCount = 0;
+        let readingOrder = 0;
+        let sectionSequence = 0;
+        let headingStack = [];
+        let currentSection = null;
+
+        const makeSection = region => {
+          const activeHeading = headingStack[headingStack.length - 1] || null;
+          return {
+            heading: activeHeading?.text || pageTitle,
+            headingLevel: activeHeading?.level || 0,
+            elementId: activeHeading?.id || '',
+            sectionPath: headingStack.map(item => item.text),
+            region: region || 'document-content',
+            parts: [],
+            bulletPoints: [],
+            codeSnippets: [],
+            tableRows: [],
+            imageAltText: []
+          };
+        };
+
+        const flushSection = () => {
+          if (!currentSection) return;
+
+          const text = this.cleanText(currentSection.parts.join(' '));
+          const heading = this.cleanText(currentSection.heading || pageTitle);
+          const internalId = currentSection.elementId || (sourceId + '-section-' + sectionSequence);
+          const chunkId = pageUrl + '#' + internalId + '::' + sectionSequence;
+
+          this.registerChunk({
+            id: chunkId,
+            pageUrl,
+            articleId: pageArticleId,
+            articleTitle: pageTitle,
+            heading,
+            tag: pageTag,
+            text,
+            bulletPoints: currentSection.bulletPoints,
+            codeSnippets: currentSection.codeSnippets,
+            tableRows: currentSection.tableRows,
+            elementId: currentSection.elementId || '',
+            headingLevel: currentSection.headingLevel,
+            sectionPath: currentSection.sectionPath,
+            readingOrder: readingOrder++,
+            region: currentSection.region,
+            imageAltText: currentSection.imageAltText,
+            sourceKind: options.sourceKind || (isResource ? 'first-party-resource' : 'page-html'),
+            sourceUrl,
+            sourceId,
+            pageType: options.pageType || documentNode?.body?.dataset?.pageType || '',
+            isResource
+          });
+          chunkCount++;
+          sectionSequence++;
+          currentSection = null;
+        };
+
+        blocks.forEach(node => {
+          const tagName = node.tagName.toLowerCase();
+          const headingMatch = /^h([1-6])$/.exec(tagName);
+
+          if (headingMatch) {
+            flushSection();
+            const level = Number(headingMatch[1]);
+            while (headingStack.length && headingStack[headingStack.length - 1].level >= level) {
+              headingStack.pop();
+            }
+            headingStack.push({
+              level,
+              text: this.cleanText(node.textContent || ''),
+              id: node.id || ''
+            });
+            currentSection = makeSection(this.getElementRegion(node));
+            return;
+          }
+
+          if (!currentSection) currentSection = makeSection(this.getElementRegion(node));
+
+          let blockText = '';
+          if (tagName === 'ul' || tagName === 'ol') {
+            const listItems = Array.from(node.querySelectorAll('li'))
+              .map(item => this.cleanText(item.textContent || ''))
+              .filter(Boolean);
+            currentSection.bulletPoints.push(...listItems);
+            blockText = listItems.join(' ');
+          } else if (tagName === 'table') {
+            const rows = Array.from(node.querySelectorAll('tr')).map(row =>
+              Array.from(row.querySelectorAll('th, td')).map(cell => this.cleanText(cell.textContent || ''))
+            ).filter(row => row.length);
+            currentSection.tableRows.push(...rows);
+            blockText = rows.map(row => row.join(' ')).join(' ');
+          } else if (tagName === 'pre' || node.classList?.contains('code-block')) {
+            const code = this.cleanText(node.textContent || '');
+            if (code) {
+              currentSection.codeSnippets.push(code);
+              blockText = code;
+            }
+          } else if (tagName === 'figure') {
+            const alts = Array.from(node.querySelectorAll('img[alt]'))
+              .map(image => this.cleanText(image.getAttribute('alt') || ''))
+              .filter(Boolean);
+            const caption = this.cleanText(node.querySelector('figcaption')?.textContent || '');
+            currentSection.imageAltText.push(...alts);
+            blockText = [...alts, caption].filter(Boolean).join(' ');
+          } else if (tagName === 'img') {
+            const alt = this.cleanText(node.getAttribute('alt') || '');
+            if (alt) currentSection.imageAltText.push(alt);
+            blockText = alt;
+          } else if (tagName === 'dl') {
+            blockText = this.cleanText(node.textContent || '');
+          } else {
+            blockText = this.cleanText(node.textContent || '');
+          }
+
+          if (blockText) currentSection.parts.push(blockText);
+        });
+
+        flushSection();
+        return chunkCount;
+      }
+
+      rebuildIndexStatistics() {
+        this.vocabulary.clear();
+        this.globalTermFreq = {};
+        this.index.forEach(chunk => {
+          (chunk.tokens || []).forEach(token => {
+            this.vocabulary.add(token);
+            this.globalTermFreq[token] = (this.globalTermFreq[token] || 0) + 1;
+          });
+        });
+      }
+
       registerChunk(data) {
-        const rawTokens = this.tokenize(`${data.articleTitle} ${data.heading} ${data.tag} ${data.text}`);
-        const stemmedTokens = rawTokens.map(t => stemToken(t));
+        const normalized = {
+          ...data,
+          articleTitle: String(data.articleTitle || ''),
+          heading: String(data.heading || ''),
+          tag: String(data.tag || ''),
+          text: String(data.text || ''),
+          bulletPoints: Array.isArray(data.bulletPoints) ? data.bulletPoints : [],
+          codeSnippets: Array.isArray(data.codeSnippets) ? data.codeSnippets : [],
+          tableRows: Array.isArray(data.tableRows) ? data.tableRows : [],
+          elementId: typeof data.elementId === 'string' ? data.elementId : ''
+        };
+
+        const previousIndex = this.index.findIndex(chunk => chunk.id === normalized.id);
+        if (previousIndex >= 0) {
+          const previous = this.index[previousIndex];
+          (previous.tokens || []).forEach(token => {
+            const remaining = (this.globalTermFreq[token] || 0) - 1;
+            if (remaining > 0) {
+              this.globalTermFreq[token] = remaining;
+            } else {
+              delete this.globalTermFreq[token];
+              this.vocabulary.delete(token);
+            }
+          });
+          this.index.splice(previousIndex, 1);
+        }
+
+        const rawTokens = this.tokenize(
+          normalized.articleTitle + ' ' + normalized.heading + ' ' + normalized.tag + ' ' + normalized.text
+        );
+        const stemmedTokens = rawTokens.map(token => stemToken(token));
         const termFreq = {};
         const stemFreq = {};
 
-        rawTokens.forEach((t, i) => {
-          termFreq[t] = (termFreq[t] || 0) + 1;
-          const st = stemmedTokens[i];
-          stemFreq[st] = (stemFreq[st] || 0) + 1;
-          this.vocabulary.add(t);
-          this.globalTermFreq[t] = (this.globalTermFreq[t] || 0) + 1;
+        rawTokens.forEach((token, index) => {
+          termFreq[token] = (termFreq[token] || 0) + 1;
+          const stem = stemmedTokens[index];
+          stemFreq[stem] = (stemFreq[stem] || 0) + 1;
+          this.vocabulary.add(token);
+          this.globalTermFreq[token] = (this.globalTermFreq[token] || 0) + 1;
         });
 
-        this.index = this.index.filter(c => c.id !== data.id);
-
         this.index.push({
-          ...data,
+          ...normalized,
           tokens: rawTokens,
           stemmedTokens,
           termFreq,
           stemFreq,
           wordCount: rawTokens.length,
-          hasCode: data.codeSnippets.length > 0,
-          hasTable: data.tableRows.length > 0
+          hasCode: normalized.codeSnippets.length > 0,
+          hasTable: normalized.tableRows.length > 0
         });
+      }
+
+      async ingestEditorialMarkdown(markdown, adapter) {
+        const entries = String(markdown || '').matchAll(/<!--\s*ENTRY\s*-->([\s\S]*?)<!--\s*END ENTRY\s*-->/gi);
+        let entryCount = 0;
+        let chunkCount = 0;
+
+        for (const match of entries) {
+          const entry = match[1];
+          const bodyMarker = entry.match(/<!--\s*BODY\s*-->/i);
+          if (!bodyMarker) continue;
+
+          const markerIndex = bodyMarker.index;
+          const metadataText = entry.slice(0, markerIndex);
+          const rawBody = entry.slice(markerIndex + bodyMarker[0].length);
+          const metadata = {};
+
+          metadataText.split(/\r?\n/).forEach(line => {
+            const pair = line.match(/^\s*([a-z_]+)\s*:\s*(.*?)\s*$/i);
+            if (!pair) return;
+            metadata[pair[1].toLowerCase()] = pair[2].replace(/^["']|["']$/g, '').trim();
+          });
+
+          const title = this.cleanText(metadata.title || ('Editorial note ' + (entryCount + 1)));
+          const articleId = metadata.id || ('editorial-note-' + (entryCount + 1));
+          const codeSnippets = [];
+          const bodyWithoutCode = rawBody.replace(/\x60{3}[\w-]*\s*([\s\S]*?)\x60{3}/g, (_, code) => {
+            const cleanCode = this.cleanText(code);
+            if (cleanCode) codeSnippets.push(cleanCode);
+            return ' ';
+          });
+          const bulletPoints = bodyWithoutCode.split(/\r?\n/)
+            .map(line => line.match(/^\s*(?:[-*+]|\d+\.)\s+(.+)$/)?.[1] || '')
+            .map(line => this.cleanText(line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1').replace(/[*_~\x60]/g, '')))
+            .filter(Boolean);
+          const bodyText = this.cleanText(
+            bodyWithoutCode
+              .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '$1')
+              .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
+              .replace(/<[^>]*>/g, ' ')
+              .replace(/^\s{0,3}#{1,6}\s+/gm, '')
+              .replace(/^\s*(?:[-*+]|\d+\.)\s+/gm, '')
+              .replace(/^\s*>\s?/gm, '')
+              .replace(/[*_~\x60]/g, ' ')
+              .replace(/\s+/g, ' ')
+          );
+
+          const noteLinks = [...rawBody.matchAll(/\[([^\]]+)\]\(([^)]+)\)/g)];
+          noteLinks.forEach(link => {
+            this.addLinkRecord(
+              adapter.pageUrl,
+              adapter.url,
+              adapter.id,
+              link[2],
+              link[1],
+              { region: 'editorial-markdown', headingContext: title }
+            );
+          });
+
+          this.registerChunk({
+            id: adapter.pageUrl + '#' + articleId,
+            pageUrl: adapter.pageUrl,
+            articleId,
+            articleTitle: title,
+            heading: title,
+            tag: adapter.tag || 'Editorial',
+            text: bodyText,
+            bulletPoints,
+            codeSnippets,
+            tableRows: [],
+            elementId: '',
+            headingLevel: 1,
+            sectionPath: [title],
+            readingOrder: entryCount,
+            region: 'editorial-markdown',
+            sourceKind: 'first-party-markdown',
+            sourceUrl: adapter.url,
+            sourceId: adapter.id,
+            pageType: 'editorial',
+            isResource: true,
+            editorialDate: metadata.date || '',
+            editorialType: metadata.type || '',
+            imageAltText: metadata.image_alt ? [metadata.image_alt] : []
+          });
+
+          entryCount++;
+          chunkCount++;
+        }
+
+        return { entries: entryCount, chunks: chunkCount };
+      }
+
+      async ingestFirstPartySources() {
+        for (const adapter of this.firstPartySourceAdapters) {
+          const sourcePage = this.crawledPages.get(adapter.pageUrl);
+          const sourceRecord = {
+            id: adapter.id,
+            type: adapter.type,
+            url: adapter.url,
+            pageUrl: adapter.pageUrl,
+            status: 'PENDING',
+            extractedChunks: 0,
+            error: null,
+            checkedAt: new Date().toISOString()
+          };
+
+          if (!sourcePage || sourcePage.status !== 'CRAWLED') {
+            sourceRecord.status = 'SKIPPED_SOURCE_PAGE_GATE';
+            sourceRecord.error = 'The associated page did not pass the breadcrumb gate.';
+            this.firstPartySourceRecords.set(adapter.id, sourceRecord);
+            continue;
+          }
+
+          try {
+            const response = await this.fetchText(adapter.url);
+            sourceRecord.finalUrl = response.responseUrl;
+            sourceRecord.httpStatus = response.httpStatus;
+
+            if (adapter.type === 'markdown-entries') {
+              const result = await this.ingestEditorialMarkdown(response.text, adapter);
+              sourceRecord.status = 'INGESTED';
+              sourceRecord.extractedChunks = result.chunks;
+              sourceRecord.entryCount = result.entries;
+            } else if (adapter.type === 'html-fragment') {
+              const documentNode = new DOMParser().parseFromString(response.text, 'text/html');
+              const chunkCount = this.extractChunksFromRoot(documentNode, adapter.pageUrl, {
+                articleId: 'component-' + adapter.id,
+                articleTitle: adapter.title,
+                tag: adapter.tag,
+                sourceKind: 'first-party-html',
+                sourceUrl: adapter.url,
+                sourceId: adapter.id,
+                isResource: true
+              });
+              sourceRecord.status = 'INGESTED';
+              sourceRecord.extractedChunks = chunkCount;
+              const componentText = this.cleanText(documentNode.body?.textContent || '');
+              this.registerSharedComponent(adapter.componentKey || adapter.id, componentText, {
+                pageUrl: adapter.pageUrl,
+                sourceUrl: adapter.url
+              });
+            } else {
+              sourceRecord.status = 'UNSUPPORTED_SOURCE_TYPE';
+              sourceRecord.error = 'Unsupported first-party source type: ' + adapter.type;
+            }
+          } catch (error) {
+            sourceRecord.status = 'FETCH_FAILED';
+            sourceRecord.error = error && error.message ? error.message : String(error);
+          }
+
+          this.firstPartySourceRecords.set(adapter.id, sourceRecord);
+        }
+      }
+
+      async fetchAndParsePage(url) {
+        let fetchUrl = url;
+
+        try {
+          fetchUrl = this.getPageFetchUrl(url);
+          const response = await this.fetchText(fetchUrl);
+          const documentNode = new DOMParser().parseFromString(response.text, 'text/html');
+          const breadcrumb = this.findBreadcrumbElement(documentNode);
+
+          let status = 'CRAWLED';
+          let breadcrumbPath = '';
+
+          if (!breadcrumb) {
+            status = 'SKIPPED_NO_BREADCRUMB';
+          } else if (!this.isBreadcrumbPopulated(breadcrumb)) {
+            status = 'SKIPPED_PLACEHOLDER';
+          } else {
+            breadcrumbPath = this.getBreadcrumbPath(breadcrumb);
+          }
+
+          const unresolvedTokens = (response.text.match(/\{\{\s*[^{}]+\s*\}\}|<%[\s\S]*?%>|\[\[\s*[\w.-]+\s*\]\]/g) || []).length;
+          const pageRecord = {
+            url,
+            fetchUrl,
+            finalUrl: response.responseUrl,
+            httpStatus: response.httpStatus,
+            status,
+            breadcrumbPath,
+            title: this.cleanText(documentNode.title || documentNode.querySelector('h1')?.textContent || ''),
+            pageType: documentNode.body?.dataset?.pageType || '',
+            unresolvedTokenCount: unresolvedTokens,
+            extractedChunkCount: 0,
+            extractedLinkCount: 0,
+            error: null,
+            checkedAt: new Date().toISOString()
+          };
+
+          this.crawledPages.set(url, pageRecord);
+          if (status !== 'CRAWLED') return pageRecord;
+
+          const originalChunkIds = new Set(this.index.map(chunk => chunk.id));
+          try {
+            pageRecord.extractedChunkCount = this.extractChunksFromRoot(documentNode, url);
+            pageRecord.extractedLinkCount = (this.linkRegistry.get(url + '::page-html') || []).length;
+          } catch (extractError) {
+            this.index = this.index.filter(chunk =>
+              chunk.pageUrl !== url || originalChunkIds.has(chunk.id)
+            );
+            this.rebuildIndexStatistics();
+            this.linkRegistry.delete(url + '::page-html');
+            this.linkDestinations.clear();
+            this.linkRegistry.forEach(records => records.forEach(record => {
+              if (!this.linkDestinations.has(record.destination)) {
+                this.linkDestinations.set(record.destination, {
+                  destination: record.destination,
+                  linkKind: record.linkKind,
+                  occurrences: []
+                });
+              }
+              this.linkDestinations.get(record.destination).occurrences.push({
+                pageUrl: record.pageUrl,
+                sourceUrl: record.sourceUrl,
+                sourceId: record.sourceId,
+                anchorText: record.anchorText,
+                region: record.region,
+                headingContext: record.headingContext,
+                sourceElementId: record.sourceElementId
+              });
+            }));
+            throw extractError;
+          }
+
+          return pageRecord;
+        } catch (error) {
+          const record = {
+            url,
+            fetchUrl,
+            finalUrl: null,
+            httpStatus: null,
+            status: 'FETCH_FAILED',
+            breadcrumbPath: '',
+            title: '',
+            pageType: '',
+            unresolvedTokenCount: 0,
+            extractedChunkCount: 0,
+            extractedLinkCount: 0,
+            error: error && error.message ? error.message : String(error),
+            checkedAt: new Date().toISOString()
+          };
+          this.crawledPages.set(url, record);
+          return record;
+        }
+      }
+
+      async crawlEntireSite() {
+        const previousState = {
+          index: this.index.slice(),
+          crawledPages: new Map(this.crawledPages),
+          vocabulary: new Set(this.vocabulary),
+          globalTermFreq: { ...this.globalTermFreq },
+          linkRegistry: new Map(this.linkRegistry),
+          linkDestinations: new Map(this.linkDestinations),
+          sharedComponentRegistry: new Map(this.sharedComponentRegistry),
+          firstPartySourceRecords: new Map(this.firstPartySourceRecords)
+        };
+
+        this.index = [];
+        this.crawledPages.clear();
+        this.vocabulary.clear();
+        this.globalTermFreq = {};
+        this.linkRegistry.clear();
+        this.linkDestinations.clear();
+        this.sharedComponentRegistry.clear();
+        this.firstPartySourceRecords.clear();
+        this.candidateCount = 0;
+        this.processedCount = 0;
+        this.sitemapError = null;
+        this.crawlCompletedAt = null;
+        this.sitemapStatus = 'LOADING_SITEMAP';
+        this.updateCrawlerTelemetryUI();
+
+        try {
+          const sitemapUrls = await this.loadSitemapUrls();
+          this.candidateCount = sitemapUrls.length;
+          this.sitemapStatus = 'CRAWLING_SITE';
+
+          sitemapUrls.forEach(url => {
+            this.crawledPages.set(url, {
+              url,
+              fetchUrl: null,
+              finalUrl: null,
+              httpStatus: null,
+              status: 'PENDING',
+              breadcrumbPath: '',
+              title: '',
+              pageType: '',
+              unresolvedTokenCount: 0,
+              extractedChunkCount: 0,
+              extractedLinkCount: 0,
+              error: null,
+              checkedAt: null
+            });
+          });
+          this.updateCrawlerTelemetryUI();
+
+          let nextIndex = 0;
+          const worker = async () => {
+            while (true) {
+              const currentIndex = nextIndex++;
+              if (currentIndex >= sitemapUrls.length) return;
+              const url = sitemapUrls[currentIndex];
+              await this.fetchAndParsePage(url);
+              this.processedCount++;
+              if (
+                this.processedCount % this.maxConcurrentRequests === 0 ||
+                this.processedCount === sitemapUrls.length
+              ) {
+                this.updateCrawlerTelemetryUI();
+              }
+            }
+          };
+
+          const workerCount = Math.min(this.maxConcurrentRequests, sitemapUrls.length);
+          await Promise.all(Array.from({ length: workerCount }, () => worker()));
+          await this.ingestFirstPartySources();
+
+          this.sitemapStatus = 'COMPLETE';
+          this.crawlCompletedAt = new Date().toISOString();
+          this.updateCrawlerTelemetryUI();
+          return Array.from(this.crawledPages.values());
+        } catch (error) {
+          this.index = previousState.index;
+          this.vocabulary = previousState.vocabulary;
+          this.globalTermFreq = previousState.globalTermFreq;
+          this.crawledPages.clear();
+          previousState.crawledPages.forEach((value, key) => this.crawledPages.set(key, value));
+          this.linkRegistry = previousState.linkRegistry;
+          this.linkDestinations = previousState.linkDestinations;
+          this.sharedComponentRegistry = previousState.sharedComponentRegistry;
+          this.firstPartySourceRecords = previousState.firstPartySourceRecords;
+          this.sitemapStatus = 'SITEMAP_FAILED';
+          this.sitemapError = error && error.message ? error.message : String(error);
+          this.updateCrawlerTelemetryUI();
+          throw error;
+        }
+      }
+
+      getCrawlSummary() {
+        const records = Array.from(this.crawledPages.values());
+        const count = status => records.filter(record => record.status === status).length;
+        const links = Array.from(this.linkRegistry.values())
+          .reduce((total, sourceRecords) => total + sourceRecords.length, 0);
+        const sourceFailures = Array.from(this.firstPartySourceRecords.values())
+          .filter(record => record.status === 'FETCH_FAILED').length;
+
+        return {
+          sitemapUrl: this.sitemapUrl,
+          sitemapStatus: this.sitemapStatus,
+          candidates: this.candidateCount,
+          checked: records.filter(record => record.status !== 'PENDING').length,
+          crawled: count('CRAWLED'),
+          skippedNoBreadcrumb: count('SKIPPED_NO_BREADCRUMB'),
+          skippedPlaceholder: count('SKIPPED_PLACEHOLDER'),
+          fetchFailed: count('FETCH_FAILED'),
+          pending: count('PENDING'),
+          indexedChunks: this.index.length,
+          capturedLinks: links,
+          uniqueLinkDestinations: this.linkDestinations.size,
+          sharedComponents: this.sharedComponentRegistry.size,
+          firstPartySources: this.firstPartySourceRecords.size,
+          firstPartySourceFailures: sourceFailures,
+          sitemapError: this.sitemapError,
+          completedAt: this.crawlCompletedAt
+        };
       }
 
       /*
@@ -2032,18 +2730,19 @@
 
         if (counter) {
           counter.textContent = summary.checked + '/' + summary.candidates +
-            ' Checked • ' + summary.crawled + ' Passed';
+            ' Checked • ' + summary.crawled + ' Passed • ' + summary.indexedChunks + ' Chunks';
         }
-        if (fabCounter) fabCounter.textContent = String(summary.crawled);
+        if (fabCounter) fabCounter.textContent = String(summary.indexedChunks);
         if (progress) {
           progress.textContent = summary.sitemapError
             ? 'Sitemap error: ' + summary.sitemapError
             : summary.checked + '/' + summary.candidates + ' checked • ' +
-              summary.crawled + ' passed • ' + summary.fetchFailed + ' failed';
+              summary.crawled + ' passed • ' + summary.indexedChunks + ' chunks • ' +
+              summary.capturedLinks + ' links • ' + summary.fetchFailed + ' failed';
         }
         if (depthBadge) {
           depthBadge.textContent = this.sitemapStatus === 'COMPLETE'
-            ? 'PHASE 1 COMPLETE'
+            ? 'PHASE 2 COMPLETE'
             : this.sitemapStatus.replace(/_/g, ' ');
         }
         if (!logList) return;
@@ -2103,17 +2802,19 @@
           detail.style.fontSize = 'var(--font-size-xs)';
 
           if (record.breadcrumbPath) {
-            detail.textContent = 'Breadcrumb: ' + record.breadcrumbPath;
+            detail.textContent = 'Breadcrumb: ' + record.breadcrumbPath +
+              ' • ' + (record.extractedChunkCount || 0) + ' chunks • ' +
+              (record.extractedLinkCount || 0) + ' links';
           } else if (record.error) {
-            detail.textContent = 'Fetch error: ' + record.error;
+            detail.textContent = 'Fetch/extraction error: ' + record.error;
           } else if (record.status === 'SKIPPED_NO_BREADCRUMB') {
-            detail.textContent = 'Skipped: no breadcrumb element found.';
+            detail.textContent = 'Skipped: no breadcrumb element found. URL remains recorded.';
           } else if (record.status === 'SKIPPED_PLACEHOLDER') {
-            detail.textContent = 'Skipped: breadcrumb is empty, incomplete, or contains unresolved template data.';
+            detail.textContent = 'Skipped: breadcrumb is empty, incomplete, or contains unresolved template data. URL remains recorded.';
           } else if (record.status === 'PENDING') {
-            detail.textContent = 'Waiting for page inspection.';
+            detail.textContent = 'Waiting for page fetch and breadcrumb validation.';
           } else {
-            detail.textContent = 'Page fetched and breadcrumb check passed.';
+            detail.textContent = 'Page passed the breadcrumb gate and its available content was processed.';
           }
 
           detail.style.overflowWrap = 'anywhere';
@@ -2128,10 +2829,15 @@
        */
       exportIndexJSON() {
         const payload = {
-          engine: 'Luxy Phase 1 Sitemap Breadcrumb Audit',
+          engine: 'Luxy Phase 2 Site-wide Content Index',
           timestamp: new Date().toISOString(),
           summary: this.getCrawlSummary(),
-          pages: Array.from(this.crawledPages.values())
+          pages: Array.from(this.crawledPages.values()),
+          chunks: this.index,
+          links: Array.from(this.linkRegistry.values()).flat(),
+          uniqueLinkDestinations: Array.from(this.linkDestinations.values()),
+          sharedComponents: Array.from(this.sharedComponentRegistry.values()),
+          firstPartySources: Array.from(this.firstPartySourceRecords.values())
         };
 
         const blob = new Blob([JSON.stringify(payload, null, 2)], {
@@ -2140,10 +2846,10 @@
         const downloadUrl = URL.createObjectURL(blob);
         const anchor = document.createElement('a');
         anchor.href = downloadUrl;
-        anchor.download = 'luxy-phase-1-crawl-report.json';
+        anchor.download = 'luxy-phase-2-site-index.json';
         anchor.click();
         URL.revokeObjectURL(downloadUrl);
-        showToast('Exported luxy-phase-1-crawl-report.json');
+        showToast('Exported luxy-phase-2-site-index.json');
       }
 
     }
@@ -2741,12 +3447,12 @@
     }
 
     /*
-     * PHASE 1 BOOTSTRAP / INITIALIZATION ORDER:
+     * PHASE 2 BOOTSTRAP / INITIALIZATION ORDER:
      * 1. Load the mascot presentation asset.
-     * 2. Read sitemap candidates and finish the breadcrumb audit.
-     * 3. Construct the existing search-engine shell without populating its index.
-     * 4. Render the Phase 1 audit summary and attach keyboard listeners.
-     * Content extraction and searchable indexing are deferred to Phase 2.
+     * 2. Fetch sitemap candidates and preserve the breadcrumb gate.
+     * 3. Extract full-page content, links and configured first-party sources.
+     * 4. Populate the compatible search index, then construct the existing engine.
+     * 5. Render the crawl/index summary and attach keyboard listeners.
      */
     window.addEventListener('DOMContentLoaded', async () => {
       await loadLuxyMascotSvg();
@@ -2782,17 +3488,18 @@
           <div class="message-avatar">${renderLuxyMascotMarkup()}</div>
           <div class="message-bubble">
             <div class="telemetry-header">
-              <span class="intent-pill">LUXY PHASE 1</span>
+              <span class="intent-pill">LUXY PHASE 2</span>
               <span class="score-pill">${crawlSummary.checked}/${crawlSummary.candidates} URLS CHECKED</span>
               <span class="Correction-pill">${crawlSummary.crawled} BREADCRUMB PASSED</span>
             </div>
             <div style="font-weight: var(--font-weight-bold); margin-bottom: 0.35rem;">
-              Phase 1 Sitemap and Breadcrumb Check.
+              Site-wide content extraction and search index.
             </div>
             <div style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
-              <strong>${siteCrawler.getCrawlSummary().crawled}</strong> of
-              <strong>${siteCrawler.getCrawlSummary().candidates}</strong> sitemap pages passed the breadcrumb checks.
-              Hidden but properly populated breadcrumbs are accepted. Content extraction and search indexing are reserved for Phase 2.
+              <strong>${crawlSummary.crawled}</strong> of
+              <strong>${crawlSummary.candidates}</strong> sitemap pages passed the breadcrumb gate.
+              Luxy has indexed <strong>${crawlSummary.indexedChunks}</strong> content chunks and captured
+              <strong>${crawlSummary.capturedLinks}</strong> links. Hidden but properly populated breadcrumbs are accepted.
             </div>
           </div>
         </div>
@@ -2850,6 +3557,21 @@
 
     function jumpToCrossPageSource(pageUrl, elementId) {
       closeSearchModal();
+
+      if (/^https?:\/\//i.test(String(pageUrl || ''))) {
+        try {
+          const sourceUrl = new URL(pageUrl, window.location.href);
+          if (elementId && String(elementId).trim()) {
+            sourceUrl.hash = String(elementId).trim();
+          }
+          window.open(sourceUrl.href, '_blank', 'noopener,noreferrer');
+          return;
+        } catch (_) {
+          showToast('The source URL could not be opened.');
+          return;
+        }
+      }
+
       switchActivePageRoute(pageUrl, elementId);
     }
 
@@ -2958,7 +3680,7 @@
 
         const summary = siteCrawler.getCrawlSummary();
         showToast(
-          'Sitemap check complete: ' + summary.crawled + ' passed, ' +
+          'Site crawl complete: ' + summary.crawled + ' passed, ' +
           (summary.skippedNoBreadcrumb + summary.skippedPlaceholder) +
           ' skipped, ' + summary.fetchFailed + ' failed.'
         );
@@ -3024,7 +3746,7 @@
       document.getElementById('new-content').value = '';
 
       switchActivePageRoute(targetRoute, headId);
-      showToast('Created virtual demo route ' + targetRoute + '. It is not part of the Phase 1 sitemap audit.');
+      showToast('Created virtual route ' + targetRoute + '. It is separate from the sitemap crawl.');
     }
 
     async function clearAndRebuildCache() {
