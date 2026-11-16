@@ -1630,6 +1630,14 @@
             title: 'Newsletter',
             tag: 'Newsletter',
             componentKey: 'newsletter-popup'
+          },
+          {
+            id: 'homepage-featured-articles',
+            type: 'javascript-url-array',
+            url: new URL('assets/js/hero-showcase.js', siteRoot).href,
+            pagePath: '/',
+            arrayName: 'FEATURED_ARTICLE_URLS',
+            heading: "Editor's picks"
           }
         ];
         this.stopWords = new Set([
@@ -1985,9 +1993,11 @@
 
         const contentRoot = sourceRoot.cloneNode(true);
         const excludedSelectors = [
-          'script', 'style', 'noscript', 'svg', 'iframe', 'template', 'nav',
+          'script', 'style', 'noscript', 'svg', 'iframe', 'template',
+          'nav[aria-label="Breadcrumb"], nav.breadcrumbs',
           'aside.topbar', '.topbar', 'header.site-header', 'footer.site-footer',
-          '[data-newsletter-placeholder]', '#search-dialog', '.search-dialog'
+          '[data-newsletter-placeholder]', '#search-dialog', '.search-dialog',
+          '.hero-showcase__status', '[data-editorial-root]'
         ];
         contentRoot.querySelectorAll(excludedSelectors.join(',')).forEach(node => node.remove());
 
@@ -2339,6 +2349,53 @@
                 pageUrl: adapter.pageUrl,
                 sourceUrl: adapter.url
               });
+            } else if (adapter.type === 'javascript-url-array') {
+              const escapedName = String(adapter.arrayName || '').replace(/[.*+?^${}()|[\]\\]/g, '\\            } else if (adapter.type === 'html-fragment') {
+              const documentNode = new DOMParser().parseFromString(response.text, 'text/html');
+              const chunkCount = this.extractChunksFromRoot(documentNode, adapter.pageUrl, {
+                articleId: 'component-' + adapter.id,
+                articleTitle: adapter.title,
+                tag: adapter.tag,
+                sourceKind: 'first-party-html',
+                sourceUrl: adapter.url,
+                sourceId: adapter.id,
+                isResource: true
+              });
+              sourceRecord.status = 'INGESTED';
+              sourceRecord.extractedChunks = chunkCount;
+              const componentText = this.cleanText(documentNode.body?.textContent || '');
+              this.registerSharedComponent(adapter.componentKey || adapter.id, componentText, {
+                pageUrl: adapter.pageUrl,
+                sourceUrl: adapter.url
+              });
+            } else {');
+              const arrayMatch = response.text.match(
+                new RegExp('(?:const|let|var)\\s+' + escapedName + '\\s*=\\s*\\[([\\s\\S]*?)\\]', 'm')
+              );
+              if (!arrayMatch) throw new Error('The configured URL array was not found in the source asset.');
+
+              const references = [...arrayMatch[1].matchAll(/["']([^"']+)["']/g)]
+                .map(match => match[1].trim())
+                .filter(Boolean);
+              references.forEach(reference => {
+                const label = reference.split('/').pop()
+                  .replace(/\\.html?(?:[?#].*)?$/i, '')
+                  .replace(/[-_]+/g, ' ');
+                this.addLinkRecord(
+                  adapter.pageUrl,
+                  adapter.url,
+                  adapter.id,
+                  reference,
+                  label,
+                  {
+                    region: 'dynamic-homepage-showcase',
+                    headingContext: adapter.heading || ''
+                  }
+                );
+              });
+              sourceRecord.status = 'INGESTED';
+              sourceRecord.referenceCount = references.length;
+              sourceRecord.extractedLinks = references.length;
             } else {
               sourceRecord.status = 'UNSUPPORTED_SOURCE_TYPE';
               sourceRecord.error = 'Unsupported first-party source type: ' + adapter.type;
