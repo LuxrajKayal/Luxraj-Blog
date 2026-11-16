@@ -1618,7 +1618,7 @@
             id: 'editorial-notes',
             type: 'markdown-entries',
             url: new URL('content/editorial-notes.md', siteRoot).href,
-            pageUrl: new URL('pages/editorial.html', siteRoot).href,
+            pagePath: '/pages/editorial.html',
             title: "The Editor's Desk",
             tag: 'Editorial'
           },
@@ -1626,7 +1626,7 @@
             id: 'newsletter-popup',
             type: 'html-fragment',
             url: new URL('assets/components/newsletter-popup.html', siteRoot).href,
-            pageUrl: siteRoot.href,
+            pagePath: '/',
             title: 'Newsletter',
             tag: 'Newsletter',
             componentKey: 'newsletter-popup'
@@ -1771,31 +1771,6 @@
         return this.cleanText(breadcrumb.textContent || '');
       }
 
-      getCrawlSummary() {
-        const records = Array.from(this.crawledPages.values());
-        const count = status => records.filter(record => record.status === status).length;
-
-        return {
-          sitemapUrl: this.sitemapUrl,
-          sitemapStatus: this.sitemapStatus,
-          candidates: this.candidateCount,
-          checked: records.filter(record => record.status !== 'PENDING').length,
-          crawled: count('CRAWLED'),
-          skippedNoBreadcrumb: count('SKIPPED_NO_BREADCRUMB'),
-          skippedPlaceholder: count('SKIPPED_PLACEHOLDER'),
-          fetchFailed: count('FETCH_FAILED'),
-          pending: count('PENDING'),
-          sitemapError: this.sitemapError,
-          completedAt: this.crawlCompletedAt
-        };
-      }
-
-      /*
-       * EXTRACTION BOUNDARY: DOM-to-chunk parser.
-       * Reads article/data-crawlable elements and turns each H2/H3 section into a
-       * chunk with source page and element IDs. This establishes the chunk schema
-       * consumed by LuxyConversationalEngine and used for cross-page citations.
-       */
       getElementRegion(element) {
         if (!element || !element.closest) return 'document';
         if (element.closest('aside.topbar, .topbar, [data-shared-component="topbar"]')) return 'topbar';
@@ -2307,6 +2282,16 @@
 
       async ingestFirstPartySources() {
         for (const adapter of this.firstPartySourceAdapters) {
+          const matchingPageUrl = Array.from(this.crawledPages.keys()).find(candidate => {
+            try {
+              const pathname = new URL(candidate).pathname;
+              const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\\/+$/, '');
+              return normalizedPath === adapter.pagePath;
+            } catch (_) {
+              return false;
+            }
+          });
+          adapter.pageUrl = matchingPageUrl || new URL(adapter.pagePath, new URL('../', window.location.href)).href;
           const sourcePage = this.crawledPages.get(adapter.pageUrl);
           const sourceRecord = {
             id: adapter.id,
@@ -2584,141 +2569,8 @@
       }
 
       /*
-       * PHASE 1 PAGE INSPECTOR
-       * Fetches one sitemap candidate and applies the two breadcrumb gates only.
-       * It deliberately does not extract content or register search chunks.
-       */
-      async fetchAndParsePage(url) {
-        let fetchUrl = url;
-
-        try {
-          fetchUrl = this.getPageFetchUrl(url);
-          const response = await this.fetchText(fetchUrl);
-          const documentNode = new DOMParser().parseFromString(response.text, 'text/html');
-          const breadcrumb = this.findBreadcrumbElement(documentNode);
-
-          let status = 'CRAWLED';
-          let breadcrumbPath = '';
-
-          if (!breadcrumb) {
-            status = 'SKIPPED_NO_BREADCRUMB';
-          } else if (!this.isBreadcrumbPopulated(breadcrumb)) {
-            status = 'SKIPPED_PLACEHOLDER';
-          } else {
-            breadcrumbPath = this.getBreadcrumbPath(breadcrumb);
-          }
-
-          const record = {
-            url,
-            fetchUrl,
-            finalUrl: response.responseUrl,
-            httpStatus: response.httpStatus,
-            status,
-            breadcrumbPath,
-            error: null,
-            checkedAt: new Date().toISOString()
-          };
-
-          this.crawledPages.set(url, record);
-          return record;
-        } catch (error) {
-          const record = {
-            url,
-            fetchUrl,
-            finalUrl: null,
-            httpStatus: null,
-            status: 'FETCH_FAILED',
-            breadcrumbPath: '',
-            error: error && error.message ? error.message : String(error),
-            checkedAt: new Date().toISOString()
-          };
-
-          this.crawledPages.set(url, record);
-          return record;
-        }
-      }
-
-      /*
-       * PHASE 1 SITEMAP COORDINATOR
-       * The sitemap supplies candidates, not permission to index. Each candidate
-       * is fetched and checked for a populated breadcrumb. hidden, canonical,
-       * robots and other metadata are intentionally not inspected here.
-       */
-      async crawlEntireSite() {
-        this.index = [];
-        this.crawledPages.clear();
-        this.vocabulary.clear();
-        this.globalTermFreq = {};
-        this.candidateCount = 0;
-        this.processedCount = 0;
-        this.sitemapError = null;
-        this.crawlCompletedAt = null;
-        this.sitemapStatus = 'LOADING_SITEMAP';
-
-        this.updateCrawlerTelemetryUI();
-
-        let sitemapUrls = [];
-        try {
-          sitemapUrls = await this.loadSitemapUrls();
-        } catch (error) {
-          this.sitemapStatus = 'SITEMAP_FAILED';
-          this.sitemapError = error && error.message ? error.message : String(error);
-          this.updateCrawlerTelemetryUI();
-          throw error;
-        }
-
-        this.candidateCount = sitemapUrls.length;
-        this.sitemapStatus = 'CHECKING_PAGES';
-
-        // Pre-create entries in sitemap order so the report remains stable even
-        // though page requests are processed concurrently.
-        sitemapUrls.forEach(url => {
-          this.crawledPages.set(url, {
-            url,
-            fetchUrl: null,
-            finalUrl: null,
-            httpStatus: null,
-            status: 'PENDING',
-            breadcrumbPath: '',
-            error: null,
-            checkedAt: null
-          });
-        });
-        this.updateCrawlerTelemetryUI();
-
-        let nextIndex = 0;
-        const worker = async () => {
-          while (true) {
-            const currentIndex = nextIndex++;
-            if (currentIndex >= sitemapUrls.length) return;
-
-            const url = sitemapUrls[currentIndex];
-            await this.fetchAndParsePage(url);
-            this.processedCount++;
-
-            if (
-              this.processedCount % this.maxConcurrentRequests === 0 ||
-              this.processedCount === sitemapUrls.length
-            ) {
-              this.updateCrawlerTelemetryUI();
-            }
-          }
-        };
-
-        const workerCount = Math.min(this.maxConcurrentRequests, sitemapUrls.length);
-        await Promise.all(Array.from({ length: workerCount }, () => worker()));
-
-        this.sitemapStatus = 'COMPLETE';
-        this.crawlCompletedAt = new Date().toISOString();
-        this.updateCrawlerTelemetryUI();
-
-        return Array.from(this.crawledPages.values());
-      }
-
-      /*
-       * PHASE 1 REPORT UI
-       * Displays every sitemap candidate in sitemap order, its decision, and the
-       * breadcrumb path or failure reason. This is a page-check audit, not an index.
+       * PHASE 2 CRAWL / INDEX TELEMETRY
+       * Displays every sitemap candidate, its breadcrumb-gate result, and extracted data counts.
        */
       updateCrawlerTelemetryUI() {
         const summary = this.getCrawlSummary();
@@ -2824,8 +2676,8 @@
       }
 
       /*
-       * PHASE 1 REPORT EXPORT
-       * Downloads the sitemap candidates and the result of each breadcrumb check.
+       * PHASE 2 INDEX EXPORT
+       * Downloads page records, compatible search chunks, link records and shared sources.
        */
       exportIndexJSON() {
         const payload = {
