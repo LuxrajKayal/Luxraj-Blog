@@ -24,3 +24,10 @@
 .mobile-nav-toggle{display:none}.mobile-nav-toggle__close{display:none!important}
 .mobile-nav-toggle[aria-expanded="true"] .mobile-nav-toggle__open{display:none}
 .mobile-nav-toggle[aria-expanded="true"] .mobile-nav-toggle__close{display:block!important}
+
+/* Unified Luxy search launcher: mascot and magnifier share one control. */
+.header-icon-button.header-search-launcher{width:74px;gap:.38rem;padding-inline:.48rem;border-color:var(--color-border);background:var(--color-surface)}
+.header-search-launcher__mascot{display:block;width:25px;height:22px;flex:0 0 auto;object-fit:contain}
+.header-search-launcher__separator{display:block;width:1px;height:21px;flex:0 0 auto;background:var(--color-border-strong)}
+.header-search-launcher__search-icon{display:block;width:19px;height:19px;flex:0 0 auto}
+
