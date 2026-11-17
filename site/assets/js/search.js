@@ -154,9 +154,6 @@ export function initSearch() {
   document.querySelectorAll("[data-search-open]").forEach(button => button.addEventListener("click", () => {
     lastTrigger = button;
     tagState.boxId = null;
-    tagState.tagName = "";
-    tagState.articles = [];
-    tagState.visibleCount = 0;
     setMode("luxy");
     renderGeneralSearch();
     openDialog();
