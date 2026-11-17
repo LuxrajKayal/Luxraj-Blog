@@ -1,32 +1,127 @@
 <dialog class="search-dialog" id="search-dialog" aria-labelledby="search-dialog-title">
   <div class="search-dialog__utility-row">
+    <div class="luxy-mascot" aria-label="Luxy mascot">
+      <object
+        class="luxy-mascot__svg"
+        data="{{ROOT}}assets/images/brand/luxy-mascot-master.svg"
+        type="image/svg+xml"
+        role="img"
+        aria-label="Luxy mascot"
+        tabindex="-1"
+      ></object>
+    </div>
     <fieldset class="search-mode-switch" data-search-mode-switch data-mode="luxy">
-   <legend class="search-mode-switch__legend">Search mode</legend>
-   <input class="search-mode-switch__radio" type="radio" name="search-mode" id="search-mode-general" value="general">
-   <label class="search-mode-switch__label" for="search-mode-general">Normal Search</label>
-   <input class="search-mode-switch__radio" type="radio" name="search-mode" id="search-mode-luxy" value="luxy" checked>
-   <label class="search-mode-switch__label" for="search-mode-luxy">Luxy</label>
-   <input class="search-mode-switch__radio" type="radio" name="search-mode" id="search-mode-tag" value="tag">
-   <label class="search-mode-switch__label" for="search-mode-tag">Tag Search</label>
-   <span class="search-mode-switch__thumb" aria-hidden="true"></span>
-  </fieldset>
-    <button class="search-dialog__close" type="button" data-search-close aria-label="Close search" title="Close search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <legend class="search-mode-switch__legend">Search mode</legend>
+      <input class="search-mode-switch__radio" type="radio" name="search-mode" id="search-mode-general" value="general">
+      <label class="search-mode-switch__label" for="search-mode-general">Normal Search</label>
+      <input class="search-mode-switch__radio" type="radio" name="search-mode" id="search-mode-luxy" value="luxy" checked>
+      <label class="search-mode-switch__label" for="search-mode-luxy">Luxy</label>
+      <input class="search-mode-switch__radio" type="radio" name="search-mode" id="search-mode-tag" value="tag">
+      <label class="search-mode-switch__label" for="search-mode-tag">Tag Search</label>
+      <span class="search-mode-switch__thumb" aria-hidden="true"></span>
+    </fieldset>
+    <button class="search-dialog__close" type="button" data-search-close aria-label="Close search" title="Close search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
   </div>
-  <div class="search-dialog__header"><div><p class="eyebrow" id="search-dialog-eyebrow">LUXRAJ LIBRARY</p><h2 id="search-dialog-title">Search articles</h2></div></div>
-  <section class="search-dialog__view" id="luxy-search-view" aria-label="Luxy Search Assistant"></section>
+
+  <div class="search-dialog__header">
+    <div>
+      <p class="eyebrow" id="search-dialog-eyebrow">LUXRAJ LIBRARY</p>
+      <h2 id="search-dialog-title">Search articles</h2>
+    </div>
+  </div>
+
+  <section class="search-dialog__view" id="luxy-search-view" aria-label="Luxy Search Assistant">
+    <div class="luxy-workspace">
+      <input
+        class="luxy-sidebar-toggle"
+        type="checkbox"
+        id="luxy-sidebar-toggle"
+        aria-label="Toggle conversation history"
+      >
+      <label class="luxy-mobile-history-trigger" for="luxy-sidebar-toggle" aria-controls="luxy-sidebar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>History</span>
+      </label>
+
+      <aside class="luxy-sidebar" id="luxy-sidebar" aria-label="Luxy conversation history">
+        <button class="luxy-new-chat" type="button" data-luxy-new-chat>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>New Chat</span>
+        </button>
+        <div class="luxy-sidebar__heading">
+          <h2>Chat History</h2>
+          <label class="luxy-sidebar__mobile-close" for="luxy-sidebar-toggle" aria-label="Close conversation history">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </label>
+        </div>
+        <nav class="luxy-history-list" data-luxy-history-list aria-label="Saved conversations"></nav>
+      </aside>
+
+      <label class="luxy-sidebar-backdrop" for="luxy-sidebar-toggle" aria-label="Close conversation history"></label>
+
+      <main class="luxy-chat" aria-label="Luxy conversation">
+        <div
+          class="luxy-chat__messages"
+          id="luxy-chat-messages"
+          data-luxy-messages
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions"
+        ></div>
+
+        <div class="luxy-chat__dock">
+          <article class="luxy-article-card" data-luxy-article-card hidden>
+            <a class="luxy-article-card__link" data-luxy-article-link>
+              <div class="luxy-article-card__media" data-luxy-article-image aria-hidden="true"></div>
+              <div class="luxy-article-card__body">
+                <span class="luxy-article-card__category" data-luxy-article-category></span>
+                <h3 class="luxy-article-card__title" data-luxy-article-title></h3>
+                <p class="luxy-article-card__summary" data-luxy-article-summary></p>
+                <span class="luxy-article-card__reading-time" data-luxy-article-reading-time></span>
+              </div>
+            </a>
+          </article>
+
+          <div class="luxy-composer" role="group" aria-label="Message Luxy">
+            <textarea
+              class="luxy-composer__input"
+              data-luxy-message-input
+              rows="1"
+              aria-label="Message Luxy"
+              placeholder="Ask Luxy something..."
+            ></textarea>
+            <button class="luxy-composer__send" type="button" data-luxy-send aria-label="Send message">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-5.5 16-3.2-6.8L4 12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m11.3 13.2 4.2-4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </section>
+
   <section class="search-dialog__view" id="general-search-view" aria-label="General article search" hidden>
-   <form class="search-form" id="search-form">
-    <label class="search-field search-field--query" for="search-query">Search titles or keywords<input id="search-query" type="search" placeholder="Try “drone”, “AI”, or “Wi-Fi”" autocomplete="off"></label>
-    <div class="search-controls"><label class="search-field" for="search-category-filter">Category<select id="search-category-filter"><option value="">All categories</option></select></label><label class="search-field" for="search-sort">Sort results<select id="search-sort"><option value="date-desc">Date: newest first</option><option value="date-asc">Date: oldest first</option><option value="category-asc">Category: A–Z</option><option value="title-asc">Article name: A–Z</option><option value="title-desc">Article name: Z–A</option></select></label></div>
-    <label class="search-field search-slider" for="search-reading-time"><span class="search-slider__heading">Reading-time filter <output id="search-reading-output" for="search-reading-time">15 min max</output></span><input id="search-reading-time" type="range" min="1" max="15" step="1" value="15"><span class="search-slider__scale"><span>1 min</span><span>15+ min</span></span></label>
-   </form>
-   <div class="search-results-heading"><p id="search-result-count" aria-live="polite">Browse sample articles</p><span>DEVELOPMENT LIBRARY</span></div>
-   <div class="search-results" id="search-results" tabindex="0" aria-label="Search results"></div>
-   <p class="search-dialog__note">These are development sample stories, ready to be replaced with published editorial content.</p>
+    <form class="search-form" id="search-form">
+      <label class="search-field search-field--query" for="search-query">Search titles or keywords<input id="search-query" type="search" placeholder="Try “drone”, “AI”, or “Wi-Fi”" autocomplete="off"></label>
+      <div class="search-controls">
+        <label class="search-field" for="search-category-filter">Category<select id="search-category-filter"><option value="">All categories</option></select></label>
+        <label class="search-field" for="search-sort">Sort results<select id="search-sort"><option value="date-desc">Date: newest first</option><option value="date-asc">Date: oldest first</option><option value="category-asc">Category: A–Z</option><option value="title-asc">Article name: A–Z</option><option value="title-desc">Article name: Z–A</option></select></label>
+      </div>
+      <label class="search-field search-slider" for="search-reading-time">
+        <span class="search-slider__heading">Reading-time filter <output id="search-reading-output" for="search-reading-time">15 min max</output></span>
+        <input id="search-reading-time" type="range" min="1" max="15" step="1" value="15">
+        <span class="search-slider__scale"><span>1 min</span><span>15+ min</span></span>
+      </label>
+    </form>
+    <div class="search-results-heading"><p id="search-result-count" aria-live="polite">Browse sample articles</p><span>DEVELOPMENT LIBRARY</span></div>
+    <div class="search-results" id="search-results" tabindex="0" aria-label="Search results"></div>
+    <p class="search-dialog__note">These are development sample stories, ready to be replaced with published editorial content.</p>
   </section>
+
   <section class="search-dialog__view" id="tag-search-view" aria-label="Tag search results" hidden>
-   <div class="search-results-heading"><p id="tag-search-result-count" aria-live="polite">Articles connected to this tag</p><span>TAG RESULTS</span></div>
-   <div class="search-results" id="tag-search-results" tabindex="0" aria-label="Articles connected to the selected tag"></div>
-   <div class="tag-search__actions"><button class="tag-search__load-more" id="tag-search-load-more" type="button" hidden>Load 10 more</button></div>
+    <div class="search-results-heading"><p id="tag-search-result-count" aria-live="polite">Articles connected to this tag</p><span>TAG RESULTS</span></div>
+    <div class="search-results" id="tag-search-results" tabindex="0" aria-label="Articles connected to the selected tag"></div>
+    <div class="tag-search__actions"><button class="tag-search__load-more" id="tag-search-load-more" type="button" hidden>Load 10 more</button></div>
   </section>
- </dialog>
+</dialog>
