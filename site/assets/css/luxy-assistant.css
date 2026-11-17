@@ -11,6 +11,11 @@
   margin-bottom: .65rem;
 }
 
+#search-dialog:has(.search-mode-switch[data-mode="luxy"]) .search-dialog__close {
+  align-self: start;
+  justify-self: end;
+}
+
 .luxy-mascot {
   display: none;
   grid-column: 1;
@@ -29,8 +34,9 @@
 .luxy-mascot__svg {
   display: block;
   width: 108px;
-  height: 92px;
   max-width: 100%;
+  height: auto;
+  aspect-ratio: 260 / 220;
   border: 0;
   pointer-events: none;
 }
