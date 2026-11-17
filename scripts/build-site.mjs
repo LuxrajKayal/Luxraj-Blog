@@ -24,6 +24,7 @@ const PARTIALS = {
   'ARTICLE-LAYOUT': path.join(PARTIAL_DIR, 'article-layout.html')
 };
 const NEWSLETTER_POPUP_PARTIAL = path.join(PARTIAL_DIR, 'newsletter-popup.html');
+const SEARCH_DIALOG_PARTIAL = path.join(PARTIAL_DIR, 'search-dialog.html');
 const STANDALONE_NEWSLETTER_PAGES = new Set([
   'newsletter-thank-you.html'
 ]);
@@ -338,8 +339,30 @@ function expandSharedComponents(sourceHtml, relativeFile, partialContents) {
   }
   html = injectFooterStylesheet(html, rootPrefix, relativeFile);
   html = injectNewsletterPlaceholder(html, relativeFile);
+  html = injectSearchDialog(html, partialContents.SEARCH_DIALOG, rootPrefix, relativeFile);
   validateBuiltPage(html, relativeFile, usesArticleLayout);
   return html;
+}
+
+
+function injectSearchDialog(html, searchDialogHtml, rootPrefix, relativeFile) {
+  const searchDialogExpression = /<dialog\\b[^>]*\\bid\\s*=\\s*([\"'])search-dialog\\1/gi;
+  const existingCount = countMatches(html, searchDialogExpression);
+  if (existingCount !== 0) {
+    throw new Error(relativeFile + ' already contains a Search dialog before shared dialog assembly.');
+  }
+
+  const bodyEnd = html.toLowerCase().lastIndexOf('</body>');
+  if (bodyEnd < 0) {
+    throw new Error(relativeFile + ' has no closing </body> tag for the shared Search dialog.');
+  }
+
+  const fragment = searchDialogHtml.replaceAll('{{ROOT}}', rootPrefix).trim();
+  if (!/<dialog\\b[^>]*\\bid\\s*=\\s*([\"'])search-dialog\\1/i.test(fragment)) {
+    throw new Error('The shared Search dialog partial is missing its expected dialog element.');
+  }
+
+  return html.slice(0, bodyEnd) + '\\n' + fragment + '\\n' + html.slice(bodyEnd);
 }
 
 function validateBuiltPage(html, relativeFile, usesArticleLayout = false) {
@@ -459,6 +482,7 @@ async function main() {
   }
 
   const newsletterPopupHtml = await readFile(NEWSLETTER_POPUP_PARTIAL, 'utf8');
+  partialContents.SEARCH_DIALOG = await readFile(SEARCH_DIALOG_PARTIAL, 'utf8');
 
   await rm(OUTPUT_DIR, { recursive: true, force: true });
   await mkdir(OUTPUT_DIR, { recursive: true });
