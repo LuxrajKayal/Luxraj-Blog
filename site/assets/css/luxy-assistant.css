@@ -46,6 +46,7 @@
   background-color: transparent !important;
   transform: translateY(-36px);
   pointer-events: none;
+  color-scheme: light;
 }
 
 /* Luxy fills the dialog space left below the shared top utility row. */
