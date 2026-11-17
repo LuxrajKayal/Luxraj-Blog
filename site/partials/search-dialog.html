@@ -61,7 +61,7 @@
 
       <label class="luxy-sidebar-backdrop" for="luxy-sidebar-toggle" aria-label="Close conversation history"></label>
 
-      <main class="luxy-chat" aria-label="Luxy conversation">
+      <div class="luxy-chat" role="region" aria-label="Luxy conversation">
         <div
           class="luxy-chat__messages"
           id="luxy-chat-messages"
@@ -69,6 +69,7 @@
           role="log"
           aria-live="polite"
           aria-relevant="additions"
+          aria-label="Conversation messages"
         ></div>
 
         <div class="luxy-chat__dock">
@@ -97,7 +98,7 @@
             </button>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   </section>
 
