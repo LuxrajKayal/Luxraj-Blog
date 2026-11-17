@@ -24,6 +24,7 @@ export function initSearch() {
   const dialog = document.querySelector("#search-dialog");
   const eyebrow = document.querySelector("#search-dialog-eyebrow");
   const title = document.querySelector("#search-dialog-title");
+  const dialogHeader = document.querySelector(".search-dialog__header");
   const generalView = document.querySelector("#general-search-view");
   const luxyView = document.querySelector("#luxy-search-view");
   const tagView = document.querySelector("#tag-search-view");
@@ -43,7 +44,7 @@ export function initSearch() {
   const tagCount = document.querySelector("#tag-search-result-count");
   const loadMore = document.querySelector("#tag-search-load-more");
 
-  if (!dialog || !eyebrow || !title || !generalView || !luxyView || !tagView ||
+  if (!dialog || !eyebrow || !title || !dialogHeader || !generalView || !luxyView || !tagView ||
       !modeSwitch || modeRadios.length !== 3 ||
       !form || !input || !category || !sort || !slider || !output ||
       !results || !count || !tagResults || !tagCount || !loadMore) return;
@@ -108,6 +109,7 @@ export function initSearch() {
     generalView.hidden = !generalMode;
     luxyView.hidden = !luxyMode;
     tagView.hidden = !tagMode;
+    dialogHeader.hidden = luxyMode;
 
     modeSwitch.dataset.mode = mode;
     modeRadios.forEach(radio => {
