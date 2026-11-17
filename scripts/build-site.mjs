@@ -346,7 +346,7 @@ function expandSharedComponents(sourceHtml, relativeFile, partialContents) {
 
 
 function injectSearchDialog(html, searchDialogHtml, rootPrefix, relativeFile) {
-  const searchDialogExpression = /<dialog\\b[^>]*\\bid\\s*=\\s*([\"'])search-dialog\\1/gi;
+  const searchDialogExpression = /<dialog\b[^>]*\bid\s*=\s*(["'])search-dialog\1/gi;
   const existingCount = countMatches(html, searchDialogExpression);
   if (existingCount !== 0) {
     throw new Error(relativeFile + ' already contains a Search dialog before shared dialog assembly.');
@@ -358,11 +358,11 @@ function injectSearchDialog(html, searchDialogHtml, rootPrefix, relativeFile) {
   }
 
   const fragment = searchDialogHtml.replaceAll('{{ROOT}}', rootPrefix).trim();
-  if (!/<dialog\\b[^>]*\\bid\\s*=\\s*([\"'])search-dialog\\1/i.test(fragment)) {
+  if (!/<dialog\b[^>]*\bid\s*=\s*(["'])search-dialog\1/i.test(fragment)) {
     throw new Error('The shared Search dialog partial is missing its expected dialog element.');
   }
 
-  return html.slice(0, bodyEnd) + '\\n' + fragment + '\\n' + html.slice(bodyEnd);
+  return html.slice(0, bodyEnd) + '\n' + fragment + '\n' + html.slice(bodyEnd);
 }
 
 function validateBuiltPage(html, relativeFile, usesArticleLayout = false) {
