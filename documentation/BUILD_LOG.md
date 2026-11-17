@@ -304,3 +304,64 @@ Append-only after implementation begins. Record real milestones only; do not pre
 ## 2026-11-06 — Verify topbar build and deployment
 
 - GitHub Actions completed the site build, artifact upload, and GitHub Pages deployment successfully for the topbar source change in commit `7cb58da06a36c1da571c124c804f7bc9135d26ca`.
+
+## 2026-11-18 — Diagnose and resolve the Luxy mascot white backdrop
+
+### Symptom
+
+- The Luxy Assistant search dialog displayed an unwanted white rectangular area behind the mascot while the surrounding interface was in dark mode.
+- The visible rectangle remained after the mascot SVG source was changed from the 80-mode master asset to the separate `Luxy-icon-small.svg` asset.
+- The issue was isolated to the mascot's external SVG embedding context; the final fix did not change the mascot artwork, the dialog surface, or the global theme palette.
+
+### Investigation and unsuccessful hypotheses
+
+1. **Reviewed the theme tokens and dialog surfaces.** `site/assets/css/tokens.css` sets the dark theme's `color-scheme: dark`, `--color-page: #171717`, `--color-surface: #262626`, and `--color-surface-raised: #303030`. `site/assets/css/search.css` uses the raised-surface token for the dialog. The utility row itself has no background declaration.
+2. **Reviewed the mascot wrapper and object styles.** In `site/assets/css/luxy-assistant.css`, `.luxy-mascot` has `background: transparent`; `.luxy-mascot__svg` (the HTML `object` element) has transparent background declarations, including `background-color: transparent !important`. No explicit white surface was found on these selectors.
+3. **Inspected the master SVG.** Its root SVG already declares a transparent background style. The file contains `pagecolor="#ffffff"` inside Inkscape's `sodipodi:namedview` metadata, which initially looked suspicious. The artwork also contains intentional white and cream fills, but no full-canvas white background shape was identified.
+4. **Isolated the external object.** A temporary test removed the embedded SVG while retaining the `.luxy-mascot` wrapper. The markup was then changed to use the existing small mascot SVG so the source asset could be compared while keeping the same object element and CSS class.
+5. **Compared the alternate SVG.** The user confirmed that the white rectangle remained with `Luxy-icon-small.svg`. This showed that the symptom was not exclusive to the master SVG artwork.
+6. **Tested the Inkscape-metadata theory.** In a reversible test, `Luxy-icon-small.svg` was changed from `pagecolor="#ffffff"` to `pagecolor="transparent"`, and an explicit transparent background style was added to its root SVG. The user confirmed that the white rectangle still remained. This ruled out that metadata change as the effective fix for this issue.
+7. **Reverted the unsuccessful tests.** The original master SVG reference and original SVG source were restored. The metadata test and alternate-asset changes were also reverted before the final CSS experiment.
+
+### Relevant browser and standards research
+
+- A close community reproduction was found in the Stack Overflow discussion [Why does `color-scheme: dark` cause `<object>`s to have white backgrounds in Chrome?](https://stackoverflow.com/questions/70352898/why-does-color-scheme-dark-cause-objects-to-have-white-backgrounds-in-chrom). The reported workaround was to set `color-scheme: light` on the embedded object.
+- A related browser report is recorded in [Mozilla Bugzilla issue 1979337](https://bugzilla.mozilla.org/show_bug.cgi?id=1979337), concerning dark color schemes and white backgrounds on embedded document elements.
+- The behavior is also relevant to the [CSS Color Adjustment Module Level 1](https://www.w3.org/TR/css-color-adjust-1/), which describes how color-scheme affects document and canvas rendering in embedded contexts.
+- These reports supplied a strong hypothesis, but the repository's own preview test was required to confirm it for Luxy.
+
+### Confirmed fix
+
+- Added one declaration to the existing base `.luxy-mascot__svg` rule in `site/assets/css/luxy-assistant.css`:
+
+      color-scheme: light;
+
+- This is applied to the HTML `object` element through its existing `.luxy-mascot__svg` class. It gives the embedded SVG its own light color-scheme context while the surrounding Luxraj page and dialog remain in dark mode.
+- No change was made to the global `:root[data-theme="dark"]` setting, the theme tokens, the dialog surface, the mascot SVG source, the markup, dimensions, grid placement, or responsive rules.
+- After the CSS-only test was deployed to the preview site, the user confirmed that the white rectangle disappeared. This is the successful, user-verified resolution.
+
+### Test and deployment record
+
+| Stage | Primary development commit | Preview commit | Result |
+|---|---|---|---|
+| Empty-wrapper isolation setup | `f542c1e` | `53b5f43` | Temporary test setup; wrapper retained |
+| Alternate small SVG test | `37d34ca` | `e141045` | White rectangle remained |
+| Restore original mascot markup | `d6127cd` | `18d4260` | Original master SVG reference restored |
+| SVG metadata transparency experiment | `f0eff4d` | `cf4b002` | White rectangle remained |
+| Revert metadata and alternate-SVG tests | `533733d` | `f911eaf` | Original SVG and markup restored |
+| Final color-scheme fix | `c7c7650` | `249de81` | User confirmed white rectangle disappeared |
+
+- The final CSS fix changed only `site/assets/css/luxy-assistant.css` on the development and preview branches.
+- The final development and preview repository trees were verified identical at `c53b0bffe81575b2a9ecdf0a610b0e3496e593f0`.
+- Preview GitHub Actions deployment run [#44154705678](https://github.com/LuxrajKayal/Luxraj-Blog-Preview/actions/runs/44154705678) completed successfully.
+- The production `Luxraj-Blog` `main` branch was not used for the implementation or visual test. This log entry is being added to production `main` separately as documentation only, by explicit owner approval.
+
+### Lessons and future reference
+
+- A transparent background on the HTML `object` and its wrapper does not, by itself, guarantee that the embedded SVG document's canvas will be transparent in every color-scheme context.
+- When an external SVG embedded with `<object>` shows a white rectangle in a dark interface, inspect the embedding element's `color-scheme` as well as the SVG source, metadata, and parent backgrounds.
+- Changing SVG artwork or editor metadata should not be the first response when the same symptom appears with multiple SVG files. Compare the common embedding path and theme context first.
+- Keep the global theme unchanged when only one embedded asset needs a different color-scheme context. The local `.luxy-mascot__svg { color-scheme: light; }` override solved this case without changing the rest of the interface.
+- Preserve each isolation test and rollback point. The alternate SVG and metadata experiments were useful for narrowing the cause, even though neither was the fix.
+
+- **Final status:** Resolved and visually confirmed by the project owner on the preview deployment. No production site code was changed as part of this documentation update.
