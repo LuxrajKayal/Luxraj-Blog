@@ -582,7 +582,8 @@
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-lg);
     transform: translateX(-105%);
-    transition: transform .2s ease;
+    visibility: hidden;
+    transition: transform .2s ease, visibility 0s linear .2s;
   }
 
   .luxy-sidebar__mobile-close {
@@ -613,6 +614,8 @@
 
   .luxy-sidebar-toggle:checked ~ .luxy-sidebar {
     transform: translateX(0);
+    visibility: visible;
+    transition: transform .2s ease, visibility 0s;
   }
 
   .luxy-sidebar-toggle:checked ~ .luxy-sidebar-backdrop {
