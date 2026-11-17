@@ -57,8 +57,19 @@
 </button>
  <button class="header-icon-button" type="button" data-theme-toggle aria-label="Switch to light theme" title="Switch to light theme"><svg data-theme-icon="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg data-theme-icon="moon" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="M20.5 15.2A8.6 8.6 0 0 1 8.8 3.5 8.7 8.7 0 1 0 20.5 15.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
  </div></header><dialog class="search-dialog" id="search-dialog" aria-labelledby="search-dialog-title">
+  <fieldset class="search-mode-switch" data-search-mode-switch data-mode="luxy">
+   <legend class="search-mode-switch__legend">Search mode</legend>
+   <input class="search-mode-switch__radio" type="radio" name="search-mode" id="search-mode-general" value="general">
+   <label class="search-mode-switch__label" for="search-mode-general">Normal Search</label>
+   <input class="search-mode-switch__radio" type="radio" name="search-mode" id="search-mode-luxy" value="luxy" checked>
+   <label class="search-mode-switch__label" for="search-mode-luxy">Luxy</label>
+   <input class="search-mode-switch__radio" type="radio" name="search-mode" id="search-mode-tag" value="tag">
+   <label class="search-mode-switch__label" for="search-mode-tag">Tag Search</label>
+   <span class="search-mode-switch__thumb" aria-hidden="true"></span>
+  </fieldset>
   <div class="search-dialog__header"><div><p class="eyebrow" id="search-dialog-eyebrow">LUXRAJ LIBRARY</p><h2 id="search-dialog-title">Search articles</h2></div><button class="search-dialog__close" type="button" data-search-close aria-label="Close search" title="Close search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
-  <section class="search-dialog__view" id="general-search-view" aria-label="General article search">
+  <section class="search-dialog__view" id="luxy-search-view" aria-label="Luxy Search Assistant"></section>
+  <section class="search-dialog__view" id="general-search-view" aria-label="General article search" hidden>
    <form class="search-form" id="search-form">
     <label class="search-field search-field--query" for="search-query">Search titles or keywords<input id="search-query" type="search" placeholder="Try “drone”, “AI”, or “Wi-Fi”" autocomplete="off"></label>
     <div class="search-controls"><label class="search-field" for="search-category-filter">Category<select id="search-category-filter"><option value="">All categories</option></select></label><label class="search-field" for="search-sort">Sort results<select id="search-sort"><option value="date-desc">Date: newest first</option><option value="date-asc">Date: oldest first</option><option value="category-asc">Category: A–Z</option><option value="title-asc">Article name: A–Z</option><option value="title-desc">Article name: Z–A</option></select></label></div>

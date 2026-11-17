@@ -25,7 +25,12 @@ export function initSearch() {
   const eyebrow = document.querySelector("#search-dialog-eyebrow");
   const title = document.querySelector("#search-dialog-title");
   const generalView = document.querySelector("#general-search-view");
+  const luxyView = document.querySelector("#luxy-search-view");
   const tagView = document.querySelector("#tag-search-view");
+  const modeSwitch = document.querySelector("[data-search-mode-switch]");
+  const modeRadios = modeSwitch
+    ? [...modeSwitch.querySelectorAll('input[name="search-mode"]')]
+    : [];
   const form = document.querySelector("#search-form");
   const input = document.querySelector("#search-query");
   const category = document.querySelector("#search-category-filter");
@@ -38,7 +43,8 @@ export function initSearch() {
   const tagCount = document.querySelector("#tag-search-result-count");
   const loadMore = document.querySelector("#tag-search-load-more");
 
-  if (!dialog || !eyebrow || !title || !generalView || !tagView ||
+  if (!dialog || !eyebrow || !title || !generalView || !luxyView || !tagView ||
+      !modeSwitch || modeRadios.length !== 3 ||
       !form || !input || !category || !sort || !slider || !output ||
       !results || !count || !tagResults || !tagCount || !loadMore) return;
 
@@ -95,11 +101,29 @@ export function initSearch() {
   };
 
   function setMode(mode) {
+    const generalMode = mode === "general";
+    const luxyMode = mode === "luxy";
     const tagMode = mode === "tag";
-    generalView.hidden = tagMode;
+
+    generalView.hidden = !generalMode;
+    luxyView.hidden = !luxyMode;
     tagView.hidden = !tagMode;
-    eyebrow.textContent = tagMode ? "TAG SEARCH" : "LUXRAJ LIBRARY";
-    title.textContent = tagMode ? tagState.tagName : "Search articles";
+
+    modeSwitch.dataset.mode = mode;
+    modeRadios.forEach(radio => {
+      radio.checked = radio.value === mode;
+    });
+
+    if (tagMode) {
+      eyebrow.textContent = "TAG SEARCH";
+      title.textContent = tagState.tagName || "Tag Search";
+    } else if (luxyMode) {
+      eyebrow.textContent = "LUXY SEARCH";
+      title.textContent = "Luxy Assistant";
+    } else {
+      eyebrow.textContent = "LUXRAJ LIBRARY";
+      title.textContent = "Search articles";
+    }
   }
 
   function openDialog() {
@@ -130,17 +154,28 @@ export function initSearch() {
   document.querySelectorAll("[data-search-open]").forEach(button => button.addEventListener("click", () => {
     lastTrigger = button;
     tagState.boxId = null;
-    setMode("general");
-    openDialog();
+    tagState.tagName = "";
+    tagState.articles = [];
+    tagState.visibleCount = 0;
+    setMode("luxy");
     renderGeneralSearch();
-    input.focus();
+    openDialog();
   }));
 
   document.querySelector("[data-search-close]")?.addEventListener("click", () => dialog.close());
   dialog.addEventListener("click", event => { if (event.target === dialog) dialog.close(); });
   dialog.addEventListener("close", () => {
-    setMode("general");
+    setMode("luxy");
     lastTrigger?.focus();
+  });
+
+  modeSwitch.addEventListener("change", event => {
+    const radio = event.target;
+    if (!modeRadios.includes(radio)) return;
+
+    setMode(radio.value);
+    if (radio.value === "general") renderGeneralSearch();
+    if (radio.value === "tag") renderTagSearch();
   });
 
   form.addEventListener("submit", event => { event.preventDefault(); renderGeneralSearch(); });
