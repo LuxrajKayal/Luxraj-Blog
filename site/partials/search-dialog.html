@@ -1,6 +1,6 @@
 <dialog class="search-dialog" id="search-dialog" aria-labelledby="search-dialog-title">
-  <div class="search-dialog__utility-row"><button class="search-dialog__close" type="button" data-search-close aria-label="Close search" title="Close search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
-  <fieldset class="search-mode-switch" data-search-mode-switch data-mode="luxy">
+  <div class="search-dialog__utility-row">
+    <fieldset class="search-mode-switch" data-search-mode-switch data-mode="luxy">
    <legend class="search-mode-switch__legend">Search mode</legend>
    <input class="search-mode-switch__radio" type="radio" name="search-mode" id="search-mode-general" value="general">
    <label class="search-mode-switch__label" for="search-mode-general">Normal Search</label>
@@ -10,6 +10,8 @@
    <label class="search-mode-switch__label" for="search-mode-tag">Tag Search</label>
    <span class="search-mode-switch__thumb" aria-hidden="true"></span>
   </fieldset>
+    <button class="search-dialog__close" type="button" data-search-close aria-label="Close search" title="Close search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  </div>
   <div class="search-dialog__header"><div><p class="eyebrow" id="search-dialog-eyebrow">LUXRAJ LIBRARY</p><h2 id="search-dialog-title">Search articles</h2></div></div>
   <section class="search-dialog__view" id="luxy-search-view" aria-label="Luxy Search Assistant"></section>
   <section class="search-dialog__view" id="general-search-view" aria-label="General article search" hidden>
