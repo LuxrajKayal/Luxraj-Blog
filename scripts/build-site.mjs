@@ -124,57 +124,6 @@ function pageRootPrefix(html, relativeFile) {
   return '../'.repeat(directory.split('/').filter(Boolean).length);
 }
 
-/*
- * Ensure every populated public HTML document has a stable page-identity
- * placeholder. Existing manually assigned IDs are preserved unchanged.
- * The placeholder is added to the generated document only; assigning a
- * permanent ID later means adding its value to the source page.
- */
-function ensurePageIdMeta(html, relativeFile) {
-  const pageIdMetaExpression =
-    /<meta\b(?=[^>]*\bname\s*=\s*(["'])luxraj:page-id\1)[^>]*>/gi;
-  const matches = Array.from(html.matchAll(pageIdMetaExpression));
-
-  if (matches.length > 1) {
-    throw new Error(relativeFile + ' must contain at most one luxraj:page-id meta tag; found ' + matches.length + '.');
-  }
-
-  const headStart = /<head\b[^>]*>/i.exec(html);
-  const headClose = headStart
-    ? /<\/head\s*>/i.exec(html.slice(headStart.index + headStart[0].length))
-    : null;
-
-  if (!headStart || !headClose) {
-    throw new Error(relativeFile + ' has no complete <head> element for page-ID metadata.');
-  }
-
-  const headContentStart = headStart.index + headStart[0].length;
-  const headContentEnd = headContentStart + headClose.index;
-
-  if (matches.length === 1) {
-    const existing = matches[0];
-    const existingEnd = existing.index + existing[0].length;
-
-    if (existing.index < headContentStart || existingEnd > headContentEnd) {
-      throw new Error(relativeFile + ' has its luxraj:page-id meta tag outside the <head> element.');
-    }
-
-    const contentAttribute = /\bcontent\s*=\s*(["'])(.*?)\1/i.exec(existing[0]);
-    if (!contentAttribute || !contentAttribute[2].trim()) {
-      throw new Error(relativeFile + ' has a luxraj:page-id meta tag without a non-empty content value.');
-    }
-
-    return { html, injected: false };
-  }
-
-  const placeholder = '  <meta name="luxraj:page-id" content="{{PAGE_ID}}">\n';
-  const insertionPoint = headStart.index + headStart[0].length;
-  return {
-    html: html.slice(0, insertionPoint) + '\n' + placeholder + html.slice(insertionPoint),
-    injected: true
-  };
-}
-
 function injectFaviconLinks(html, rootPrefix, relativeFile) {
   const headEnd = html.toLowerCase().lastIndexOf('</head>');
   if (headEnd < 0) {
@@ -489,12 +438,6 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
       throw new Error(normalizedRelativePath + ' is non-empty HTML but has no <body> element.');
     }
 
-    // Ensure page identity metadata before branching into standalone-page handling.
-    const pageIdResult = ensurePageIdMeta(sourceHtml, normalizedRelativePath);
-    sourceHtml = pageIdResult.html;
-    if (pageIdResult.injected) stats.pageIdMetaInjected += 1;
-    else stats.pageIdMetaPreserved += 1;
-
     // Inject one consistent icon set into every populated page, including standalone pages.
     // pageRootPrefix keeps URLs correct from nested article/category routes.
     const faviconRootPrefix = pageRootPrefix(sourceHtml, normalizedRelativePath);
@@ -555,23 +498,14 @@ async function main() {
   await mkdir(path.dirname(newsletterAssetPath), { recursive: true });
   await writeFile(newsletterAssetPath, newsletterPopupHtml, 'utf8');
 
-  const stats = {
-    builtPages: 0,
-    emptyPlaceholders: 0,
-    standalonePages: 0,
-    pageIdMetaInjected: 0,
-    pageIdMetaPreserved: 0
-  };
+  const stats = { builtPages: 0, emptyPlaceholders: 0, standalonePages: 0 };
   await walkAndBuild(SITE_DIR, '', partialContents, stats);
   await writeFile(path.join(OUTPUT_DIR, '.nojekyll'), '', 'utf8');
 
   console.log(
     'Built _site/: assembled and verified shared components on ' +
     stats.builtPages + ' populated HTML pages; copied ' +
-    stats.standalonePages + ' standalone HTML pages; ensured page-ID metadata on ' +
-    (stats.pageIdMetaInjected + stats.pageIdMetaPreserved) + ' populated HTML pages (' +
-    stats.pageIdMetaInjected + ' placeholders injected; ' + stats.pageIdMetaPreserved +
-    ' existing values preserved); left ' +
+    stats.standalonePages + ' standalone HTML pages; left ' +
     stats.emptyPlaceholders + ' empty HTML placeholders unchanged.'
   );
 }
