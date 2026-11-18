@@ -1,0 +1,1822 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 260 220"
+   width="260"
+   height="220"
+   role="img"
+   aria-labelledby="luxy-title"
+   version="1.1"
+   id="luxy-master-80"
+   class="mode-happy"
+   style="background-color: transparent;"
+   sodipodi:docname="luxy-master-80.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview78"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.2863636"
+     inkscape:cx="130.11928"
+     inkscape:cy="144.99006"
+     inkscape:window-width="1366"
+     inkscape:window-height="705"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="luxy-master-80" />
+  <title
+     id="luxy-title">Luxy -  80-Mode Search Engine Mascot</title>
+  <defs
+     id="defs1">
+    <style
+       id="style1">
+      .luxy-cap, .luxy-eyes, .luxy-mouth, .luxy-prop { display: none; }
+
+      svg.mode-happy #cap-default, svg.mode-happy #eyes-default, svg.mode-happy #mouth-default { display: inline; }
+      svg.mode-coding #cap-coding, svg.mode-coding #eyes-coding, svg.mode-coding #mouth-coding { display: inline; }
+      svg.mode-analysis #cap-analysis, svg.mode-analysis #eyes-analysis, svg.mode-analysis #mouth-analysis { display: inline; }
+      svg.mode-read #cap-read, svg.mode-read #eyes-read, svg.mode-read #mouth-default { display: inline; }
+      svg.mode-write #cap-write, svg.mode-write #eyes-default, svg.mode-write #mouth-default { display: inline; }
+      svg.mode-sad #cap-sad, svg.mode-sad #eyes-sad, svg.mode-sad #mouth-sad, svg.mode-sad #prop-sad { display: inline; }
+      svg.mode-broken #cap-broken, svg.mode-broken #eyes-broken, svg.mode-broken #mouth-broken, svg.mode-broken #prop-broken { display: inline; }
+      svg.mode-search #cap-default, svg.mode-search #eyes-default, svg.mode-search #mouth-default, svg.mode-search #prop-mag { display: inline; }
+      svg.mode-creative #cap-creative, svg.mode-creative #eyes-creative, svg.mode-creative #mouth-default { display: inline; }
+      svg.mode-science #cap-science, svg.mode-science #eyes-analysis, svg.mode-science #mouth-coding, svg.mode-science #prop-flask { display: inline; }
+      svg.mode-finance #cap-finance, svg.mode-finance #eyes-coding, svg.mode-finance #mouth-coding { display: inline; }
+      svg.mode-history #cap-history, svg.mode-history #eyes-read, svg.mode-history #mouth-analysis { display: inline; }
+      svg.mode-music #cap-music, svg.mode-music #eyes-default, svg.mode-music #mouth-default { display: inline; }
+      svg.mode-gaming #cap-gaming, svg.mode-gaming #eyes-coding, svg.mode-gaming #mouth-coding { display: inline; }
+      svg.mode-security #cap-security, svg.mode-security #eyes-analysis, svg.mode-security #mouth-analysis { display: inline; }
+      svg.mode-travel #cap-travel, svg.mode-travel #eyes-default, svg.mode-travel #mouth-default { display: inline; }
+      svg.mode-weather #cap-weather, svg.mode-weather #eyes-sad, svg.mode-weather #mouth-default { display: inline; }
+      svg.mode-chef #cap-chef, svg.mode-chef #eyes-default, svg.mode-chef #mouth-default { display: inline; }
+      svg.mode-sports #cap-sports, svg.mode-sports #eyes-default, svg.mode-sports #mouth-default { display: inline; }
+      svg.mode-medicine #cap-medicine, svg.mode-medicine #eyes-default, svg.mode-medicine #mouth-default { display: inline; }
+      svg.mode-law #cap-law, svg.mode-law #eyes-analysis, svg.mode-law #mouth-coding { display: inline; }
+      svg.mode-astronomy #cap-astronomy, svg.mode-astronomy #eyes-creative, svg.mode-astronomy #mouth-default { display: inline; }
+      svg.mode-philosophy #cap-philosophy, svg.mode-philosophy #eyes-read, svg.mode-philosophy #mouth-analysis { display: inline; }
+      svg.mode-environment #cap-environment, svg.mode-environment #eyes-default, svg.mode-environment #mouth-default { display: inline; }
+      svg.mode-ai-core #cap-ai, svg.mode-ai-core #eyes-coding, svg.mode-ai-core #mouth-coding { display: inline; }
+      svg.mode-magic #cap-magic, svg.mode-magic #eyes-magic, svg.mode-magic #mouth-analysis, svg.mode-magic #prop-wand { display: inline; }
+      svg.mode-speed #cap-speed, svg.mode-speed #eyes-coding, svg.mode-speed #mouth-coding { display: inline; }
+      svg.mode-sleep #cap-sleep, svg.mode-sleep #eyes-sad, svg.mode-sleep #mouth-sad, svg.mode-sleep #prop-zzz { display: inline; }
+      svg.mode-celebration #cap-party, svg.mode-celebration #eyes-default, svg.mode-celebration #mouth-default { display: inline; }
+      svg.mode-mystery #cap-mystery, svg.mode-mystery #eyes-analysis, svg.mode-mystery #mouth-analysis { display: inline; }
+      svg.mode-phone #cap-phone, svg.mode-phone #eyes-coding, svg.mode-phone #mouth-default { display: inline; }
+      svg.mode-drone #cap-drone, svg.mode-drone #eyes-analysis, svg.mode-drone #mouth-coding { display: inline; }
+      svg.mode-howto #cap-howto, svg.mode-howto #eyes-default, svg.mode-howto #mouth-default { display: inline; }
+      svg.mode-engineer #cap-engineer, svg.mode-engineer #eyes-analysis, svg.mode-engineer #mouth-analysis { display: inline; }
+      svg.mode-tech-news #cap-technews, svg.mode-tech-news #eyes-default, svg.mode-tech-news #mouth-default { display: inline; }
+      svg.mode-hardware #cap-hardware, svg.mode-hardware #eyes-coding, svg.mode-hardware #mouth-coding { display: inline; }
+      svg.mode-software #cap-software, svg.mode-software #eyes-coding, svg.mode-software #mouth-coding { display: inline; }
+      svg.mode-laptop #cap-laptop, svg.mode-laptop #eyes-default, svg.mode-laptop #mouth-analysis { display: inline; }
+      svg.mode-file #cap-file, svg.mode-file #eyes-default, svg.mode-file #mouth-default { display: inline; }
+      svg.mode-vr-ar #cap-vr, svg.mode-vr-ar #mouth-default { display: inline; }
+      svg.mode-smart-home #cap-smarthome, svg.mode-smart-home #eyes-default, svg.mode-smart-home #mouth-default { display: inline; }
+      svg.mode-robotics #cap-robotics, svg.mode-robotics #eyes-coding, svg.mode-robotics #mouth-coding { display: inline; }
+      svg.mode-hacker #cap-hacker, svg.mode-hacker #eyes-coding, svg.mode-hacker #mouth-analysis { display: inline; }
+      svg.mode-server #cap-server, svg.mode-server #eyes-analysis, svg.mode-server #mouth-coding { display: inline; }
+      svg.mode-crypto #cap-crypto, svg.mode-crypto #eyes-coding, svg.mode-crypto #mouth-default { display: inline; }
+      svg.mode-ui-design #cap-uidesign, svg.mode-ui-design #eyes-creative, svg.mode-ui-design #mouth-default { display: inline; }
+      svg.mode-3d-model #cap-3d, svg.mode-3d-model #eyes-analysis, svg.mode-3d-model #mouth-coding { display: inline; }
+      svg.mode-math #cap-math, svg.mode-math #eyes-analysis, svg.mode-math #mouth-coding { display: inline; }
+      svg.mode-email #cap-email, svg.mode-email #eyes-default, svg.mode-email #mouth-default { display: inline; }
+      svg.mode-calendar #cap-calendar, svg.mode-calendar #eyes-default, svg.mode-calendar #mouth-default { display: inline; }
+      svg.mode-audio #cap-audio, svg.mode-audio #eyes-default, svg.mode-audio #mouth-default { display: inline; }
+      svg.mode-video #cap-video, svg.mode-video #eyes-creative, svg.mode-video #mouth-default { display: inline; }
+      svg.mode-ecommerce #cap-ecommerce, svg.mode-ecommerce #eyes-default, svg.mode-ecommerce #mouth-default { display: inline; }
+      svg.mode-delivery #cap-delivery, svg.mode-delivery #eyes-default, svg.mode-delivery #mouth-default { display: inline; }
+      svg.mode-fitness #cap-fitness, svg.mode-fitness #eyes-default, svg.mode-fitness #mouth-default { display: inline; }
+      svg.mode-yoga #cap-yoga, svg.mode-yoga #eyes-sad, svg.mode-yoga #mouth-default { display: inline; }
+      svg.mode-gaming-pro #cap-gamingpro, svg.mode-gaming-pro #eyes-coding, svg.mode-gaming-pro #mouth-coding { display: inline; }
+      svg.mode-automotive #cap-automotive, svg.mode-automotive #eyes-analysis, svg.mode-automotive #mouth-default { display: inline; }
+      svg.mode-aviation #cap-aviation, svg.mode-aviation #eyes-analysis, svg.mode-aviation #mouth-default { display: inline; }
+      svg.mode-nautical #cap-nautical, svg.mode-nautical #eyes-default, svg.mode-nautical #mouth-default { display: inline; }
+      svg.mode-botany #cap-botany, svg.mode-botany #eyes-default, svg.mode-botany #mouth-default { display: inline; }
+      svg.mode-baking #cap-baking, svg.mode-baking #eyes-default, svg.mode-baking #mouth-default { display: inline; }
+      svg.mode-literature #cap-literature, svg.mode-literature #eyes-read, svg.mode-literature #mouth-default { display: inline; }
+      svg.mode-language #cap-language, svg.mode-language #eyes-default, svg.mode-language #mouth-default { display: inline; }
+      svg.mode-chemistry #cap-chemistry, svg.mode-chemistry #eyes-analysis, svg.mode-chemistry #mouth-coding { display: inline; }
+      svg.mode-archaeology #cap-archaeology, svg.mode-archaeology #eyes-analysis, svg.mode-archaeology #mouth-analysis { display: inline; }
+      svg.mode-photography #cap-photography, svg.mode-photography #eyes-magic, svg.mode-photography #mouth-default { display: inline; }
+      svg.mode-social #cap-social, svg.mode-social #eyes-default, svg.mode-social #mouth-default { display: inline; }
+      svg.mode-podcast #cap-podcast, svg.mode-podcast #eyes-default, svg.mode-podcast #mouth-default { display: inline; }
+      svg.mode-support #cap-support, svg.mode-support #eyes-default, svg.mode-support #mouth-default { display: inline; }
+      svg.mode-qa-tester #cap-qatester, svg.mode-qa-tester #eyes-analysis, svg.mode-qa-tester #mouth-broken { display: inline; }
+      svg.mode-vip #cap-vip, svg.mode-vip #eyes-default, svg.mode-vip #mouth-default { display: inline; }
+      svg.mode-stealth #cap-stealth, svg.mode-stealth #eyes-sad, svg.mode-stealth #mouth-coding { display: inline; }
+      svg.mode-beta #cap-beta, svg.mode-beta #eyes-broken, svg.mode-beta #mouth-broken { display: inline; }
+      svg.mode-startup #cap-startup, svg.mode-startup #eyes-creative, svg.mode-startup #mouth-default { display: inline; }
+      svg.mode-legacy #cap-legacy, svg.mode-legacy #eyes-sad, svg.mode-legacy #mouth-sad { display: inline; }
+      svg.mode-sync #cap-sync, svg.mode-sync #eyes-coding, svg.mode-sync #mouth-default { display: inline; }
+      svg.mode-battery-low #cap-battery, svg.mode-battery-low #eyes-sad, svg.mode-battery-low #mouth-sad, svg.mode-battery-low #prop-lowbattery { display: inline; }
+      svg.mode-virus #cap-virus, svg.mode-virus #eyes-broken, svg.mode-virus #mouth-broken, svg.mode-virus #prop-warning { display: inline; }
+      svg.mode-god-mode #cap-god, svg.mode-god-mode #eyes-god, svg.mode-god-mode #mouth-default { display: inline; }
+    </style>
+  </defs>
+  <ellipse
+     cx="130"
+     cy="202"
+     rx="68"
+     ry="11"
+     fill="rgba(45, 35, 46, 0.12)"
+     id="ellipse1" />
+  <g
+     id="g5">
+    <circle
+       cx="66"
+       cy="96"
+       r="16"
+       fill="#FFE5F1"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="circle1" />
+    <circle
+       cx="194"
+       cy="96"
+       r="16"
+       fill="#FFE5F1"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="circle2" />
+    <path
+       d="M 55 148 C 50 92, 82 55, 130 55 C 178 55, 210 92, 205 148 C 202 184, 182 196, 130 196 C 78 196, 58 184, 55 148 Z"
+       fill="#FFFDF9"
+       stroke="#2D232E"
+       stroke-width="5"
+       stroke-linejoin="round"
+       id="path2" />
+    <path
+       d="M 65 168 C 78 190, 182 190, 195 168 C 190 188, 172 193, 130 193 C 88 193, 70 188, 65 168 Z"
+       fill="#F7F1E5"
+       id="path3" />
+    <ellipse
+       cx="82"
+       cy="128"
+       rx="12"
+       ry="7"
+       fill="#FF7EB6"
+       opacity="0.65"
+       id="ellipse3" />
+    <ellipse
+       cx="178"
+       cy="128"
+       rx="12"
+       ry="7"
+       fill="#FF7EB6"
+       opacity="0.65"
+       id="ellipse4" />
+    <circle
+       cx="94"
+       cy="162"
+       r="11"
+       fill="#FFFDF9"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle4" />
+    <circle
+       cx="166"
+       cy="162"
+       r="11"
+       fill="#FFFDF9"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle5" />
+  </g>
+  <g
+     id="cap-default"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 88 64 C 88 36, 172 36, 172 64 Z"
+       fill="#38BDF8"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path5" />
+    <path
+       d="M 80 63 Q 130 74 180 63 Q 186 56 172 58 L 88 58 Q 74 56 80 63 Z"
+       fill="#2D232E"
+       id="path6" />
+    <rect
+       x="108"
+       y="41"
+       width="44"
+       height="15"
+       rx="7.5"
+       fill="#FFD166"
+       stroke="#2D232E"
+       stroke-width="2.5"
+       id="rect6" />
+    <text
+       x="130"
+       y="51.5"
+       text-anchor="middle"
+       font-size="12px"
+       font-weight="700"
+       fill="#2D232E"
+       id="text6">LUXY</text>
+  </g>
+  <!-- Coding cap strictly avoiding unescaped entities by drawing the brackets -->
+  <g
+     id="cap-coding"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 84 65 C 84 32, 176 32, 176 65 Z"
+       fill="#1E293B"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path7" />
+    <path
+       d="M 124 45 L 117 50 L 124 55 M 128 58 L 133 42 M 137 45 L 144 50 L 137 55"
+       fill="none"
+       stroke="#34D399"
+       stroke-width="2"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       id="path8" />
+  </g>
+  <g
+     id="cap-analysis"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 88 62 C 88 38, 172 38, 172 62 Z"
+       fill="#78350F"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path9" />
+    <path
+       d="M 72 61 Q 130 70 188 61 Q 194 54 178 56 L 82 56 Q 66 54 72 61 Z"
+       fill="#451A03"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="path10" />
+  </g>
+  <g
+     id="cap-read"
+     class="luxy-cap"
+     transform="translate(0, -6)">
+    <polygon
+       points="130,30 196,50 130,70 64,50"
+       fill="#312E81"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="polygon10" />
+    <path
+       d="M 98 59 L 98 78 C 98 84, 162 84, 162 78 L 162 59 Z"
+       fill="#4338CA"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="path11" />
+  </g>
+  <g
+     id="cap-write"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 82 62 C 82 35, 178 35, 178 62 Z"
+       fill="#334155"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path12" />
+    <rect
+       x="135"
+       y="42"
+       width="22"
+       height="15"
+       rx="2"
+       fill="#FFFFFF"
+       stroke="#2D232E"
+       stroke-width="2"
+       id="rect12" />
+  </g>
+  <g
+     id="cap-sad"
+     class="luxy-cap"
+     transform="translate(0, -3) rotate(-5 130 50)">
+    <path
+       d="M 88 64 C 88 36, 172 36, 172 64 Z"
+       fill="#94A3B8"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path13" />
+  </g>
+  <g
+     id="cap-broken"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 84 64 C 84 34, 176 34, 176 64 Z"
+       fill="#F59E0B"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path14" />
+    <line
+       x1="110"
+       y1="42"
+       x2="120"
+       y2="58"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="line14" />
+    <line
+       x1="130"
+       y1="42"
+       x2="140"
+       y2="58"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="line15" />
+  </g>
+  <g
+     id="cap-creative"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <ellipse
+       cx="130"
+       cy="55"
+       rx="55"
+       ry="20"
+       fill="#EF4444"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="ellipse15" />
+  </g>
+  <g
+     id="cap-science"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <rect
+       x="95"
+       y="35"
+       width="70"
+       height="25"
+       rx="10"
+       fill="#E0F2FE"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect15" />
+  </g>
+  <g
+     id="cap-finance"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 75 55 Q 130 70 185 55 Q 195 45 175 45 L 85 45 Z"
+       fill="#22C55E"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="path15" />
+  </g>
+  <g
+     id="cap-history"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 84 62 C 84 35, 176 35, 176 62 Z"
+       fill="#92400E"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path16" />
+  </g>
+  <g
+     id="cap-music"
+     class="luxy-cap"
+     transform="translate(0, 0)">
+    <path
+       d="M 60 90 C 60 30, 200 30, 200 90"
+       fill="none"
+       stroke="#2D232E"
+       stroke-width="8"
+       id="path17" />
+    <rect
+       x="50"
+       y="80"
+       width="20"
+       height="40"
+       rx="10"
+       fill="#F43F5E"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect17" />
+    <rect
+       x="190"
+       y="80"
+       width="20"
+       height="40"
+       rx="10"
+       fill="#F43F5E"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect18" />
+  </g>
+  <g
+     id="cap-gaming"
+     class="luxy-cap"
+     transform="translate(0, 0)">
+    <path
+       d="M 65 90 C 65 40, 195 40, 195 90"
+       fill="none"
+       stroke="#2D232E"
+       stroke-width="6"
+       id="path18" />
+    <rect
+       x="55"
+       y="80"
+       width="25"
+       height="35"
+       rx="8"
+       fill="#10B981"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect19" />
+    <rect
+       x="180"
+       y="80"
+       width="25"
+       height="35"
+       rx="8"
+       fill="#10B981"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect20" />
+  </g>
+  <g
+     id="cap-security"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 82 62 C 82 35, 178 35, 178 62 Z"
+       fill="#1E3A8A"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path20" />
+    <polygon
+       points="130,35 140,45 130,55 120,45"
+       fill="#FBBF24"
+       stroke="#2D232E"
+       stroke-width="2"
+       id="polygon20" />
+  </g>
+  <g
+     id="cap-travel"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 60 62 Q 130 50 200 62 Z"
+       fill="#D97706"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path21" />
+  </g>
+  <g
+     id="cap-weather"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 90 60 C 90 40, 110 30, 130 30 C 150 30, 170 40, 170 60 Z"
+       fill="#E0F2FE"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path22" />
+  </g>
+  <g
+     id="cap-chef"
+     class="luxy-cap"
+     transform="translate(0, -25)">
+    <path
+       d="M 95 85 L 90 40 C 90 20, 110 10, 130 10 C 150 10, 170 20, 170 40 L 165 85 Z"
+       fill="#FFFFFF"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path23" />
+  </g>
+  <g
+     id="cap-sports"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 88 64 C 88 36, 172 36, 172 64 Z"
+       fill="#EF4444"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path24" />
+  </g>
+  <g
+     id="cap-medicine"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 88 64 C 88 36, 172 36, 172 64 Z"
+       fill="#F8FAFC"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path25" />
+    <rect
+       x="122"
+       y="42"
+       width="16"
+       height="16"
+       fill="#EF4444"
+       id="rect25" />
+  </g>
+  <g
+     id="cap-law"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 75 75 C 75 30, 185 30, 185 75 Z"
+       fill="#F1F5F9"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="path26" />
+  </g>
+  <g
+     id="cap-astronomy"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 84 65 C 84 32, 176 32, 176 65 Z"
+       fill="#1E1B4B"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path27" />
+  </g>
+  <g
+     id="cap-philosophy"
+     class="luxy-cap"
+     transform="translate(0, 0)">
+    <path
+       d="M 70 65 Q 130 50 190 65"
+       fill="none"
+       stroke="#22C55E"
+       stroke-width="6"
+       id="path28" />
+  </g>
+  <g
+     id="cap-environment"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 130 55 Q 125 35 115 35 Q 130 35 130 55"
+       fill="#22C55E"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="path29" />
+  </g>
+  <g
+     id="cap-ai"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <rect
+       x="75"
+       y="45"
+       width="110"
+       height="20"
+       rx="4"
+       fill="#0F172A"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect29" />
+  </g>
+  <g
+     id="cap-magic"
+     class="luxy-cap"
+     transform="translate(0, -40)">
+    <polygon
+       points="130,0 170,80 90,80"
+       fill="#6B21A8"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="polygon29" />
+  </g>
+  <g
+     id="cap-speed"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <rect
+       x="70"
+       y="50"
+       width="120"
+       height="15"
+       fill="#EF4444"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="rect30" />
+  </g>
+  <g
+     id="cap-sleep"
+     class="luxy-cap"
+     transform="translate(0, -20)">
+    <path
+       d="M 85 80 C 85 50, 110 30, 150 40 C 180 45, 200 70, 200 90 Z"
+       fill="#38BDF8"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path30" />
+  </g>
+  <g
+     id="cap-party"
+     class="luxy-cap"
+     transform="translate(0, -30)">
+    <polygon
+       points="130,10 160,70 100,70"
+       fill="#F472B6"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="polygon30" />
+  </g>
+  <g
+     id="cap-mystery"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 82 62 C 82 35, 178 35, 178 62 Z"
+       fill="#374151"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path31" />
+    <text
+       x="130"
+       y="58"
+       text-anchor="middle"
+       font-size="22px"
+       font-weight="900"
+       fill="#FBBF24"
+       id="text31">?</text>
+  </g>
+  <g
+     id="cap-phone"
+     class="luxy-cap"
+     transform="translate(0, -10)">
+    <rect
+       x="100"
+       y="10"
+       width="60"
+       height="55"
+       rx="8"
+       fill="#1E293B"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="rect31" />
+    <circle
+       cx="115"
+       cy="25"
+       r="3"
+       fill="#64748B"
+       id="circle31" />
+  </g>
+  <g
+     id="cap-drone"
+     class="luxy-cap"
+     transform="translate(0, -10)">
+    <path
+       d="M 90 65 C 90 45, 170 45, 170 65 Z"
+       fill="#94A3B8"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path32" />
+    <ellipse
+       cx="130"
+       cy="25"
+       rx="30"
+       ry="4"
+       fill="#CBD5E1"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="ellipse32" />
+  </g>
+  <g
+     id="cap-howto"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="90"
+       y="30"
+       width="80"
+       height="40"
+       rx="4"
+       fill="#3B82F6"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect32" />
+    <text
+       x="130"
+       y="55"
+       text-anchor="middle"
+       font-size="16px"
+       font-weight="900"
+       fill="#FFFFFF"
+       id="text32">?</text>
+  </g>
+  <g
+     id="cap-engineer"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 84 64 C 84 34, 176 34, 176 64 Z"
+       fill="#FACC15"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path33" />
+  </g>
+  <g
+     id="cap-technews"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 75 62 C 75 35, 185 35, 185 62 Z"
+       fill="#64748B"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path34" />
+    <rect
+       x="110"
+       y="42"
+       width="40"
+       height="14"
+       fill="#EF4444"
+       stroke="#2D232E"
+       stroke-width="2"
+       id="rect34" />
+  </g>
+  <g
+     id="cap-hardware"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <path
+       d="M 80 65 L 80 40 C 80 35, 85 30, 90 30 L 170 30 Z"
+       fill="#15803D"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path35" />
+  </g>
+  <g
+     id="cap-software"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <rect
+       x="75"
+       y="48"
+       width="110"
+       height="18"
+       fill="#3B82F6"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect35" />
+  </g>
+  <g
+     id="cap-laptop"
+     class="luxy-cap"
+     transform="translate(0, -8)">
+    <polygon
+       points="70,65 190,65 170,30 90,30"
+       fill="#CBD5E1"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="polygon35" />
+  </g>
+  <g
+     id="cap-file"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <path
+       d="M 80 65 L 80 35 L 110 35 L 120 45 L 180 45 Z"
+       fill="#FDE047"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path36" />
+  </g>
+  <g
+     id="cap-vr"
+     class="luxy-cap"
+     transform="translate(0, 0)">
+    <rect
+       x="75"
+       y="90"
+       width="110"
+       height="40"
+       rx="10"
+       fill="#F8FAFC"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="rect36" />
+  </g>
+  <g
+     id="cap-smarthome"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <polygon
+       points="130,25 170,50 90,50"
+       fill="#EC4899"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="polygon36" />
+  </g>
+  <g
+     id="cap-robotics"
+     class="luxy-cap"
+     transform="translate(0, -10)">
+    <rect
+       x="110"
+       y="25"
+       width="40"
+       height="35"
+       fill="#94A3B8"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect37" />
+    <line
+       x1="130"
+       y1="25"
+       x2="130"
+       y2="10"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="line37" />
+    <circle
+       cx="130"
+       cy="8"
+       r="4"
+       fill="#EF4444"
+       id="circle37" />
+  </g>
+  <g
+     id="cap-hacker"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <path
+       d="M 75 65 C 75 35, 185 35, 185 65 Z"
+       fill="#0F172A"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path37" />
+  </g>
+  <g
+     id="cap-server"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="90"
+       y="30"
+       width="80"
+       height="35"
+       fill="#334155"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect38" />
+    <circle
+       cx="105"
+       cy="40"
+       r="3"
+       fill="#22C55E"
+       id="circle38" />
+    <circle
+       cx="105"
+       cy="52"
+       r="3"
+       fill="#22C55E"
+       id="circle39" />
+  </g>
+  <g
+     id="cap-crypto"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <circle
+       cx="130"
+       cy="45"
+       r="18"
+       fill="#F59E0B"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle40" />
+    <path
+       d="M 125 35 L 125 55 M 125 35 Q 135 35 135 45 Q 125 45 125 45 M 125 45 Q 138 45 138 55 Q 125 55 125 55 M 122 32 L 122 58 M 128 32 L 128 58"
+       fill="none"
+       stroke="#FFFFFF"
+       stroke-width="2"
+       id="path40" />
+  </g>
+  <g
+     id="cap-uidesign"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="90"
+       y="30"
+       width="80"
+       height="35"
+       rx="6"
+       fill="#F43F5E"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect40" />
+  </g>
+  <g
+     id="cap-3d"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <polygon
+       points="130,25 165,45 130,65 95,45"
+       fill="#06B6D4"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="polygon40" />
+  </g>
+  <g
+     id="cap-math"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="90"
+       y="30"
+       width="80"
+       height="35"
+       fill="#8B5CF6"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect41" />
+    <path
+       d="M 120 45 Q 125 40 140 45 M 125 45 L 125 60 M 135 45 L 135 60"
+       fill="none"
+       stroke="#FFFFFF"
+       stroke-width="3"
+       stroke-linecap="round"
+       id="path41" />
+  </g>
+  <g
+     id="cap-email"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <polygon
+       points="90,35 170,35 130,60"
+       fill="#FFFFFF"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="polygon41" />
+  </g>
+  <g
+     id="cap-calendar"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="95"
+       y="30"
+       width="70"
+       height="35"
+       fill="#EF4444"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect42" />
+  </g>
+  <g
+     id="cap-audio"
+     class="luxy-cap"
+     transform="translate(0, 0)">
+    <path
+       d="M 60 90 C 60 30, 200 30, 200 90"
+       fill="none"
+       stroke="#2D232E"
+       stroke-width="8"
+       id="path42" />
+  </g>
+  <g
+     id="cap-video"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="90"
+       y="30"
+       width="80"
+       height="35"
+       fill="#0F172A"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect43" />
+    <polygon
+       points="120,40 120,55 145,47"
+       fill="#FACC15"
+       id="polygon43" />
+  </g>
+  <g
+     id="cap-ecommerce"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="100"
+       y="35"
+       width="60"
+       height="30"
+       fill="#3B82F6"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect44" />
+  </g>
+  <g
+     id="cap-delivery"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="95"
+       y="35"
+       width="70"
+       height="30"
+       fill="#F97316"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect45" />
+  </g>
+  <g
+     id="cap-fitness"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <rect
+       x="75"
+       y="48"
+       width="110"
+       height="15"
+       fill="#10B981"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="rect46" />
+  </g>
+  <g
+     id="cap-yoga"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <circle
+       cx="130"
+       cy="45"
+       r="12"
+       fill="#A855F7"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="circle46" />
+  </g>
+  <g
+     id="cap-gamingpro"
+     class="luxy-cap"
+     transform="translate(0, 0)">
+    <path
+       d="M 65 90 C 65 40, 195 40, 195 90"
+       fill="none"
+       stroke="#EF4444"
+       stroke-width="6"
+       id="path46" />
+  </g>
+  <g
+     id="cap-automotive"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <path
+       d="M 90 50 Q 130 25 170 50 Z"
+       fill="#64748B"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="path47" />
+  </g>
+  <g
+     id="cap-aviation"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <path
+       d="M 80 50 L 130 30 L 180 50 Z"
+       fill="#0284C7"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="path48" />
+  </g>
+  <g
+     id="cap-nautical"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <path
+       d="M 85 55 C 85 35, 175 35, 175 55 Z"
+       fill="#FFFFFF"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path49" />
+  </g>
+  <g
+     id="cap-botany"
+     class="luxy-cap"
+     transform="translate(0, -10)">
+    <ellipse
+       cx="130"
+       cy="35"
+       rx="15"
+       ry="10"
+       fill="#22C55E"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="ellipse49" />
+  </g>
+  <g
+     id="cap-baking"
+     class="luxy-cap"
+     transform="translate(0, -25)">
+    <path
+       d="M 95 85 L 90 40 C 90 20, 110 10, 130 10 C 150 10, 170 20, 170 40 Z"
+       fill="#FEF08A"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path50" />
+  </g>
+  <g
+     id="cap-literature"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="90"
+       y="30"
+       width="80"
+       height="35"
+       fill="#78350F"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect50" />
+  </g>
+  <g
+     id="cap-language"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <circle
+       cx="130"
+       cy="45"
+       r="16"
+       fill="#0EA5E9"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle50" />
+  </g>
+  <g
+     id="cap-chemistry"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="95"
+       y="30"
+       width="70"
+       height="35"
+       rx="6"
+       fill="#E0F2FE"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect51" />
+  </g>
+  <g
+     id="cap-archaeology"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <path
+       d="M 82 62 C 82 35, 178 35, 178 62 Z"
+       fill="#B45309"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path51" />
+  </g>
+  <g
+     id="cap-photography"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <circle
+       cx="130"
+       cy="45"
+       r="18"
+       fill="#1E293B"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle51" />
+  </g>
+  <g
+     id="cap-social"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="95"
+       y="30"
+       width="70"
+       height="35"
+       rx="8"
+       fill="#EC4899"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect52" />
+  </g>
+  <g
+     id="cap-podcast"
+     class="luxy-cap"
+     transform="translate(0, -10)">
+    <circle
+       cx="130"
+       cy="35"
+       r="12"
+       fill="#64748B"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle52" />
+  </g>
+  <g
+     id="cap-support"
+     class="luxy-cap"
+     transform="translate(0, 0)">
+    <rect
+       x="55"
+       y="80"
+       width="25"
+       height="35"
+       rx="8"
+       fill="#3B82F6"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect53" />
+  </g>
+  <g
+     id="cap-qatester"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 84 64 C 84 34, 176 34, 176 64 Z"
+       fill="#14B8A6"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path53" />
+  </g>
+  <g
+     id="cap-vip"
+     class="luxy-cap"
+     transform="translate(0, -15)">
+    <polygon
+       points="130,15 160,45 100,45"
+       fill="#EAB308"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="polygon53" />
+  </g>
+  <g
+     id="cap-stealth"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 82 62 C 82 35, 178 35, 178 62 Z"
+       fill="#0F172A"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path54" />
+  </g>
+  <g
+     id="cap-beta"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <path
+       d="M 84 64 C 84 34, 176 34, 176 64 Z"
+       fill="#F97316"
+       stroke="#2D232E"
+       stroke-width="4.5"
+       id="path55" />
+  </g>
+  <g
+     id="cap-startup"
+     class="luxy-cap"
+     transform="translate(0, -10)">
+    <path
+       d="M 120 50 L 130 15 L 140 50 Z"
+       fill="#EF4444"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="path56" />
+  </g>
+  <g
+     id="cap-legacy"
+     class="luxy-cap"
+     transform="translate(0, -3)">
+    <rect
+       x="95"
+       y="30"
+       width="70"
+       height="35"
+       fill="#64748B"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect56" />
+  </g>
+  <g
+     id="cap-sync"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <circle
+       cx="130"
+       cy="45"
+       r="16"
+       fill="#3B82F6"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle56" />
+  </g>
+  <g
+     id="cap-battery"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <rect
+       x="105"
+       y="30"
+       width="50"
+       height="30"
+       rx="4"
+       fill="#EF4444"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect57" />
+  </g>
+  <g
+     id="cap-virus"
+     class="luxy-cap"
+     transform="translate(0, -5)">
+    <circle
+       cx="130"
+       cy="45"
+       r="16"
+       fill="#DC2626"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle57" />
+  </g>
+  <g
+     id="cap-god"
+     class="luxy-cap"
+     transform="translate(0, -20)">
+    <ellipse
+       cx="130"
+       cy="25"
+       rx="35"
+       ry="8"
+       fill="none"
+       stroke="#FFFFFF"
+       stroke-width="6"
+       id="ellipse57" />
+  </g>
+  <g
+     id="eyes-default"
+     class="luxy-eyes">
+    <g
+       transform="translate(98, 112)"
+       id="g59">
+      <circle
+         cx="0"
+         cy="0"
+         r="13.5"
+         fill="#2D232E"
+         id="circle58" />
+      <circle
+         cx="-4.5"
+         cy="-4.5"
+         r="4.8"
+         fill="#FFFFFF"
+         id="circle59" />
+    </g>
+    <g
+       transform="translate(162, 112)"
+       id="g61">
+      <circle
+         cx="0"
+         cy="0"
+         r="13.5"
+         fill="#2D232E"
+         id="circle60" />
+      <circle
+         cx="-4.5"
+         cy="-4.5"
+         r="4.8"
+         fill="#FFFFFF"
+         id="circle61" />
+    </g>
+  </g>
+  <g
+     id="eyes-coding"
+     class="luxy-eyes">
+    <rect
+       x="76"
+       y="94"
+       width="42"
+       height="36"
+       rx="6"
+       fill="rgba(56, 189, 248, 0.15)"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect61" />
+    <rect
+       x="142"
+       y="94"
+       width="42"
+       height="36"
+       rx="6"
+       fill="rgba(56, 189, 248, 0.15)"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="rect62" />
+    <g
+       transform="translate(98, 112)"
+       id="g63">
+      <circle
+         cx="0"
+         cy="0"
+         r="13.5"
+         fill="#2D232E"
+         id="circle62" />
+      <rect
+         x="-6"
+         y="-6"
+         width="6"
+         height="6"
+         rx="1"
+         fill="#34D399"
+         id="rect63" />
+    </g>
+    <g
+       transform="translate(162, 112)"
+       id="g64">
+      <circle
+         cx="0"
+         cy="0"
+         r="13.5"
+         fill="#2D232E"
+         id="circle63" />
+      <rect
+         x="-6"
+         y="-6"
+         width="6"
+         height="6"
+         rx="1"
+         fill="#34D399"
+         id="rect64" />
+    </g>
+  </g>
+  <g
+     id="eyes-analysis"
+     class="luxy-eyes">
+    <g
+       transform="translate(98, 112)"
+       id="g65">
+      <path
+         d="M -13 2 A 13.5 13.5 0 0 0 13 2 Z"
+         fill="#2D232E"
+         id="path64" />
+      <circle
+         cx="-3"
+         cy="-2"
+         r="3"
+         fill="#FFFFFF"
+         id="circle64" />
+    </g>
+    <g
+       transform="translate(162, 112)"
+       id="g66">
+      <circle
+         cx="0"
+         cy="0"
+         r="20"
+         fill="rgba(224, 242, 254, 0.6)"
+         stroke="#2D232E"
+         stroke-width="3"
+         id="circle65" />
+      <circle
+         cx="0"
+         cy="0"
+         r="13.5"
+         fill="#2D232E"
+         id="circle66" />
+    </g>
+  </g>
+  <g
+     id="eyes-read"
+     class="luxy-eyes">
+    <circle
+       cx="98"
+       cy="112"
+       r="18"
+       fill="rgba(224, 242, 254, 0.4)"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle67" />
+    <circle
+       cx="162"
+       cy="112"
+       r="18"
+       fill="rgba(224, 242, 254, 0.4)"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle68" />
+    <g
+       transform="translate(98, 112)"
+       id="g69">
+      <circle
+         cx="0"
+         cy="0"
+         r="10"
+         fill="#2D232E"
+         id="circle69" />
+    </g>
+    <g
+       transform="translate(162, 112)"
+       id="g70">
+      <circle
+         cx="0"
+         cy="0"
+         r="10"
+         fill="#2D232E"
+         id="circle70" />
+    </g>
+  </g>
+  <g
+     id="eyes-sad"
+     class="luxy-eyes">
+    <g
+       transform="translate(98, 114)"
+       id="g71">
+      <circle
+         cx="0"
+         cy="0"
+         r="12"
+         fill="#2D232E"
+         id="circle71" />
+    </g>
+    <g
+       transform="translate(162, 114)"
+       id="g72">
+      <circle
+         cx="0"
+         cy="0"
+         r="12"
+         fill="#2D232E"
+         id="circle72" />
+    </g>
+  </g>
+  <g
+     id="eyes-broken"
+     class="luxy-eyes">
+    <path
+       d="M 89 103 L 105 112 L 89 121"
+       fill="none"
+       stroke="#2D232E"
+       stroke-width="5"
+       stroke-linecap="round"
+       id="path72" />
+    <path
+       d="M 171 103 L 155 112 L 171 121"
+       fill="none"
+       stroke="#2D232E"
+       stroke-width="5"
+       stroke-linecap="round"
+       id="path73" />
+  </g>
+  <g
+     id="eyes-creative"
+     class="luxy-eyes">
+    <g
+       transform="translate(98, 112)"
+       id="g73">
+      <circle
+         cx="0"
+         cy="0"
+         r="13.5"
+         fill="#2D232E"
+         id="circle73" />
+      <polygon
+         points="0,-6 2,-2 6,-2 3,1 4,5 0,3 -4,5 -3,1 -6,-2 -2,-2"
+         fill="#FDE047"
+         id="polygon73" />
+    </g>
+    <g
+       transform="translate(162, 112)"
+       id="g74">
+      <circle
+         cx="0"
+         cy="0"
+         r="13.5"
+         fill="#2D232E"
+         id="circle74" />
+      <polygon
+         points="0,-6 2,-2 6,-2 3,1 4,5 0,3 -4,5 -3,1 -6,-2 -2,-2"
+         fill="#FDE047"
+         id="polygon74" />
+    </g>
+  </g>
+  <g
+     id="eyes-magic"
+     class="luxy-eyes">
+    <g
+       transform="translate(98, 112)"
+       id="g75">
+      <circle
+         cx="0"
+         cy="0"
+         r="13.5"
+         fill="#2D232E"
+         id="circle75" />
+    </g>
+    <path
+       d="M 152 112 Q 162 105 172 112"
+       fill="none"
+       stroke="#2D232E"
+       stroke-width="4"
+       stroke-linecap="round"
+       id="path75" />
+  </g>
+  <g
+     id="eyes-god"
+     class="luxy-eyes">
+    <circle
+       cx="98"
+       cy="112"
+       r="13.5"
+       fill="#FFFFFF"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="circle76" />
+    <circle
+       cx="162"
+       cy="112"
+       r="13.5"
+       fill="#FFFFFF"
+       stroke="#2D232E"
+       stroke-width="3"
+       id="circle77" />
+  </g>
+  <path
+     id="mouth-default"
+     class="luxy-mouth"
+     d="M 118 124 Q 124 132 130 124 Q 136 132 142 124"
+     fill="none"
+     stroke="#2D232E"
+     stroke-width="4"
+     stroke-linecap="round" />
+  <line
+     id="mouth-coding"
+     class="luxy-mouth"
+     x1="122"
+     y1="130"
+     x2="138"
+     y2="130"
+     stroke="#2D232E"
+     stroke-width="4"
+     stroke-linecap="round" />
+  <path
+     id="mouth-analysis"
+     class="luxy-mouth"
+     d="M 120 128 L 132 128 L 138 124"
+     fill="none"
+     stroke="#2D232E"
+     stroke-width="4"
+     stroke-linecap="round"
+     stroke-linejoin="round" />
+  <path
+     id="mouth-sad"
+     class="luxy-mouth"
+     d="M 118 134 Q 130 126 142 134"
+     fill="none"
+     stroke="#2D232E"
+     stroke-width="4"
+     stroke-linecap="round" />
+  <path
+     id="mouth-broken"
+     class="luxy-mouth"
+     d="M 116 128 L 122 123 L 128 128 L 134 123 L 140 128"
+     fill="none"
+     stroke="#2D232E"
+     stroke-width="4"
+     stroke-linecap="round"
+     stroke-linejoin="round" />
+  <g
+     id="prop-mag"
+     class="luxy-prop">
+    <line
+       x1="140"
+       y1="160"
+       x2="162"
+       y2="167"
+       stroke="#2D232E"
+       stroke-width="11"
+       stroke-linecap="round"
+       id="line77" />
+    <circle
+       cx="126"
+       cy="152"
+       r="17"
+       fill="#E0F2FE"
+       stroke="#2D232E"
+       stroke-width="4"
+       id="circle78" />
+  </g>
+  <path
+     id="prop-sad"
+     class="luxy-prop"
+     d="M 98 126 C 98 126, 104 135, 104 140 C 104 143, 101 146, 98 146 C 95 146, 92 143, 92 140 Z"
+     fill="#38BDF8"
+     stroke="#2D232E"
+     stroke-width="2" />
+  <path
+     id="prop-broken"
+     class="luxy-prop"
+     d="M 178 78 C 178 78, 188 88, 188 95 C 188 100, 183 105, 178 105 C 173 105, 168 100, 168 95 Z"
+     fill="#38BDF8"
+     stroke="#2D232E"
+     stroke-width="3" />
+  <g
+     id="prop-zzz"
+     class="luxy-prop">
+    <path
+       d="M 165 70 L 180 70 L 165 85 L 180 85"
+       fill="none"
+       stroke="#38BDF8"
+       stroke-width="3"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       id="path78" />
+  </g>
+  <g
+     id="prop-lowbattery"
+     class="luxy-prop">
+    <rect
+       x="110"
+       y="140"
+       width="40"
+       height="15"
+       fill="#EF4444"
+       stroke="#2D232E"
+       stroke-width="2"
+       id="rect78" />
+  </g>
+  <g
+     id="prop-warning"
+     class="luxy-prop">
+    <polygon
+       points="130,135 145,160 115,160"
+       fill="#FACC15"
+       stroke="#2D232E"
+       stroke-width="2"
+       id="polygon78" />
+  </g>
+  <metadata
+     id="metadata78">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Luxy -  80-Mode Search Engine Mascot</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Subrata Kayal</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Copyright © 2026 Subrata Kayal. All rights reserved. https://luxraj.com/ — https://blog.luxraj.com/</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:date>2026-11-17</dc:date>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>Subrata Kayal (Luxraj Kayal) , 	Luxraj (luxraj.com)</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:relation>Luxy - Luxraj Blog Search Engine</dc:relation>
+        <dc:language>en</dc:language>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>Luxy</rdf:li>
+            <rdf:li>Luxraj</rdf:li>
+            <rdf:li>mascot</rdf:li>
+            <rdf:li>search engine</rdf:li>
+            <rdf:li>SVG</rdf:li>
+            <rdf:li>vector illustration</rdf:li>
+            <rdf:li>80 modes</rdf:li>
+            <rdf:li>character design</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <dc:description>Original vector mascot artwork for the Luxy search engine developed by Subrata Kayal. Features a shared character design with 80 themed visual modes, interchangeable expressions, headwear and accessories for contextual interface states. 
+
+© 2026 Subrata Kayal. All Rights Reserved.
+
+This artwork, including its SVG source code, visual elements, character design, expressions, accessories, and mascot configurations, is the exclusive intellectual property of Subrata Kayal.
+
+**Unauthorized use is strictly prohibited.** Reproduction, copying, modification, redistribution, republishing, commercial use, or incorporation into other projects is not permitted without prior written permission from the copyright owner.
+
+No licence or permission to reuse, adapt, or distribute this artwork is granted by making it publicly accessible.
+
+Official websites: https://luxraj.com/ · https://blog.luxraj.com/</dc:description>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

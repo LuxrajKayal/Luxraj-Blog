@@ -1,0 +1,733 @@
+/*
+ * Luxy Assistant workspace
+ * Scope: Luxy mode only. Search mode controls and other search views remain in search.css.
+ * Content containers intentionally start empty; conversation and article data are supplied later.
+ */
+
+/* The shared dialog header is transformed only while Luxy mode is selected. */
+#search-dialog:has(.search-mode-switch[data-mode="luxy"]) .search-dialog__utility-row {
+  grid-template-columns: minmax(88px, 1fr) minmax(0, 440px) minmax(88px, 1fr);
+  align-items: start;
+  min-height: 184px;
+  margin-bottom: .65rem;
+}
+
+#search-dialog:has(.search-mode-switch[data-mode="luxy"]) .search-dialog__close {
+  align-self: start;
+  justify-self: end;
+  margin-top: .5rem;
+}
+
+.luxy-mascot {
+  display: none;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-width: 0;
+  min-height: 184px;
+  overflow: visible;
+  background: transparent;
+}
+
+#search-dialog:has(.search-mode-switch[data-mode="luxy"]) .luxy-mascot {
+  display: flex;
+}
+
+.luxy-mascot__svg {
+  display: block;
+  width: 260px;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 260 / 220;
+  border: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+  transform: translateY(-36px);
+  pointer-events: none;
+  color-scheme: light;
+}
+
+/* Luxy fills the dialog space left below the shared top utility row. */
+#luxy-search-view:not([hidden]) {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-rows: minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.luxy-workspace {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(210px, 28%) minmax(0, 1fr);
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--color-text-primary);
+}
+
+/* Desktop conversation-history sidebar. */
+.luxy-sidebar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .95rem;
+  min-width: 0;
+  min-height: 0;
+  padding: .15rem 1rem 0 0;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+}
+
+.luxy-new-chat {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  width: 100%;
+  min-height: 38px;
+  padding: .4rem .8rem;
+  border: 1px solid var(--brand-crimson);
+  border-radius: var(--radius-md);
+  background: var(--brand-crimson);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  transition: background .16s ease, border-color .16s ease, transform .16s ease;
+}
+
+.luxy-new-chat:hover {
+  border-color: var(--brand-red-deep);
+  background: var(--brand-red-deep);
+}
+
+.luxy-new-chat:active {
+  transform: translateY(1px);
+}
+
+.luxy-new-chat svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+.luxy-sidebar__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  min-width: 0;
+  padding-top: .15rem;
+}
+
+.luxy-sidebar__heading h2 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: .01em;
+}
+
+.luxy-sidebar__mobile-close {
+  display: none;
+}
+
+.luxy-history-list {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: .35rem;
+  min-width: 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: .1rem .35rem .8rem 0;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Styling hooks for conversation rows that will be populated from real history later. */
+.luxy-history-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .25rem .5rem;
+  width: 100%;
+  min-width: 0;
+  padding: .65rem .7rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  text-align: left;
+  transition: border-color .16s ease, background .16s ease, color .16s ease;
+}
+
+.luxy-history-item:hover {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.luxy-history-item[aria-current="true"],
+.luxy-history-item.is-active {
+  border-color: var(--brand-crimson);
+  background: color-mix(in srgb, var(--brand-crimson) 11%, var(--color-surface-raised));
+  color: var(--color-text-primary);
+}
+
+.luxy-history-item__title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.luxy-history-item__date {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+/* Independent conversation scroller and bottom-anchored composer area. */
+.luxy-chat {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  padding-left: 1rem;
+}
+
+.luxy-chat__messages {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: .9rem .35rem 1rem 0;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Message presentation hooks; no example messages are included in the markup. */
+.luxy-message {
+  display: flex;
+  align-items: flex-end;
+  gap: .65rem;
+  max-width: min(100%, 760px);
+  min-width: 0;
+}
+
+.luxy-message--user {
+  align-self: flex-end;
+  flex-direction: row;
+  max-width: min(82%, 680px);
+}
+
+.luxy-message--assistant {
+  align-self: flex-start;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.luxy-message__avatar {
+  display: grid;
+  flex: 0 0 34px;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.luxy-message__avatar img,
+.luxy-message__avatar svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.luxy-message__body {
+  display: grid;
+  gap: .5rem;
+  min-width: 0;
+}
+
+.luxy-message--user .luxy-message__body {
+  justify-items: end;
+}
+
+.luxy-message__bubble {
+  min-width: 0;
+  padding: .75rem .95rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem 1rem 1rem .25rem;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+.luxy-message--user .luxy-message__bubble {
+  border-color: var(--brand-crimson);
+  border-radius: 1rem 1rem .25rem 1rem;
+  background: var(--brand-crimson);
+  color: #fff;
+}
+
+.luxy-message__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .45rem .6rem;
+  min-width: 0;
+}
+
+.luxy-message__name {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.luxy-message__category {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: .15rem .5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+.luxy-message__content {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+.luxy-message__content > :first-child {
+  margin-top: 0;
+}
+
+.luxy-message__content > :last-child {
+  margin-bottom: 0;
+}
+
+.luxy-message__quote {
+  margin: .75rem 0;
+  padding: .65rem .85rem;
+  border-left: 3px solid var(--brand-crimson);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-body);
+}
+
+/* Related-article preview is absent until real article data is attached. */
+.luxy-chat__dock {
+  display: grid;
+  gap: .7rem;
+  min-width: 0;
+  padding: .7rem 0 0;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+}
+
+.luxy-article-card[hidden] {
+  display: none !important;
+}
+
+.luxy-article-card:not([hidden]) {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.luxy-article-card__link {
+  display: grid;
+  grid-template-columns: minmax(112px, 24%) minmax(0, 1fr);
+  align-items: stretch;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.luxy-article-card__link:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.luxy-article-card__media {
+  display: grid;
+  min-width: 0;
+  min-height: 94px;
+  overflow: hidden;
+  place-items: center;
+  background: var(--color-page);
+}
+
+.luxy-article-card__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 94px;
+  object-fit: cover;
+}
+
+.luxy-article-card__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: .28rem;
+  min-width: 0;
+  padding: .7rem .85rem;
+}
+
+.luxy-article-card__category {
+  color: var(--brand-crimson);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.luxy-article-card__title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.25;
+}
+
+.luxy-article-card__summary {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+}
+
+.luxy-article-card__reading-time {
+  margin-top: .1rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* Composer remains outside the conversation scroller at the bottom of the chat. */
+.luxy-composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 46px;
+  align-items: end;
+  gap: .55rem;
+  min-width: 0;
+  padding: .45rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+.luxy-composer:focus-within {
+  border-color: var(--brand-crimson);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-crimson) 16%, transparent);
+}
+
+.luxy-composer__input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  max-height: 7rem;
+  padding: .65rem .7rem;
+  resize: none;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.luxy-composer__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.luxy-composer__input:focus-visible {
+  outline: 0;
+}
+
+.luxy-composer__send {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--brand-crimson);
+  border-radius: var(--radius-md);
+  background: var(--brand-crimson);
+  color: #fff;
+  transition: background .16s ease, border-color .16s ease;
+}
+
+.luxy-composer__send:hover {
+  border-color: var(--brand-red-deep);
+  background: var(--brand-red-deep);
+}
+
+.luxy-composer__send svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+}
+
+/* Mobile drawer controls use a native checkbox state, so no script is required. */
+.luxy-sidebar-toggle,
+.luxy-mobile-history-trigger,
+.luxy-sidebar-backdrop {
+  display: none;
+}
+
+.luxy-mobile-history-trigger svg,
+.luxy-sidebar__mobile-close svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 760px) {
+  #search-dialog:has(.search-mode-switch[data-mode="luxy"]) .search-dialog__utility-row {
+    grid-template-columns: 72px minmax(0, 1fr) 72px;
+    align-items: start;
+    min-height: 84px;
+    gap: .3rem;
+    margin-bottom: .55rem;
+  }
+
+  .luxy-mascot {
+    min-height: 80px;
+  }
+
+  .luxy-mascot__svg {
+    width: 100px;
+    max-width: 72px;
+    height: auto;
+    transform: none;
+  }
+
+  .luxy-workspace {
+    display: block;
+  }
+
+  .luxy-sidebar-toggle {
+    position: absolute;
+    z-index: 6;
+    display: block;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .luxy-mobile-history-trigger {
+    position: absolute;
+    z-index: 2;
+    top: .55rem;
+    left: .65rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    min-height: 34px;
+    padding: .35rem .65rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+  }
+
+  .luxy-sidebar-toggle:focus-visible + .luxy-mobile-history-trigger {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .luxy-sidebar {
+    position: absolute;
+    z-index: 4;
+    inset: 0 auto 0 0;
+    width: min(84%, 320px);
+    padding: .9rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-raised);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(-105%);
+    visibility: hidden;
+    transition: transform .2s ease, visibility 0s linear .2s;
+  }
+
+  .luxy-sidebar__mobile-close {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text-primary);
+    cursor: pointer;
+  }
+
+  .luxy-sidebar-backdrop {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    display: block;
+    border: 0;
+    background: rgb(0 0 0 / .48);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    cursor: pointer;
+    transition: opacity .2s ease, visibility .2s ease;
+  }
+
+  .luxy-sidebar-toggle:checked ~ .luxy-sidebar {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform .2s ease, visibility 0s;
+  }
+
+  .luxy-sidebar-toggle:checked ~ .luxy-sidebar-backdrop {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .luxy-chat {
+    width: 100%;
+    height: 100%;
+    padding: 2.8rem 0 0;
+  }
+
+  .luxy-chat__messages {
+    padding: .55rem .2rem .8rem 0;
+  }
+
+  .luxy-chat__dock {
+    gap: .55rem;
+    padding-top: .55rem;
+  }
+
+  .luxy-article-card__link {
+    grid-template-columns: 104px minmax(0, 1fr);
+  }
+
+  .luxy-article-card__media,
+  .luxy-article-card__media img {
+    min-height: 86px;
+  }
+
+  .luxy-article-card__body {
+    padding: .55rem .65rem;
+  }
+
+  .luxy-article-card__title {
+    font-size: var(--font-size-sm);
+  }
+
+  .luxy-article-card__summary {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .luxy-message--user {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 420px) {
+  #search-dialog:has(.search-mode-switch[data-mode="luxy"]) .search-dialog__utility-row {
+    grid-template-columns: 60px minmax(0, 1fr) 60px;
+    min-height: 72px;
+    gap: .2rem;
+  }
+
+  .luxy-mascot {
+    min-height: 68px;
+  }
+
+  .luxy-mascot__svg {
+    width: 76px;
+    max-width: 60px;
+    height: auto;
+  }
+
+  .luxy-composer {
+    grid-template-columns: minmax(0, 1fr) 42px;
+    gap: .35rem;
+    padding: .35rem;
+  }
+
+  .luxy-composer__send {
+    width: 40px;
+    height: 40px;
+  }
+
+  .luxy-article-card__link {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+
+  .luxy-article-card__media,
+  .luxy-article-card__media img {
+    min-height: 82px;
+  }
+
+  .luxy-article-card__summary {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxy-new-chat,
+  .luxy-history-item,
+  .luxy-composer,
+  .luxy-composer__send,
+  .luxy-sidebar,
+  .luxy-sidebar-backdrop {
+    transition: none;
+  }
+}

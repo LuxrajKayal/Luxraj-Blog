@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/luxy-rebuild
     paths:
       - "site/**"
       - "scripts/**"
@@ -11,7 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # Built-in GITHUB_TOKEN persists injected source metadata.
   pages: write
   id-token: write
 
@@ -28,6 +29,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -47,13 +50,37 @@ jobs:
           echo "Prepared public site:"
           find _site -maxdepth 2 -type f | sort | head -80
 
+      - name: Persist injected page IDs to source HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_REF}" != refs/heads/* ]]; then
+            echo "Skipping source metadata commit because this run is not on a branch ref: ${GITHUB_REF}"
+            exit 0
+          fi
+
+          git add -- site
+
+          if git diff --cached --quiet; then
+            echo "No page-ID source changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: persist page-ID metadata in source HTML"
+          git push origin "HEAD:${GITHUB_REF}"
+
       - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v5
         with:
           name: github-pages-${{ github.run_attempt }}
           path: _site
 
       - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
         id: deployment
         uses: actions/deploy-pages@v5
         with:
