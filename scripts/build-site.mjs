@@ -38,6 +38,13 @@ const ARTICLE_SLOT_NAMES = ['HEADER', 'CONTENT'];
 
 const PAGE_ID_META_NAME = 'luxraj:page-id';
 const PAGE_ID_PLACEHOLDER = '{{PAGE_ID}}';
+const SEO_ELIGIBILITY_ATTRIBUTE = 'data-luxraj-seo';
+// Error and newsletter utility pages are not eligible for ordinary SEO editing.
+const SEO_EXCLUDED_FILE_NAMES = new Set([
+  '404.html',
+  'newsletter-thank-you.html',
+  'unsubscribe.html'
+]);
 
 function readHtmlAttribute(tag, attributeName) {
   const patterns = {
@@ -106,10 +113,32 @@ function ensurePageIdPlaceholder(html, relativeFile) {
 }
 
 /*
+ * Permanently mark complete source HTML pages as eligible for the local SEO CMS.
+ * Keep existing attributes (including an explicit "false") untouched.
+ */
+function ensureSeoEligibilityMarker(html, relativeFile) {
+  const htmlOpenings = Array.from(html.matchAll(/<html\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi));
+  if (htmlOpenings.length !== 1 || !/<body\b[^>]*>/i.test(html)) {
+    throw new Error(relativeFile + ' must be a complete HTML document to receive the SEO eligibility marker.');
+  }
+
+  const opening = htmlOpenings[0];
+  if (/(?:\s)data-luxraj-seo(?=\s|=|>)/i.test(opening[0])) {
+    return { html, injected: false };
+  }
+
+  const updatedTag = opening[0].replace(/\s*>$/, ' ' + SEO_ELIGIBILITY_ATTRIBUTE + '="true">');
+  return {
+    html: html.slice(0, opening.index) + updatedTag + html.slice(opening.index + opening[0].length),
+    injected: true
+  };
+}
+
+/*
  * Validate all populated pages and permanent IDs before writing any source
  * changes. This avoids partial injection if a duplicate ID is found.
  */
-async function collectPageIdUpdates(sourceDirectory, relativeDirectory, pendingUpdates, permanentPageIds) {
+async function collectSourceMetadataUpdates(sourceDirectory, relativeDirectory, pendingUpdates, permanentPageIds) {
   const entries = await readdir(sourceDirectory, { withFileTypes: true });
 
   for (const entry of entries) {
@@ -118,13 +147,13 @@ async function collectPageIdUpdates(sourceDirectory, relativeDirectory, pendingU
       : entry.name;
     const normalizedRelativePath = relativePath.split(path.sep).join('/');
 
-    // Shared HTML fragments are not individual pages and must never receive IDs.
-    if (!relativeDirectory && entry.isDirectory() && entry.name === 'partials') continue;
+    // Shared HTML fragments are not individual pages and must never receive metadata.
+    if (entry.isDirectory() && entry.name.toLowerCase() === 'partials') continue;
 
     const sourcePath = path.join(sourceDirectory, entry.name);
 
     if (entry.isDirectory()) {
-      await collectPageIdUpdates(sourcePath, relativePath, pendingUpdates, permanentPageIds);
+      await collectSourceMetadataUpdates(sourcePath, relativePath, pendingUpdates, permanentPageIds);
       continue;
     }
 
@@ -136,6 +165,9 @@ async function collectPageIdUpdates(sourceDirectory, relativeDirectory, pendingU
     if (!sourceHtml.trim()) continue;
 
     const result = ensurePageIdPlaceholder(sourceHtml, normalizedRelativePath);
+    const seoResult = SEO_EXCLUDED_FILE_NAMES.has(entry.name.toLowerCase())
+      ? { html: result.html, injected: false }
+      : ensureSeoEligibilityMarker(result.html, normalizedRelativePath);
 
     if (result.pageId !== PAGE_ID_PLACEHOLDER) {
       const firstFile = permanentPageIds.get(result.pageId);
@@ -148,21 +180,27 @@ async function collectPageIdUpdates(sourceDirectory, relativeDirectory, pendingU
       permanentPageIds.set(result.pageId, normalizedRelativePath);
     }
 
-    if (result.injected) {
-      pendingUpdates.push({ sourcePath, html: result.html });
+    if (result.injected || seoResult.injected) {
+      pendingUpdates.push({
+        sourcePath,
+        html: seoResult.html,
+        pageIdInjected: result.injected,
+        seoMarkerInjected: seoResult.injected
+      });
     }
   }
 }
 
-async function injectPageIdsIntoSource(stats) {
+async function injectSourceMetadataIntoSource(stats) {
   const pendingUpdates = [];
-  await collectPageIdUpdates(SITE_DIR, '', pendingUpdates, new Map());
+  await collectSourceMetadataUpdates(SITE_DIR, '', pendingUpdates, new Map());
 
   for (const update of pendingUpdates) {
     await writeFile(update.sourcePath, update.html, 'utf8');
   }
 
-  stats.pageIdsInjected = pendingUpdates.length;
+  stats.pageIdsInjected = pendingUpdates.filter(update => update.pageIdInjected).length;
+  stats.seoMarkersInjected = pendingUpdates.filter(update => update.seoMarkerInjected).length;
 }
 
 function extractArticleSlot(html, name, relativeFile) {
@@ -617,12 +655,13 @@ async function main() {
     builtPages: 0,
     emptyPlaceholders: 0,
     standalonePages: 0,
-    pageIdsInjected: 0
+    pageIdsInjected: 0,
+    seoMarkersInjected: 0
   };
 
   // Update actual source HTML first; the normal builder then assembles those
   // same files into _site so source and deployed metadata stay aligned.
-  await injectPageIdsIntoSource(stats);
+  await injectSourceMetadataIntoSource(stats);
 
   await rm(OUTPUT_DIR, { recursive: true, force: true });
   await mkdir(OUTPUT_DIR, { recursive: true });
@@ -643,6 +682,7 @@ async function main() {
 
   console.log(
     'Injected page-ID placeholders into ' + stats.pageIdsInjected +
+    ' source HTML files, and SEO eligibility markers into ' + stats.seoMarkersInjected +
     ' source HTML files. Built _site/: assembled and verified shared components on ' +
     stats.builtPages + ' populated HTML pages; copied ' +
     stats.standalonePages + ' standalone HTML pages; left ' +
