@@ -11,6 +11,8 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PAGE_ID_PLACEHOLDER, ensurePageIdPlaceholder } from './injectors/placeholder-injector.mjs';
+import { ensureSeoEligibilityMarker } from './injectors/permanent-element-injector.mjs';
 
 const REPOSITORY_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE_DIR = path.join(REPOSITORY_ROOT, 'site');
@@ -35,104 +37,6 @@ const REQUIRED_MARKER_NAMES = ['TOPBAR', 'MAIN-HEADER', 'FOOTER'];
 const MARKER_NAMES = Object.keys(PARTIALS);
 const markerFor = name => '<!-- SHARED:' + name + ' -->';
 const ARTICLE_SLOT_NAMES = ['HEADER', 'CONTENT'];
-
-const PAGE_ID_META_NAME = 'luxraj:page-id';
-const PAGE_ID_PLACEHOLDER = '{{PAGE_ID}}';
-const SEO_ELIGIBILITY_ATTRIBUTE = 'data-luxraj-seo';
-// Error and newsletter utility pages are not eligible for ordinary SEO editing.
-const SEO_EXCLUDED_FILE_NAMES = new Set([
-  '404.html',
-  'newsletter-thank-you.html',
-  'unsubscribe.html'
-]);
-
-function readHtmlAttribute(tag, attributeName) {
-  const patterns = {
-    name: /(?:^|\s)name\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>]+))/i,
-    content: /(?:^|\s)content\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>]+))/i
-  };
-  const expression = patterns[attributeName];
-  if (!expression) throw new Error('Unsupported HTML attribute: ' + attributeName);
-  const match = expression.exec(tag);
-  return match ? (match[1] ?? match[2] ?? match[3]) : null;
-}
-
-/*
- * Give every populated source page one stable identity slot. Placeholder values
- * may repeat until Luxraj assigns permanent IDs; permanent IDs must be unique.
- */
-function ensurePageIdPlaceholder(html, relativeFile) {
-  const headOpenings = Array.from(html.matchAll(/<head\b[^>]*>/gi));
-  const headClosings = Array.from(html.matchAll(/<\/head\s*>/gi));
-
-  if (headOpenings.length !== 1 || headClosings.length !== 1) {
-    throw new Error(relativeFile + ' must contain exactly one complete <head> element for page-ID metadata.');
-  }
-
-  const headContentStart = headOpenings[0].index + headOpenings[0][0].length;
-  const headContentEnd = headClosings[0].index;
-  if (headContentEnd < headContentStart) {
-    throw new Error(relativeFile + ' has an incorrectly ordered <head> element.');
-  }
-
-  const pageIdMetas = Array.from(html.matchAll(/<meta\b[^>]*>/gi))
-    .filter(match => (readHtmlAttribute(match[0], 'name') || '').toLowerCase() === PAGE_ID_META_NAME);
-
-  if (pageIdMetas.length > 1) {
-    throw new Error(
-      relativeFile + ' must contain at most one ' + PAGE_ID_META_NAME +
-      ' meta tag; found ' + pageIdMetas.length + '.'
-    );
-  }
-
-  if (pageIdMetas.length === 1) {
-    const existing = pageIdMetas[0];
-    const existingEnd = existing.index + existing[0].length;
-
-    if (existing.index < headContentStart || existingEnd > headContentEnd) {
-      throw new Error(relativeFile + ' has its ' + PAGE_ID_META_NAME + ' meta tag outside the <head> element.');
-    }
-
-    const content = readHtmlAttribute(existing[0], 'content');
-    if (content === null || !content.trim()) {
-      throw new Error(relativeFile + ' has a ' + PAGE_ID_META_NAME + ' meta tag without a non-empty content value.');
-    }
-
-    return { html, pageId: content.trim(), injected: false };
-  }
-
-  const newline = html.includes('\r\n') ? '\r\n' : '\n';
-  const meta = '  <meta name="' + PAGE_ID_META_NAME + '" content="' + PAGE_ID_PLACEHOLDER + '">' + newline;
-  const separator = html.slice(0, headContentEnd).endsWith('\n') ? '' : newline;
-
-  return {
-    html: html.slice(0, headContentEnd) + separator + meta + html.slice(headContentEnd),
-    pageId: PAGE_ID_PLACEHOLDER,
-    injected: true
-  };
-}
-
-/*
- * Permanently mark complete source HTML pages as eligible for the local SEO CMS.
- * Keep existing attributes (including an explicit "false") untouched.
- */
-function ensureSeoEligibilityMarker(html, relativeFile) {
-  const htmlOpenings = Array.from(html.matchAll(/<html\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi));
-  if (htmlOpenings.length !== 1 || !/<body\b[^>]*>/i.test(html)) {
-    throw new Error(relativeFile + ' must be a complete HTML document to receive the SEO eligibility marker.');
-  }
-
-  const opening = htmlOpenings[0];
-  if (/(?:\s)data-luxraj-seo(?=\s|=|>)/i.test(opening[0])) {
-    return { html, injected: false };
-  }
-
-  const updatedTag = opening[0].replace(/\s*>$/, ' ' + SEO_ELIGIBILITY_ATTRIBUTE + '="true">');
-  return {
-    html: html.slice(0, opening.index) + updatedTag + html.slice(opening.index + opening[0].length),
-    injected: true
-  };
-}
 
 /*
  * Validate all populated pages and permanent IDs before writing any source
@@ -165,9 +69,7 @@ async function collectSourceMetadataUpdates(sourceDirectory, relativeDirectory, 
     if (!sourceHtml.trim()) continue;
 
     const result = ensurePageIdPlaceholder(sourceHtml, normalizedRelativePath);
-    const seoResult = SEO_EXCLUDED_FILE_NAMES.has(entry.name.toLowerCase())
-      ? { html: result.html, injected: false }
-      : ensureSeoEligibilityMarker(result.html, normalizedRelativePath);
+    const seoResult = ensureSeoEligibilityMarker(result.html, normalizedRelativePath);
 
     if (result.pageId !== PAGE_ID_PLACEHOLDER) {
       const firstFile = permanentPageIds.get(result.pageId);
