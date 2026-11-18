@@ -36,6 +36,135 @@ const MARKER_NAMES = Object.keys(PARTIALS);
 const markerFor = name => '<!-- SHARED:' + name + ' -->';
 const ARTICLE_SLOT_NAMES = ['HEADER', 'CONTENT'];
 
+const PAGE_ID_META_NAME = 'luxraj:page-id';
+const PAGE_ID_PLACEHOLDER = '{{PAGE_ID}}';
+
+function readHtmlAttribute(tag, attributeName) {
+  const patterns = {
+    name: /(?:^|\s)name\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>]+))/i,
+    content: /(?:^|\s)content\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>]+))/i
+  };
+  const expression = patterns[attributeName];
+  if (!expression) throw new Error('Unsupported HTML attribute: ' + attributeName);
+  const match = expression.exec(tag);
+  return match ? (match[1] ?? match[2] ?? match[3]) : null;
+}
+
+/*
+ * Give every populated source page one stable identity slot. Placeholder values
+ * may repeat until Luxraj assigns permanent IDs; permanent IDs must be unique.
+ */
+function ensurePageIdPlaceholder(html, relativeFile) {
+  const headOpenings = Array.from(html.matchAll(/<head\b[^>]*>/gi));
+  const headClosings = Array.from(html.matchAll(/<\/head\s*>/gi));
+
+  if (headOpenings.length !== 1 || headClosings.length !== 1) {
+    throw new Error(relativeFile + ' must contain exactly one complete <head> element for page-ID metadata.');
+  }
+
+  const headContentStart = headOpenings[0].index + headOpenings[0][0].length;
+  const headContentEnd = headClosings[0].index;
+  if (headContentEnd < headContentStart) {
+    throw new Error(relativeFile + ' has an incorrectly ordered <head> element.');
+  }
+
+  const pageIdMetas = Array.from(html.matchAll(/<meta\b[^>]*>/gi))
+    .filter(match => (readHtmlAttribute(match[0], 'name') || '').toLowerCase() === PAGE_ID_META_NAME);
+
+  if (pageIdMetas.length > 1) {
+    throw new Error(
+      relativeFile + ' must contain at most one ' + PAGE_ID_META_NAME +
+      ' meta tag; found ' + pageIdMetas.length + '.'
+    );
+  }
+
+  if (pageIdMetas.length === 1) {
+    const existing = pageIdMetas[0];
+    const existingEnd = existing.index + existing[0].length;
+
+    if (existing.index < headContentStart || existingEnd > headContentEnd) {
+      throw new Error(relativeFile + ' has its ' + PAGE_ID_META_NAME + ' meta tag outside the <head> element.');
+    }
+
+    const content = readHtmlAttribute(existing[0], 'content');
+    if (content === null || !content.trim()) {
+      throw new Error(relativeFile + ' has a ' + PAGE_ID_META_NAME + ' meta tag without a non-empty content value.');
+    }
+
+    return { html, pageId: content.trim(), injected: false };
+  }
+
+  const newline = html.includes('\r\n') ? '\r\n' : '\n';
+  const meta = '  <meta name="' + PAGE_ID_META_NAME + '" content="' + PAGE_ID_PLACEHOLDER + '">' + newline;
+  const separator = html.slice(0, headContentEnd).endsWith('\n') ? '' : newline;
+
+  return {
+    html: html.slice(0, headContentEnd) + separator + meta + html.slice(headContentEnd),
+    pageId: PAGE_ID_PLACEHOLDER,
+    injected: true
+  };
+}
+
+/*
+ * Validate all populated pages and permanent IDs before writing any source
+ * changes. This avoids partial injection if a duplicate ID is found.
+ */
+async function collectPageIdUpdates(sourceDirectory, relativeDirectory, pendingUpdates, permanentPageIds) {
+  const entries = await readdir(sourceDirectory, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const relativePath = relativeDirectory
+      ? path.join(relativeDirectory, entry.name)
+      : entry.name;
+    const normalizedRelativePath = relativePath.split(path.sep).join('/');
+
+    // Shared HTML fragments are not individual pages and must never receive IDs.
+    if (!relativeDirectory && entry.isDirectory() && entry.name === 'partials') continue;
+
+    const sourcePath = path.join(sourceDirectory, entry.name);
+
+    if (entry.isDirectory()) {
+      await collectPageIdUpdates(sourcePath, relativePath, pendingUpdates, permanentPageIds);
+      continue;
+    }
+
+    if (!entry.isFile() || !normalizedRelativePath.toLowerCase().endsWith('.html')) continue;
+
+    const sourceHtml = await readFile(sourcePath, 'utf8');
+
+    // Empty HTML placeholders are not pages yet.
+    if (!sourceHtml.trim()) continue;
+
+    const result = ensurePageIdPlaceholder(sourceHtml, normalizedRelativePath);
+
+    if (result.pageId !== PAGE_ID_PLACEHOLDER) {
+      const firstFile = permanentPageIds.get(result.pageId);
+      if (firstFile) {
+        throw new Error(
+          'Duplicate permanent page ID "' + result.pageId + '" in ' +
+          firstFile + ' and ' + normalizedRelativePath + '.'
+        );
+      }
+      permanentPageIds.set(result.pageId, normalizedRelativePath);
+    }
+
+    if (result.injected) {
+      pendingUpdates.push({ sourcePath, html: result.html });
+    }
+  }
+}
+
+async function injectPageIdsIntoSource(stats) {
+  const pendingUpdates = [];
+  await collectPageIdUpdates(SITE_DIR, '', pendingUpdates, new Map());
+
+  for (const update of pendingUpdates) {
+    await writeFile(update.sourcePath, update.html, 'utf8');
+  }
+
+  stats.pageIdsInjected = pendingUpdates.length;
+}
+
 function extractArticleSlot(html, name, relativeFile) {
   const startMarker = '<!-- ARTICLE:' + name + ':START -->';
   const endMarker = '<!-- ARTICLE:' + name + ':END -->';
@@ -484,6 +613,17 @@ async function main() {
   const newsletterPopupHtml = await readFile(NEWSLETTER_POPUP_PARTIAL, 'utf8');
   partialContents.SEARCH_DIALOG = await readFile(SEARCH_DIALOG_PARTIAL, 'utf8');
 
+  const stats = {
+    builtPages: 0,
+    emptyPlaceholders: 0,
+    standalonePages: 0,
+    pageIdsInjected: 0
+  };
+
+  // Update actual source HTML first; the normal builder then assembles those
+  // same files into _site so source and deployed metadata stay aligned.
+  await injectPageIdsIntoSource(stats);
+
   await rm(OUTPUT_DIR, { recursive: true, force: true });
   await mkdir(OUTPUT_DIR, { recursive: true });
 
@@ -498,12 +638,12 @@ async function main() {
   await mkdir(path.dirname(newsletterAssetPath), { recursive: true });
   await writeFile(newsletterAssetPath, newsletterPopupHtml, 'utf8');
 
-  const stats = { builtPages: 0, emptyPlaceholders: 0, standalonePages: 0 };
   await walkAndBuild(SITE_DIR, '', partialContents, stats);
   await writeFile(path.join(OUTPUT_DIR, '.nojekyll'), '', 'utf8');
 
   console.log(
-    'Built _site/: assembled and verified shared components on ' +
+    'Injected page-ID placeholders into ' + stats.pageIdsInjected +
+    ' source HTML files. Built _site/: assembled and verified shared components on ' +
     stats.builtPages + ' populated HTML pages; copied ' +
     stats.standalonePages + ' standalone HTML pages; left ' +
     stats.emptyPlaceholders + ' empty HTML placeholders unchanged.'
