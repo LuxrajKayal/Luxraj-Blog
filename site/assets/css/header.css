@@ -25,9 +25,10 @@
 .mobile-nav-toggle[aria-expanded="true"] .mobile-nav-toggle__open{display:none}
 .mobile-nav-toggle[aria-expanded="true"] .mobile-nav-toggle__close{display:block!important}
 
-/* Unified Luxy search launcher: mascot and magnifier share one control. */
-.header-icon-button.header-search-launcher{width:74px;gap:.38rem;padding-inline:.48rem;border-color:var(--color-border);background:var(--color-surface)}
-.header-search-launcher__mascot{display:block;width:25px;height:22px;flex:0 0 auto;object-fit:contain}
-.header-search-launcher__separator{display:block;width:1px;height:21px;flex:0 0 auto;background:var(--color-border-strong)}
-.header-search-launcher__search-icon{display:block;width:19px;height:19px;flex:0 0 auto}
+/* Separate Luxy Assistant CTA and standard article-search icon. */
+.header-ask-luxy{display:inline-flex;align-items:center;justify-content:center;gap:.42rem;min-height:40px;padding:.45rem .78rem;border:1px solid var(--color-border-strong);border-radius:var(--radius-pill);background:var(--color-surface);color:var(--color-text-primary);font:inherit;font-size:var(--font-size-sm);font-weight:var(--font-weight-bold);line-height:1;white-space:nowrap;cursor:pointer;transition:border-color .16s ease,background .16s ease,color .16s ease}
+.header-ask-luxy:hover{border-color:var(--brand-crimson);background:var(--color-surface-raised);color:var(--brand-crimson)}
+.header-ask-luxy__mascot{display:block;width:23px;height:22px;flex:0 0 auto;object-fit:contain}
+.header-ask-luxy:focus-visible,.header-search-launcher:focus-visible{outline:2px solid var(--brand-crimson);outline-offset:3px}
+.header-icon-button .header-search-launcher__search-icon{display:block;width:19px;height:19px;flex:0 0 auto}
 

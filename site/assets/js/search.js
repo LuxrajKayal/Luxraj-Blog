@@ -153,10 +153,13 @@ export function initSearch() {
 
   let lastTrigger = null;
 
+  // Explicit entry-point modes allow Ask Luxy and normal Search to share this dialog.
+  // Unlabelled legacy triggers retain their previous Luxy default.
   document.querySelectorAll("[data-search-open]").forEach(button => button.addEventListener("click", () => {
     lastTrigger = button;
     tagState.boxId = null;
-    setMode("luxy");
+    const requestedMode = button.dataset.searchOpen === "general" ? "general" : "luxy";
+    setMode(requestedMode);
     renderGeneralSearch();
     openDialog();
   }));
