@@ -1,9 +1,0 @@
-/* Click-operated dropdowns; there is intentionally no hover-to-open rule. */
-.nav-dropdown,.nav-dropdown[hidden]{list-style:none;margin:0;padding:0}
-.nav-dropdown[hidden]{display:none!important}
-.nav-dropdown:not([hidden]){position:absolute;top:calc(100% - 1px);left:0;z-index:var(--layer-dropdown);display:grid;grid-template-columns:minmax(0,1fr);gap:.12rem;width:max-content;min-width:220px;max-width:min(290px,calc(100vw - 2rem));max-height:min(62vh,480px);overflow-y:auto;padding:.5rem;border:1px solid var(--color-border);border-top:3px solid var(--brand-crimson);border-radius:0 0 var(--radius-md) var(--radius-md);background:var(--color-surface-raised);box-shadow:var(--shadow-md)}
-.nav-item:nth-child(7) .nav-dropdown:not([hidden]){right:0;left:auto}
-.nav-dropdown li{margin:0;padding:0}
-.nav-dropdown a{display:block;padding:.62rem .72rem;border-radius:var(--radius-sm);color:var(--color-text-primary);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);line-height:1.25;text-decoration:none}
-.nav-dropdown a:hover,.nav-dropdown a[aria-current="page"]{background:var(--color-surface);color:var(--brand-crimson);text-decoration:none}
-.nav-dropdown a[aria-current="page"]{font-weight:var(--font-weight-bold)}
