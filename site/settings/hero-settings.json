@@ -1,7 +1,7 @@
 {
   "mode": "auto",
   "maximumArticles": 5,
-  "rotationIntervalMs": 5000,
+  "rotationIntervalMs": 3000,
   "manualArticles": [
     "categories/tech-news/ai/articles/ai-on-the-edge-what-local-inference-changes.html",
     "categories/how-to/linux/articles/how-to-choose-a-linux-desktop-for-an-older-computer.html",
