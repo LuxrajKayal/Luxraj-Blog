@@ -34,10 +34,11 @@ const STANDALONE_UNSUBSCRIBE_PAGES = new Set([
   'pages/newsletter/unsubscribe.html'
 ]);
 
-// Preserve the existing public URL while organizing the source page.
-const PUBLIC_OUTPUT_PATH_OVERRIDES = new Map([
-  ['pages/newsletter/unsubscribe.html', 'unsubscribe.html']
-]);
+// The source tree is mirrored into the public site. Keep retired public routes
+// as generated redirects so existing newsletter links continue to work.
+const LEGACY_ROUTE_REDIRECTS = [
+  { from: 'unsubscribe.html', to: 'pages/newsletter/unsubscribe.html' }
+];
 const REQUIRED_MARKER_NAMES = ['TOPBAR', 'MAIN-HEADER', 'FOOTER'];
 const MARKER_NAMES = Object.keys(PARTIALS);
 const markerFor = name => '<!-- SHARED:' + name + ' -->';
@@ -483,8 +484,7 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
     if (!relativeDirectory && entry.isDirectory() && entry.name === 'partials') continue;
 
     const sourcePath = path.join(sourceDirectory, entry.name);
-    const outputRelativePath = PUBLIC_OUTPUT_PATH_OVERRIDES.get(normalizedRelativePath) || normalizedRelativePath;
-    const outputPath = path.join(OUTPUT_DIR, outputRelativePath);
+    const outputPath = path.join(OUTPUT_DIR, relativePath);
 
     if (entry.isDirectory()) {
       await mkdir(outputPath, { recursive: true });
@@ -515,8 +515,8 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
 
     // Inject one consistent icon set into every populated page, including standalone pages.
     // pageRootPrefix keeps URLs correct from nested article/category routes.
-    // Resolve icon URLs against the public output path, not the organized source path.
-    const faviconRootPrefix = pageRootPrefix(sourceHtml, outputRelativePath);
+    // Resolve icon URLs relative to the mirrored public output location.
+    const faviconRootPrefix = pageRootPrefix(sourceHtml, normalizedRelativePath);
     sourceHtml = injectFaviconLinks(sourceHtml, faviconRootPrefix, normalizedRelativePath);
 
     // Newsletter callback pages are intentionally standalone: no site shell or popup injection.
@@ -546,6 +546,43 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
     const builtHtml = expandSharedComponents(sourceHtml, normalizedRelativePath, partialContents);
     await writeFile(outputPath, builtHtml, 'utf8');
     stats.builtPages += 1;
+  }
+}
+
+async function writeLegacyRouteRedirects() {
+  for (const route of LEGACY_ROUTE_REDIRECTS) {
+    const targetOutputPath = path.join(OUTPUT_DIR, route.to);
+    await readFile(targetOutputPath, 'utf8');
+
+    const legacyOutputPath = path.join(OUTPUT_DIR, route.from);
+    const targetHref = path.posix.relative(
+      path.posix.dirname(route.from),
+      route.to
+    );
+    const targetLiteral = JSON.stringify(targetHref);
+
+    const redirectHtml = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="${targetHref}">
+  <title>Page moved | Luxraj Blog</title>
+  <script>
+    const destination = new URL(${targetLiteral}, window.location.href);
+    destination.search = window.location.search;
+    destination.hash = window.location.hash;
+    window.location.replace(destination.href);
+  </script>
+</head>
+<body>
+  <p>This page has moved. <a href="${targetHref}">Continue to the unsubscribe page</a>.</p>
+</body>
+</html>
+`;
+
+    await mkdir(path.dirname(legacyOutputPath), { recursive: true });
+    await writeFile(legacyOutputPath, redirectHtml, 'utf8');
   }
 }
 
@@ -587,6 +624,7 @@ async function main() {
   await writeFile(newsletterAssetPath, newsletterPopupHtml, 'utf8');
 
   await walkAndBuild(SITE_DIR, '', partialContents, stats);
+  await writeLegacyRouteRedirects();
   await writeFile(path.join(OUTPUT_DIR, '.nojekyll'), '', 'utf8');
 
   console.log(
