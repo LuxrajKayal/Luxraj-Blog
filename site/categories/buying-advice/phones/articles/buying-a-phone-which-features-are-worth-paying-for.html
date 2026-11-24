@@ -404,11 +404,17 @@
     <!-- Design tokens used by the topbar, main header and footer. -->
     <link rel="stylesheet" href="../../../../assets/css/tokens.css">
 
+    <!-- Universal HTML defaults and shared typography foundation. -->
+    <link rel="stylesheet" href="../../../../assets/css/base.css">
+
+    <!-- Shared breadcrumb navigation used across page types. -->
+    <link rel="stylesheet" href="../../../../assets/css/breadcrumbs.css">
+
     <!-- Each article may provide its own independent stylesheet. -->
-    <link
-        rel="stylesheet"
-        href="{{ARTICLE_CSS_PATH}}"
-    >
+    <link rel="stylesheet" href="../../../../assets/css/article-layout.css">
+
+    <!-- Reusable author identity, dates and sharing bar. -->
+    <link rel="stylesheet" href="../../../../assets/css/author-bar.css">
 
     <!-- Existing styles for the three shared components. -->
     <link rel="stylesheet" href="../../../../assets/css/topbar.css">
@@ -656,287 +662,344 @@
         }
     </style>
 
+    <!-- ================================================= -->
+    <!-- ARTICLE-LOCAL TYPOGRAPHY                          -->
+    <!-- These rules belong to this article only.          -->
+    <!-- ================================================= -->
+    <style id="article-local-typography">
+        /*
+         * Invisible boundary for all content inside the article's left column.
+         * Global box sizing and responsive media limits come from base.css.
+         */
+        .article-content-frame {
+            width: 100%;
+            min-width: 0;
+        }
+
+        /* Dedicated 16:9 featured-image frame. */
+        .article-featured-media {
+            margin: 0 0 2.25rem;
+        }
+
+        .article-featured-media__frame {
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            background: var(--color-surface, #F5F5F5);
+        }
+
+        .article-featured-media__frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+        }
+
+        /* Separate image-context box beneath the image. */
+        .article-image-caption {
+            margin-block-start: 0.65rem;
+            padding: 0.75rem 1rem;
+            border-inline-start: 3px solid var(--brand-crimson, #DC2626);
+            background: var(--color-surface, #F5F5F5);
+            color: var(--color-text-muted, #737373);
+            font-family: var(--font-ui, Arial, sans-serif);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .article-body {
+            color: var(--color-text-primary, #171717);
+            font-family: var(--font-ui, Arial, sans-serif);
+            font-size: clamp(1.0625rem, 1.05vw + 0.72rem, 1.125rem);
+            font-weight: 400;
+            line-height: 1.8;
+        }
+
+        .article-body section + section {
+            margin-block-start: 3.25rem;
+        }
+
+        .article-body p {
+            margin: 0 0 1.35em;
+            color: var(--color-text-secondary, #525252);
+            font-size: 1em;
+            line-height: 1.8;
+            text-align: justify;
+            text-align-last: start;
+            text-justify: inter-word;
+            -webkit-hyphens: none;
+            hyphens: none;
+            word-break: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .article-body h2 {
+            margin: 0 0 1.15rem;
+            color: var(--color-text-primary, #171717);
+            font-family: var(--font-ui, Arial, sans-serif);
+            font-size: clamp(1.65rem, 2.2vw, 2rem);
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            line-height: 1.22;
+            text-wrap: balance;
+        }
+
+        .article-body h3 {
+            margin: 2rem 0 0.7rem;
+            color: var(--color-text-primary, #171717);
+            font-family: var(--font-ui, Arial, sans-serif);
+            font-size: clamp(1.15rem, 1.4vw, 1.3rem);
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            line-height: 1.35;
+            text-wrap: balance;
+        }
+
+        .article-body ul,
+        .article-body ol {
+            margin: 0 0 1.6rem;
+            padding-inline-start: 1.35rem;
+            color: var(--color-text-secondary, #525252);
+            font-size: 1em;
+            line-height: 1.75;
+            text-align: left;
+        }
+
+        .article-body ul {
+            list-style-type: disc;
+        }
+
+        .article-body ol {
+            list-style-type: decimal;
+        }
+
+        .article-body li {
+            padding-inline-start: 0.2rem;
+            margin-block: 0.5rem;
+        }
+
+        .article-body li + li {
+            margin-block-start: 0.5rem;
+        }
+
+        .article-body li::marker {
+            color: var(--brand-crimson, #DC2626);
+        }
+
+        .article-body .article-checklist-panel {
+            margin-block: 3rem;
+            padding: clamp(1.25rem, 3vw, 1.75rem);
+            border: 1px solid var(--color-border, #E5E5E5);
+            border-radius: 0.85rem;
+            background: var(--color-surface, #F5F5F5);
+        }
+
+        .article-body .article-checklist-panel h2 {
+            margin-block-end: 1.25rem;
+        }
+
+        .article-body .article-checklist-panel h3 {
+            margin-block-start: 1.5rem;
+        }
+
+        .article-body .article-checklist-panel ul {
+            margin-block-end: 1.1rem;
+        }
+
+        .article-body .article-checklist-panel ul:last-child {
+            margin-block-end: 0;
+        }
+
+        .article-body a,
+        .article-footer a {
+            color: var(--color-link, #B91C1C);
+            text-decoration: underline;
+            text-decoration-thickness: 0.07em;
+            text-underline-offset: 0.18em;
+        }
+
+        .article-body a:hover,
+        .article-footer a:hover {
+            color: var(--color-link-hover, #7F1D1D);
+        }
+
+        .article-body strong,
+        .article-footer strong {
+            color: var(--color-text-primary, #171717);
+            font-weight: 700;
+        }
+
+        .article-body .article-pull-quote {
+            margin: 2.5rem 0;
+            padding: 0.15rem 0 0.15rem 1.5rem;
+            border-left: 4px solid var(--brand-crimson, #DC2626);
+            font-style: italic;
+        }
+
+        .article-body .article-pull-quote p {
+            margin: 0;
+            color: var(--color-text-primary, #171717);
+            font-size: clamp(1.45rem, 2.5vw, 1.85rem);
+            font-weight: 600;
+            line-height: 1.3;
+            text-align: left;
+            hyphens: none;
+        }
+
+        .article-body .drop-cap::first-letter {
+            float: left;
+            margin: 0.5rem 0.75rem 0 0;
+            color: var(--brand-crimson, #DC2626);
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 0.8;
+        }
+
+        :root[data-theme="dark"] .article-body .drop-cap::first-letter {
+            color: var(--brand-red-soft, #FCA5A5);
+        }
+
+        .article-footer {
+            margin-block-start: 3.5rem;
+            padding-block-start: 1.5rem;
+            border-top: 1px solid var(--color-border, #E5E5E5);
+            color: var(--color-text-secondary, #525252);
+            font-family: var(--font-ui, Arial, sans-serif);
+            font-size: 0.975rem;
+            line-height: 1.7;
+        }
+
+        .article-footer h2 {
+            margin: 0 0 0.9rem;
+            color: var(--color-text-primary, #171717);
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+
+        .article-footer ul {
+            margin: 0;
+            padding-inline-start: 1.3rem;
+        }
+
+        .article-footer li {
+            margin-block: 0.55rem;
+            padding-inline-start: 0.15rem;
+        }
+
+        .article-footer li::marker {
+            color: var(--brand-crimson, #DC2626);
+        }
+
+        @media (max-width: 600px) {
+            .article-body {
+                font-size: 1.025rem;
+                line-height: 1.75;
+            }
+
+            .article-body section + section {
+                margin-block-start: 2.6rem;
+            }
+
+            .article-body p {
+                line-height: 1.75;
+            }
+
+            .article-body h2 {
+                font-size: clamp(1.55rem, 7vw, 1.8rem);
+            }
+
+            .article-body .drop-cap::first-letter {
+                font-size: 3.75rem;
+                margin-right: 0.65rem;
+                margin-top: 0.4rem;
+            }
+
+            .article-body .article-pull-quote {
+                margin-block: 2rem;
+                padding-inline-start: 1.1rem;
+            }
+
+            .article-body .article-pull-quote p {
+                font-size: 1.35rem;
+            }
+        }
+    </style>
+
   <meta name="luxraj:page-id" content="article-buyingadvice-phones-01">
 </head>
 
-
 <body data-site-root="../../../../">
-
-
-    <!-- ================================================= -->
-    <!-- 7. SHARED WEBSITE COMPONENTS                      -->
-    <!-- ================================================= -->
-
     <!-- SHARED:TOPBAR -->
-
     <!-- SHARED:MAIN-HEADER -->
 
-
-
-    <!-- ================================================= -->
-    <!-- 8. MAIN ARTICLE AREA                               -->
-    <!-- ================================================= -->
-
-    <main id="main-content">
-
-
-        <!--
-            OPTIONAL BREADCRUMB NAVIGATION
-
-            Show the actual category hierarchy.
-
-            Keep visible navigation and any future
-            BreadcrumbList structured data consistent.
-        -->
-
-        <nav aria-label="Breadcrumb">
-
-            <a href="{{SITE_URL}}">Home</a>
-
-            <span aria-hidden="true"> / </span>
-
-            <a href="{{ARTICLE_CATEGORY_URL}}">
-                {{ARTICLE_MAIN_CATEGORY}}
-            </a>
-
-            <span aria-hidden="true"> / </span>
-
-            <span aria-current="page">
-                {{ARTICLE_TITLE}}
-            </span>
-
-        </nav>
-
-
-
-        <!-- ================================================= -->
-        <!-- 9. ARTICLE CONTENT                                -->
-        <!-- ================================================= -->
-
-        <!--
-            ARTICLE
-
-            This is the semantic article container.
-
-            Its internal layout is completely independent.
-
-            You can create different structures for:
-            - Engineering articles
-            - Product reviews
-            - Technical tutorials
-            - News articles
-            - Buying guides
-            - General editorial articles
-        -->
-
-        <article>
-
-
-            <!-- ARTICLE INTRODUCTION -->
-
-            <header class="article-header">
-
-
-                <!-- Main editorial category -->
-
-                <p class="article-category">
-                    {{ARTICLE_SUBCATEGORY}}
-                </p>
-
-
-                <!-- Main article headline -->
-
-                <h1>{{ARTICLE_TITLE}}</h1>
-
-
-                <!-- Article introduction / deck -->
-
-                <p class="article-introduction">
-                    {{ARTICLE_INTRODUCTION}}
-                </p>
-
-
-                <!--
-                    VISIBLE PUBLICATION INFORMATION
-
-                    Use the same dates as JSON-LD.
-                    Include the modification information
-                    only when it is applicable.
-                -->
-
-                <div class="article-byline">
-
-                    <span>
-                        By
-                        <a href="{{AUTHOR_PROFILE_URL}}">
-                            {{AUTHOR_NAME}}
-                        </a>
-                    </span>
-
-
-                    <time datetime="{{PUBLISHED_ISO_8601}}">
-                        {{PUBLISHED_DISPLAY_DATE}}
-                    </time>
-
-
-                    <span>
-                        Updated:
-                        <time datetime="{{MODIFIED_ISO_8601}}">
-                            {{MODIFIED_DISPLAY_DATE}}
-                        </time>
-                    </span>
-
-                </div>
-
-
-            </header>
-
-
-
-            <!-- ================================================= -->
-            <!-- FEATURED IMAGE                                    -->
-            <!-- ================================================= -->
-
-            <!--
-                Use the actual article image.
-
-                ALT text describes the image accurately.
-                Do not stuff keywords into alt text.
-
-                Set width and height to the actual image
-                dimensions to help prevent layout shifts.
-            -->
-
-            <figure class="article-featured-image">
-
-                <img
-                    src="{{FEATURED_IMAGE_URL}}"
-                    alt="{{FEATURED_IMAGE_ALT}}"
-                    width="{{FEATURED_IMAGE_WIDTH}}"
-                    height="{{FEATURED_IMAGE_HEIGHT}}"
-                    fetchpriority="high"
-                >
-
-                <!-- Optional image caption -->
-
-                <figcaption>
-                    {{FEATURED_IMAGE_CAPTION}}
-                </figcaption>
-
-            </figure>
-
-
-
-            <!-- ================================================= -->
-            <!-- ARTICLE BODY                                      -->
-            <!-- ================================================= -->
-
-            <!--
-                ARTICLE BODY
-
-                The following is only an example.
-
-                You may create your own sections, diagrams,
-                images, tables, code blocks, lists and other
-                elements according to the article subject.
-
-                No compulsory article layout is imposed.
-            -->
-
-            <div class="article-body">
-
-
-                <section>
-
-                    <h2>{{SECTION_HEADING}}</h2>
-
-                    <p>
-                        {{SECTION_CONTENT}}
-                    </p>
-
-                </section>
-
-
-                <!--
-                    ADD ADDITIONAL ARTICLE SECTIONS AS REQUIRED.
-
-                    H2 = Main sections.
-                    H3 = Subsections.
-                    
-                    Choose headings according to the actual
-                    subject and logical content hierarchy.
-                -->
-
-
+    <!-- ARTICLE:HEADER:START -->
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="../../../../index.html">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="../../../../categories/buying-advice/buying-advice-index.html">Buying Advice</a>
+        <span aria-hidden="true">/</span>
+        <span>Phones</span>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Buying a Phone: Which Features Are Worth Paying For?</span>
+    </nav>
+    <header class="article-entry-header">
+        <p class="article-category">Phones</p>
+        <h1>Buying a Phone: Which Features Are Worth Paying For?</h1>
+        <p class="article-introduction">A practical method for matching a smartphone's display, camera, battery, software support and repair options to the way you actually use it.</p>
+        <div class="author-bar" data-author-bar data-author-id="author-luxraj-kayal" data-published-date="2026-11-23"></div>
+    </header>
+    <!-- ARTICLE:HEADER:END -->
+
+    <!-- ARTICLE:CONTENT:START -->
+    <div class="article-content-frame">
+        <figure class="article-featured-media">
+            <div class="article-featured-media__frame">
+                <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Smartphones_back.jpg?width=960" alt="Rear view of four different smartphone models arranged side by side." fetchpriority="high" decoding="async">
             </div>
+            <figcaption class="article-image-caption">Different smartphone designs illustrate why a buying decision should go beyond a single specification. <a href="https://commons.wikimedia.org/wiki/File:Smartphones_back.jpg">Maurizio Pesce, Wikimedia Commons</a> — <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>. Display cropped to fit.</figcaption>
+        </figure>
+        <div class="article-body">
+            <section>
+                <h2>Start with the daily workload</h2>
+                <p class="drop-cap">List the activities that occupy most of your day: messaging, navigation, photography, gaming, calls or work. Separate essential features from occasional preferences. A higher-priced processor may be useful for sustained gaming but unnecessary for light browsing and communication.</p>
+            </section>
 
+            <section>
+                <h2>Evaluate display and battery together</h2>
+                <p>Compare readability outdoors, screen size and comfort in addition to resolution and refresh rate. Battery life depends on brightness, network conditions and workload, not only battery capacity. Look for independent tests with conditions close to your own usage.</p>
+            </section>
 
+            <section>
+                <h2>Judge cameras using actual images</h2>
+                <p>Megapixel count does not establish image quality. Look at focus, motion capture, low-light results and consistency between cameras. If video matters, examine stabilization, audio and recording limits. Compare unedited samples instead of relying only on promotional claims.</p>
+            </section>
 
-            <!-- ================================================= -->
-            <!-- OPTIONAL REFERENCES                               -->
-            <!-- ================================================= -->
+            <section>
+                <h2>Check software support and repairs</h2>
+                <p>Confirm the exact model's promised security support, remaining update period, available service centers and repair pricing. Check whether the phone supports your carrier's bands and calling features. Android security bulletins explain platform fixes, but delivery timing depends on the device manufacturer and model.</p>
+            </section>
 
-            <!--
-                Include references when relevant to the article.
+            <section>
+                <h2>Budget for the complete ownership period</h2>
+                <p>Include the cost of a protective case, charger if required, possible battery replacement and storage needs. Inspect warranty terms and return conditions. Choose the model that satisfies the essential requirements at a sensible total cost, rather than paying for features unlikely to be used.</p>
+            </section>
+        </div>
+        <footer class="article-footer">
+            <section aria-labelledby="references-heading">
+                <h2 id="references-heading">References</h2>
+                <ul>
+                    <li><a href="https://source.android.com/docs/security/bulletin/asb-overview" target="_blank" rel="noopener noreferrer">Android Open Source Project — Android Security Bulletins</a></li>
+                    <li><a href="https://www.android.com/certified/" target="_blank" rel="noopener noreferrer">Android — Play Protect certification</a></li>
+                </ul>
+            </section>
+        </footer>
+    </div>
+    <!-- ARTICLE:CONTENT:END -->
 
-                Do not add empty or placeholder references
-                to published pages.
-            -->
-
-            <footer class="article-footer">
-
-
-                <section aria-labelledby="references-heading">
-
-                    <h2 id="references-heading">
-                        References
-                    </h2>
-
-                    <ul>
-
-                        <li>
-                            <a href="{{SOURCE_URL}}">
-                                {{SOURCE_TITLE}}
-                            </a>
-                        </li>
-
-                    </ul>
-
-                </section>
-
-
-            </footer>
-
-
-        </article>
-
-
-    </main>
-
-
-
-    <!-- ================================================= -->
-    <!-- 10. SHARED WEBSITE FOOTER                          -->
-    <!-- ================================================= -->
-
+    <!-- SHARED:ARTICLE-LAYOUT -->
     <!-- SHARED:FOOTER -->
-
-
-
-    <!-- ================================================= -->
-    <!-- 11. ARTICLE-SPECIFIC JAVASCRIPT                    -->
-    <!-- ================================================= -->
-
-    <!--
-        Add JavaScript only when required by this article.
-
-        The article does not need a shared article
-        JavaScript framework.
-    -->
-
-
     <script type="module" src="../../../../assets/js/main.js"></script>
-
+    <script type="module" src="../../../../assets/js/article-share.js"></script>
 </body>
-
 </html>
