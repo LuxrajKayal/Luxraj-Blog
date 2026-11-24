@@ -31,7 +31,12 @@ const STANDALONE_NEWSLETTER_PAGES = new Set([
   'newsletter-thank-you.html'
 ]);
 const STANDALONE_UNSUBSCRIBE_PAGES = new Set([
-  'unsubscribe.html'
+  'pages/newsletter/unsubscribe.html'
+]);
+
+// Preserve the existing public URL while organizing the source page.
+const PUBLIC_OUTPUT_PATH_OVERRIDES = new Map([
+  ['pages/newsletter/unsubscribe.html', 'unsubscribe.html']
 ]);
 const REQUIRED_MARKER_NAMES = ['TOPBAR', 'MAIN-HEADER', 'FOOTER'];
 const MARKER_NAMES = Object.keys(PARTIALS);
@@ -478,7 +483,8 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
     if (!relativeDirectory && entry.isDirectory() && entry.name === 'partials') continue;
 
     const sourcePath = path.join(sourceDirectory, entry.name);
-    const outputPath = path.join(OUTPUT_DIR, relativePath);
+    const outputRelativePath = PUBLIC_OUTPUT_PATH_OVERRIDES.get(normalizedRelativePath) || normalizedRelativePath;
+    const outputPath = path.join(OUTPUT_DIR, outputRelativePath);
 
     if (entry.isDirectory()) {
       await mkdir(outputPath, { recursive: true });
@@ -509,7 +515,8 @@ async function walkAndBuild(sourceDirectory, relativeDirectory, partialContents,
 
     // Inject one consistent icon set into every populated page, including standalone pages.
     // pageRootPrefix keeps URLs correct from nested article/category routes.
-    const faviconRootPrefix = pageRootPrefix(sourceHtml, normalizedRelativePath);
+    // Resolve icon URLs against the public output path, not the organized source path.
+    const faviconRootPrefix = pageRootPrefix(sourceHtml, outputRelativePath);
     sourceHtml = injectFaviconLinks(sourceHtml, faviconRootPrefix, normalizedRelativePath);
 
     // Newsletter callback pages are intentionally standalone: no site shell or popup injection.
