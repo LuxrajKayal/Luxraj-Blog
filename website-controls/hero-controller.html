@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luxraj Hero Controller</title>
+<style>
+:root{color-scheme:light dark;font-family:system-ui,sans-serif;line-height:1.5}
+*{box-sizing:border-box}body{margin:0;padding:24px;background:Canvas;color:CanvasText}
+main{max-width:700px;margin:auto;border:1px solid GrayText;border-radius:12px;padding:clamp(16px,4vw,32px)}
+h1{font-size:1.65rem;margin:0 0 1.25rem}h2{font-size:1.1rem;margin:1.25rem 0 .5rem}
+label{display:block;font-weight:600;margin:.9rem 0 .35rem}input,select,button{font:inherit;border:1px solid GrayText;border-radius:6px;padding:.65rem .75rem;background:Field;color:FieldText}
+input:not([type=file]),select{width:100%}input[type=file]{width:100%}
+button{cursor:pointer;background:#a81d39;color:white;border:0;font-weight:600}button:disabled{opacity:.5;cursor:not-allowed}
+fieldset{border:0;padding:0;margin:0;min-width:0}fieldset:disabled{opacity:.6}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hint{font-size:.875rem;color:GrayText;margin:.4rem 0}
+#status{min-height:1.5em;overflow-wrap:anywhere}.actions{margin-top:1.5rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid GrayText;padding:12px;border-radius:6px;font-size:.8rem}
+@media(max-width:500px){body{padding:12px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>Hero Carousel Settings</h1>
+<label for="source">Import hero-settings.json</label>
+<input id="source" type="file" accept=".json,application/json">
+<p id="status" role="status" aria-live="polite"></p>
+<form id="form">
+<fieldset id="fields" disabled>
+<label for="mode">Article selection</label>
+<select id="mode"><option value="manual">Manual</option><option value="auto">Automatic — newest published articles</option></select>
+<div class="grid">
+<div><label for="maximum">Maximum articles</label><select id="maximum"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+<div><label for="interval">Rotation interval (seconds)</label><input id="interval" type="number" min="3" max="15" step="0.001" required></div>
+</div>
+<div id="manual">
+<h2>Manual article paths</h2>
+<p class="hint">Enter paths relative to the website root, without a leading slash or domain. Order controls the carousel sequence.</p>
+<label for="article0">Article 1</label><input id="article0" type="text" placeholder="categories/…/articles/….html" autocomplete="off">
+<label for="article1">Article 2</label><input id="article1" type="text" placeholder="categories/…/articles/….html" autocomplete="off">
+<label for="article2">Article 3</label><input id="article2" type="text" placeholder="categories/…/articles/….html" autocomplete="off">
+<label for="article3">Article 4</label><input id="article3" type="text" placeholder="categories/…/articles/….html" autocomplete="off">
+<label for="article4">Article 5</label><input id="article4" type="text" placeholder="categories/…/articles/….html" autocomplete="off">
+</div>
+<p id="autoHint" class="hint" hidden>Automatic mode uses the published dates of eligible articles listed in the website sitemap. Manual paths remain saved.</p>
+<h2>JSON preview</h2>
+<pre id="preview"></pre>
+<div class="actions"><button type="submit">Download hero-settings.json</button></div>
+</fieldset>
+</form>
+</main>
+<script>
+function validPath(path) {
+  return typeof path === "string" && /^categories\/(?:[a-zA-Z0-9_-]+\/)+articles\/[a-zA-Z0-9_-]+\.html$/.test(path);
+}
+function validateSettings(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value) ||
+      !["manual", "auto"].includes(value.mode) ||
+      !Number.isInteger(value.maximumArticles) || value.maximumArticles < 1 || value.maximumArticles > 5 ||
+      !Number.isInteger(value.rotationIntervalMs) || value.rotationIntervalMs < 3000 || value.rotationIntervalMs > 15000 ||
+      !Array.isArray(value.manualArticles) || value.manualArticles.length > 5 ||
+      !value.manualArticles.every(validPath) || new Set(value.manualArticles).size !== value.manualArticles.length) {
+    throw new Error("Invalid hero settings. Use one to five articles, unique website-relative article paths, and a rotation interval of 3–15 seconds.");
+  }
+  return { mode: value.mode, maximumArticles: value.maximumArticles, rotationIntervalMs: value.rotationIntervalMs, manualArticles: [...value.manualArticles] };
+}
+const byId = id => document.getElementById(id);
+const source = byId("source"), form = byId("form"), fields = byId("fields"), status = byId("status");
+const mode = byId("mode"), maximum = byId("maximum"), interval = byId("interval");
+const paths = Array.from({length:5}, (_, i) => byId("article" + i));
+function readForm() {
+  return validateSettings({mode:mode.value, maximumArticles:Number(maximum.value), rotationIntervalMs:Math.round(Number(interval.value)*1000), manualArticles:paths.map(input=>input.value.trim()).filter(Boolean)});
+}
+function refresh() {
+  byId("manual").hidden = mode.value !== "manual";
+  byId("autoHint").hidden = mode.value !== "auto";
+  try { byId("preview").textContent = JSON.stringify(readForm(), null, 2); }
+  catch (error) { byId("preview").textContent = error.message; }
+}
+source.addEventListener("change", async () => {
+  fields.disabled = true;
+  if (!source.files[0]) { status.textContent = ""; return; }
+  try {
+    const settings = validateSettings(JSON.parse(await source.files[0].text()));
+    mode.value = settings.mode;
+    maximum.value = String(settings.maximumArticles);
+    interval.value = String(settings.rotationIntervalMs/1000);
+    paths.forEach((input, i) => input.value = settings.manualArticles[i] || "");
+    fields.disabled = false;
+    status.textContent = "Settings imported.";
+    refresh();
+  } catch(error) { status.textContent = error.message; byId("preview").textContent = ""; }
+});
+form.addEventListener("input", refresh);
+form.addEventListener("change", refresh);
+form.addEventListener("submit", event => {
+  event.preventDefault();
+  try {
+    const settings = readForm();
+    const blob = new Blob([JSON.stringify(settings, null, 2) + "\n"], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url; anchor.download = "hero-settings.json";
+    document.body.append(anchor); anchor.click(); anchor.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    status.textContent = "hero-settings.json generated.";
+  } catch(error) { status.textContent = error.message; }
+});
+</script>
+</body>
+</html>

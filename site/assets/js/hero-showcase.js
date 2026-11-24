@@ -1,17 +1,17 @@
-/*
- * Luxraj Blog — curated homepage hero.
- * Maintain up to five same-origin article URLs in FEATURED_ARTICLE_URLS.
- * Each article must contain an image marked with data-hero-image.
- */
-const FEATURED_ARTICLE_URLS = [
-  "categories/tech-news/ai/articles/ai-on-the-edge-what-local-inference-changes.html",
-  "categories/how-to/linux/articles/how-to-choose-a-linux-desktop-for-an-older-computer.html",
-  "categories/engineering/drone-technology/articles/how-a-drone-flight-controller-connects-aircraft-systems.html",
-  "categories/reviews/phones/articles/phone-review-sample-beyond-the-specification-sheet.html",
-  "categories/buying-advice/phones/articles/buying-a-phone-which-features-are-worth-paying-for.html"
-];
-const MAX_FEATURED_ARTICLES = 5;
-const ROTATION_INTERVAL_MS = 5000;
+function validPath(path) {
+  return typeof path === "string" && /^categories\/(?:[a-zA-Z0-9_-]+\/)+articles\/[a-zA-Z0-9_-]+\.html$/.test(path);
+}
+function validateSettings(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value) ||
+      !["manual", "auto"].includes(value.mode) ||
+      !Number.isInteger(value.maximumArticles) || value.maximumArticles < 1 || value.maximumArticles > 5 ||
+      !Number.isInteger(value.rotationIntervalMs) || value.rotationIntervalMs < 3000 || value.rotationIntervalMs > 15000 ||
+      !Array.isArray(value.manualArticles) || value.manualArticles.length > 5 ||
+      !value.manualArticles.every(validPath) || new Set(value.manualArticles).size !== value.manualArticles.length) {
+    throw new Error("Invalid hero settings. Use one to five articles, unique website-relative article paths, and a rotation interval of 3–15 seconds.");
+  }
+  return { mode: value.mode, maximumArticles: value.maximumArticles, rotationIntervalMs: value.rotationIntervalMs, manualArticles: [...value.manualArticles] };
+}
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -34,20 +34,59 @@ function makeArrow(direction, onClick, disabled) {
 }
 
 async function readArticle(path, siteRoot) {
+  if (!validPath(path)) throw new Error("Invalid article path");
   const url = new URL(path, siteRoot);
-  if (url.origin !== window.location.origin) throw new Error("Featured article must be same-origin: " + url.href);
-  const response = await fetch(url.href, { headers: { Accept: "text/html" } });
-  if (!response.ok) throw new Error("Article request failed (" + response.status + "): " + url.href);
+  const response = await fetch(url, { headers: { Accept: "text/html" }, signal: AbortSignal.timeout(12000) });
+  if (!response.ok) throw new Error("Article request failed: " + response.status);
+  const finalUrl = new URL(response.url || url.href);
+  if (finalUrl.origin !== siteRoot.origin || !finalUrl.pathname.startsWith(siteRoot.pathname)) throw new Error("Article is outside the website");
   const doc = new DOMParser().parseFromString(await response.text(), "text/html");
-  const heading = doc.querySelector(".article-content h1, main article h1, article h1, main h1");
-  const image = doc.querySelector("img[data-hero-image]");
-  if (!heading?.textContent.trim()) throw new Error("Article has no h1: " + url.href);
-  if (!image) throw new Error("Article has no img[data-hero-image]: " + url.href);
-  const src = image.getAttribute("src") || image.getAttribute("data-src");
-  if (!src) throw new Error("Tagged image has no src: " + url.href);
-  const imageUrl = new URL(src, url);
-  if (!["http:", "https:"].includes(imageUrl.protocol)) throw new Error("Unsupported image URL: " + imageUrl.href);
-  return { url: url.href, title: heading.textContent.trim(), imageUrl: imageUrl.href, alt: (image.getAttribute("alt") || heading.textContent).trim() };
+  const article = doc.querySelector("main article, article");
+  const title = article?.querySelector("h1")?.textContent.trim();
+  const image = article && [...article.querySelectorAll("img")].find(node => !node.closest("header, nav, aside, footer, .author-bar"));
+  const src = image?.getAttribute("src")?.trim() || image?.getAttribute("data-src")?.trim();
+  if (!title || !src || /\{\{|\}\}/.test(title + src)) throw new Error("Article has incomplete content");
+  const imageUrl = new URL(src, finalUrl);
+  if (!["http:", "https:"].includes(imageUrl.protocol)) throw new Error("Invalid image URL");
+  const date = article.querySelector("[data-published-date]")?.getAttribute("data-published-date") || "";
+  const published = /^\d{4}-\d{2}-\d{2}$/.test(date) && Number.isFinite(Date.parse(date)) && new Date(date).toISOString().slice(0, 10) === date ? date : "";
+  return { url: url.href, title, imageUrl: imageUrl.href, alt: (image.getAttribute("alt") || title).trim(), published };
+}
+
+async function discoverArticles(siteRoot) {
+  const response = await fetch(new URL("sitemap.xml", siteRoot), { signal: AbortSignal.timeout(12000) });
+  if (!response.ok) throw new Error("Sitemap request failed");
+  const doc = new DOMParser().parseFromString(await response.text(), "application/xml");
+  if (doc.querySelector("parsererror")) throw new Error("Invalid sitemap");
+  const paths = [...doc.getElementsByTagNameNS("*", "loc")].flatMap(loc => {
+    try {
+      const url = new URL(loc.textContent.trim(), siteRoot);
+      const path = url.pathname.startsWith(siteRoot.pathname) ? url.pathname.slice(siteRoot.pathname.length) : url.pathname.replace(/^\/+/, "");
+      return validPath(path) ? [path] : [];
+    } catch { return []; }
+  });
+  return [...new Set(paths)];
+}
+
+async function loadArticles(settings, siteRoot) {
+  const paths = settings.mode === "auto" ? await discoverArticles(siteRoot) : settings.manualArticles;
+  const results = new Array(paths.length);
+  let cursor = 0;
+  async function worker() {
+    while (cursor < paths.length) {
+      const index = cursor++;
+      try { results[index] = await readArticle(paths[index], siteRoot); }
+      catch { results[index] = null; }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(6, paths.length) }, worker));
+  let articles = results.filter(Boolean);
+  if (settings.mode === "auto") {
+    const today = new Date().toISOString().slice(0, 10);
+    articles = articles.filter(article => article.published && article.published <= today)
+      .sort((a, b) => b.published.localeCompare(a.published) || a.url.localeCompare(b.url));
+  }
+  return articles.slice(0, settings.maximumArticles);
 }
 
 function buildSlide(article, onPrevious, onNext, canNavigate) {
@@ -69,7 +108,8 @@ function buildSlide(article, onPrevious, onNext, canNavigate) {
   titleLink.href = article.url;
   titleLink.setAttribute("aria-label", article.title);
   const titleText = el("span", "hero-showcase__headline-text", article.title);
-  const openIcon = el("svg", "hero-showcase__open-icon");
+  const openIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  openIcon.setAttribute("class", "hero-showcase__open-icon");
   openIcon.setAttribute("viewBox", "0 0 24 24");
   openIcon.setAttribute("aria-hidden", "true");
   openIcon.setAttribute("focusable", "false");
@@ -96,6 +136,7 @@ export function initHeroShowcase() {
   let hovering = false;
   let focused = false;
   let timer = null;
+  let rotationIntervalMs = 5000;
 
   function updateCount() {
     const total = articles.length;
@@ -108,7 +149,7 @@ export function initHeroShowcase() {
   function syncTimer() {
     stopTimer();
     if (articles.length < 2 || hovering || focused || document.hidden || reducedMotion) return;
-    timer = window.setInterval(() => show(current + 1), ROTATION_INTERVAL_MS);
+    timer = window.setInterval(() => show(current + 1), rotationIntervalMs);
   }
   function navigate(offset) {
     show(current + offset);
@@ -142,13 +183,24 @@ export function initHeroShowcase() {
   });
   document.addEventListener("visibilitychange", syncTimer);
 
-  Promise.all(FEATURED_ARTICLE_URLS.slice(0, MAX_FEATURED_ARTICLES).map(async path => {
-    try { return await readArticle(path, siteRoot); }
-    catch (error) { console.warn("[Luxraj hero] Skipping featured article:", error); return null; }
-  })).then(results => {
-    articles = results.filter(Boolean);
-    if (!articles.length) { unavailable(); return; }
-    show(0);
-    syncTimer();
-  });
+  fetch(new URL("settings/hero-settings.json", siteRoot), { cache: "no-cache", signal: AbortSignal.timeout(12000) })
+    .then(response => {
+      if (!response.ok) throw new Error("Hero settings request failed");
+      return response.json();
+    })
+    .then(validateSettings)
+    .then(settings => {
+      rotationIntervalMs = settings.rotationIntervalMs;
+      return loadArticles(settings, siteRoot);
+    })
+    .then(results => {
+      articles = results;
+      if (!articles.length) { unavailable(); return; }
+      show(0);
+      syncTimer();
+    })
+    .catch(error => {
+      console.warn("[Luxraj hero]", error);
+      unavailable();
+    });
 }

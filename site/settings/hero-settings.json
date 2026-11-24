@@ -1,0 +1,12 @@
+{
+  "mode": "manual",
+  "maximumArticles": 5,
+  "rotationIntervalMs": 5000,
+  "manualArticles": [
+    "categories/tech-news/ai/articles/ai-on-the-edge-what-local-inference-changes.html",
+    "categories/how-to/linux/articles/how-to-choose-a-linux-desktop-for-an-older-computer.html",
+    "categories/hardware/storage/articles/storage-sample-ssd-interfaces-and-real-world-workloads.html",
+    "categories/software/operating-systems/articles/operating-system-sample-choosing-the-right-environment.html",
+    "categories/buying-advice/phones/articles/buying-a-phone-which-features-are-worth-paying-for.html"
+  ]
+}
