@@ -1,5 +1,5 @@
 {
-  "mode": "manual",
+  "mode": "auto",
   "maximumArticles": 5,
   "rotationIntervalMs": 5000,
   "manualArticles": [
