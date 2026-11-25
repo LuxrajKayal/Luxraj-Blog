@@ -11,7 +11,6 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PAGE_ID_PLACEHOLDER, ensurePageIdPlaceholder } from './injectors/placeholder-injector.mjs';
 import { ensureSeoEligibilityMarker } from './injectors/permanent-element-injector.mjs';
 
 const REPOSITORY_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -45,10 +44,9 @@ const markerFor = name => '<!-- SHARED:' + name + ' -->';
 const ARTICLE_SLOT_NAMES = ['HEADER', 'CONTENT'];
 
 /*
- * Validate all populated pages and permanent IDs before writing any source
- * changes. This avoids partial injection if a duplicate ID is found.
+ * Collect SEO eligibility updates before writing any source changes.
  */
-async function collectSourceMetadataUpdates(sourceDirectory, relativeDirectory, pendingUpdates, permanentPageIds) {
+async function collectSourceMetadataUpdates(sourceDirectory, relativeDirectory, pendingUpdates) {
   const entries = await readdir(sourceDirectory, { withFileTypes: true });
 
   for (const entry of entries) {
@@ -63,7 +61,7 @@ async function collectSourceMetadataUpdates(sourceDirectory, relativeDirectory, 
     const sourcePath = path.join(sourceDirectory, entry.name);
 
     if (entry.isDirectory()) {
-      await collectSourceMetadataUpdates(sourcePath, relativePath, pendingUpdates, permanentPageIds);
+      await collectSourceMetadataUpdates(sourcePath, relativePath, pendingUpdates);
       continue;
     }
 
@@ -74,26 +72,12 @@ async function collectSourceMetadataUpdates(sourceDirectory, relativeDirectory, 
     // Empty HTML placeholders are not pages yet.
     if (!sourceHtml.trim()) continue;
 
-    const result = ensurePageIdPlaceholder(sourceHtml, normalizedRelativePath);
-    const seoResult = ensureSeoEligibilityMarker(result.html, normalizedRelativePath);
+    const seoResult = ensureSeoEligibilityMarker(sourceHtml, normalizedRelativePath);
 
-    if (result.pageId !== PAGE_ID_PLACEHOLDER) {
-      const firstFile = permanentPageIds.get(result.pageId);
-      if (firstFile) {
-        throw new Error(
-          'Duplicate permanent page ID "' + result.pageId + '" in ' +
-          firstFile + ' and ' + normalizedRelativePath + '.'
-        );
-      }
-      permanentPageIds.set(result.pageId, normalizedRelativePath);
-    }
-
-    if (result.injected || seoResult.injected) {
+    if (seoResult.injected) {
       pendingUpdates.push({
         sourcePath,
-        html: seoResult.html,
-        pageIdInjected: result.injected,
-        seoMarkerInjected: seoResult.injected
+        html: seoResult.html
       });
     }
   }
@@ -101,14 +85,13 @@ async function collectSourceMetadataUpdates(sourceDirectory, relativeDirectory, 
 
 async function injectSourceMetadataIntoSource(stats) {
   const pendingUpdates = [];
-  await collectSourceMetadataUpdates(SITE_DIR, '', pendingUpdates, new Map());
+  await collectSourceMetadataUpdates(SITE_DIR, '', pendingUpdates);
 
   for (const update of pendingUpdates) {
     await writeFile(update.sourcePath, update.html, 'utf8');
   }
 
-  stats.pageIdsInjected = pendingUpdates.filter(update => update.pageIdInjected).length;
-  stats.seoMarkersInjected = pendingUpdates.filter(update => update.seoMarkerInjected).length;
+  stats.seoMarkersInjected = pendingUpdates.length;
 }
 
 function extractArticleSlot(html, name, relativeFile) {
@@ -601,7 +584,6 @@ async function main() {
     builtPages: 0,
     emptyPlaceholders: 0,
     standalonePages: 0,
-    pageIdsInjected: 0,
     seoMarkersInjected: 0
   };
 
@@ -628,8 +610,7 @@ async function main() {
   await writeFile(path.join(OUTPUT_DIR, '.nojekyll'), '', 'utf8');
 
   console.log(
-    'Injected page-ID placeholders into ' + stats.pageIdsInjected +
-    ' source HTML files, and SEO eligibility markers into ' + stats.seoMarkersInjected +
+    'Injected SEO eligibility markers into ' + stats.seoMarkersInjected +
     ' source HTML files. Built _site/: assembled and verified shared components on ' +
     stats.builtPages + ' populated HTML pages; copied ' +
     stats.standalonePages + ' standalone HTML pages; left ' +
