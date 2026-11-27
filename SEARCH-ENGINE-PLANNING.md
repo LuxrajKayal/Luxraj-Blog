@@ -19,3 +19,23 @@ Phase 4.2.2 — RiveScript rule setting: Develop our own language-specific conve
 Phase 4.3.1 — NLP.js infrastructure: Set up training, model loading, execution and communication, using minimal sample data to verify functionality.
 
 Phase 4.3.2 — NLP.js training: Prepare English, Arabic and Spanish training data, train and save the models, and test intent recognition.
+
+## Workflow Architecture
+
+```mermaid
+flowchart TD
+    USER[User] --> UI[Website UI]
+    UI --> NS[Normal Search]
+    UI --> LX[Luxy Assistant]
+    NS <-->|ui-pagefind.js| PF[Pagefind]
+    LX -->|ui-nlp.js| NLP[NLP.js - Brain]
+    NLP -->|nlp-rivescript.js| RS[RiveScript - Nerve]
+    RS <-->|rivescript-pagefind.js| PF
+    RS -->|rivescript-ui.js| LX
+```
+
+**Normal Search:** The UI sends the user's query to Pagefind through `ui-pagefind.js`. Pagefind processes the query using its native search logic and returns results to the UI through the same adapter.
+
+**Luxy Assistant:** The UI sends the user's query to NLP.js through `ui-nlp.js`. NLP.js identifies the intent, subject and requested outcome, and passes the processed information and original input to RiveScript through `nlp-rivescript.js`. RiveScript follows the predefined intent-based rules to respond, search Pagefind through `rivescript-pagefind.js`, or execute an authorized JavaScript function. Pagefind results return to RiveScript through the same adapter. RiveScript sends the final response directly to the UI through `rivescript-ui.js`, without NLP reprocessing.
+
+**Adapters:** Communication only; no independent decision-making or execution logic. No central controller. Tag Search remains untouched.
