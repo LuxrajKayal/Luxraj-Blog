@@ -186,3 +186,46 @@ html:has(#search-dialog[open][data-normal-workspace]),body:has(#search-dialog[op
 #search-dialog:not([data-search-ui-mode="developer"]) #general-search-view [data-ns-developer-only] {
   display:none!important;
 }
+
+
+/* Adaptive Normal Search toolbar. Its rail stays reachable; the content track
+   collapses in flow, releasing space to the existing scrollable results. */
+#general-search-view .ns-top-shell{
+  flex:none;min-width:0;position:relative;z-index:2;background:var(--ns-surface);
+}
+#general-search-view .ns-top-rail{
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;
+  padding:2px 0;min-width:0;
+}
+#general-search-view .ns-top-rail button{
+  min-height:28px;height:28px;padding:2px 8px;border-radius:6px;
+  background:transparent;border-color:transparent;color:var(--ns-muted);
+}
+#general-search-view .ns-top-handle{width:100%;justify-content:center}
+#general-search-view .ns-top-pin{width:36px;min-width:36px}
+#general-search-view .ns-top-rail button:disabled{opacity:.45;cursor:default}
+#general-search-view .ns-top-rail button:not(:disabled):hover{background:var(--ns-hover);border-color:var(--ns-border)}
+#general-search-view .ns-top-pin .ns-icon:last-child{display:none}
+#general-search-view .ns-top-pin[aria-pressed="true"] .ns-icon:first-child{display:none}
+#general-search-view .ns-top-pin[aria-pressed="true"] .ns-icon:last-child{display:block}
+#general-search-view .ns-top-pin[aria-pressed="true"]{color:var(--ns-accent);background:var(--ns-hover);border-color:var(--ns-accent)}
+#general-search-view .ns-top-handle .ns-icon{transform:rotate(180deg)}
+#general-search-view .ns-top-shell[data-expanded="false"] .ns-top-handle .ns-icon{transform:none}
+#general-search-view .ns-top-fold{display:grid;grid-template-rows:1fr;transition:grid-template-rows 200ms ease}
+#general-search-view .ns-top-shell[data-expanded="false"] .ns-top-fold{grid-template-rows:0fr}
+#general-search-view .ns-top-clip{min-height:0;max-height:var(--ns-top-available,none);overflow:auto;overscroll-behavior:contain}
+#general-search-view .ns-top-shell[data-expanded="false"] .ns-top-clip{visibility:hidden;overflow:hidden}
+#general-search-view .ns-top-shell[data-expanded="false"] .ns-top{pointer-events:none}
+#general-search-view .ns-body,#general-search-view .ns-workspace{overflow-anchor:none}
+@media(max-width:767px),(pointer:coarse){
+  #general-search-view .ns-top-rail button{height:44px;min-height:44px}
+  #general-search-view .ns-top-pin{width:44px;min-width:44px}
+}
+@media(max-height:480px){
+  #general-search-view .ns-top-shell{position:sticky;top:0}
+  #general-search-view .ns-top-clip{max-height:var(--ns-top-available,120px);overflow:auto;overscroll-behavior:contain}
+  #general-search-view .ns-top-shell[data-expanded="false"] .ns-top-clip{overflow:hidden}
+}
+@media(prefers-reduced-motion:reduce){
+  #general-search-view .ns-top-fold{transition:none}
+}

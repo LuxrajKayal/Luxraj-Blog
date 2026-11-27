@@ -1,4 +1,4 @@
-// Normal Search visual workspace only. No Pagefind import, adapter, search, index or persistence.
+// Normal Search visual workspace only. No Pagefind import, adapter, search or index operations.
 // All result/filter examples are explicitly illustrative, not live search output.
 function normalMarkup(lang) {
   const t=(en,ar,es)=>({en,ar,es}[lang]||en);
@@ -18,7 +18,7 @@ function normalMarkup(lang) {
     label:t("Label","التسمية","Etiqueta"),value:t("Value","القيمة","Valor"),field:t("Field","الحقل","Campo"),direction:t("Direction","الاتجاه","Dirección"),done:t("Done","تم","Listo")
   };
   const label=k=>e(text[k]||k);
-  const icon=(name)=>{const paths={search:'<circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/>',close:'<path d="m6 6 12 12M18 6 6 18"/>',filter:'<path d="M4 6h16M7 12h10M10 18h4"/><circle cx="8" cy="6" r="2"/><circle cx="15" cy="12" r="2"/>',sort:'<path d="M8 4v16m-4-4 4 4 4-4M16 20V4m-4 4 4-4 4 4"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/>',grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',list:'<path d="M8 5h13M8 12h13M8 19h13M3 5h1M3 12h1M3 19h1"/>',external:'<path d="M13 5h6v6M19 5l-9 9M10 5H5v14h14v-5"/>',image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m4 18 6-6 4 4 3-3 4 5"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-9h.01"/>',back:'<path d="m10 5-7 7 7 7M3 12h18"/>',chevron:'<path d="m8 10 4 4 4-4"/>'};return `<svg class="ns-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.info}</svg>`;};
+  const icon=(name)=>{const paths={search:'<circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/>',close:'<path d="m6 6 12 12M18 6 6 18"/>',filter:'<path d="M4 6h16M7 12h10M10 18h4"/><circle cx="8" cy="6" r="2"/><circle cx="15" cy="12" r="2"/>',sort:'<path d="M8 4v16m-4-4 4 4 4-4M16 20V4m-4 4 4-4 4 4"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/>',grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',list:'<path d="M8 5h13M8 12h13M8 19h13M3 5h1M3 12h1M3 19h1"/>',external:'<path d="M13 5h6v6M19 5l-9 9M10 5H5v14h14v-5"/>',image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m4 18 6-6 4 4 3-3 4 5"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-9h.01"/>',back:'<path d="m10 5-7 7 7 7M3 12h18"/>',chevron:'<path d="m8 10 4 4 4-4"/>',pin:'<path d="M16 3l5 5-3 1-3 5v3l-2 2-8-8 2-2h3l5-3 1-3ZM9 15l-6 6"/>',pinOff:'<path d="m3 3 18 18M16 3l5 5-3 1-2 3M9 9H7l-2 2 8 8 2-2v-2M9 15l-6 6"/>'};return `<svg class="ns-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.info}</svg>`;};
   const btn=(s,attrs="",i="")=>`<button type="button" ${attrs}>${i?icon(i):""}<span>${e(s)}</span></button>`;
   const dead=(s,i="")=>btn(s,`disabled title="${e(text.unavailable)}"`,i);
   const opt=(v,s)=>`<option value="${e(v)}">${e(s)}</option>`;
@@ -91,8 +91,178 @@ function normalMarkup(lang) {
   const attrs=[["data-pagefind-body",t("Searchable region","منطقة قابلة للبحث","Región indexable")],["data-pagefind-ignore",t("Ignore all / index only","تجاهل الكل / الفهرسة فقط","Ignorar todo / solo índice")],["data-pagefind-weight",t("Content weight","وزن المحتوى","Peso de contenido")],["data-pagefind-filter",t("Filter key / value","مفتاح / قيمة التصفية","Clave / valor de filtro")],["data-pagefind-meta",t("Metadata","البيانات الوصفية","Metadatos")],["data-pagefind-default-meta",t("Fallback metadata","البيانات الاحتياطية","Metadatos alternativos")],["data-pagefind-sort",t("Sort key / value","مفتاح / قيمة الترتيب","Clave / valor de orden")],["data-pagefind-index-attrs",t("Index HTML attributes","فهرسة سمات HTML","Indexar atributos HTML")],["data-pagefind-title",t("Explicit sub-result title","عنوان القسم الصريح","Título explícito de subresultado")]];
   const index=panel("index",text.index,`<div class="ns-form">${section(t("Source and output","المصدر والمخرجات","Origen y salida"),fields([field("site","",'data-native="site"'),field("source (legacy)","",'data-native="source"'),field("glob","**/*.html",'data-native="glob"'),field("output_subdir","",'data-native="output_subdir"'),field("output_path","",'data-native="output_path"'),field("bundle_dir (legacy)","",'data-native="bundle_dir"'),field("root_selector","body",'data-native="root_selector"'),area("exclude_selectors","",'data-native="exclude_selectors"'),select("force_language",[["",t("Automatic","تلقائي","Automático")],["en","English"],["ar","العربية"],["es","Español"]],'data-native="force_language"'),field("include_characters","",'data-native="include_characters"'),num("max_fragments (0 = unset)",0,0,100000,'data-native="max_fragments"'),field("logfile","",'data-native="logfile"'),select(t("Configuration source","مصدر التهيئة","Origen de configuración"),["CLI","Environment","JSON","YAML","TOML"])] )+`<div class="ns-check-grid">${["keep_index_url","serve","verbose","quiet","silent","write_playground","service"].map(k=>check(k,false,`data-native="${k}"`)).join("")}</div>`)}${section(t("Indexing attributes and mappings","سمات الفهرسة والتعيينات","Atributos y asignaciones de índice"),`<div class="ns-index-attrs">${attrs.map(([key,name])=>accordion(key,`<p class="ns-muted">${e(name)}</p>${fields([field(t("Selector / element","المحدد / العنصر","Selector / elemento"),""),field(t("Key / value / attribute","مفتاح / قيمة / سمة","Clave / valor / atributo"),""),field(t("Default / source value","القيمة الافتراضية / المصدر","Valor predeterminado / origen"),"")])}`,false)).join("")}</div>${select("data-pagefind-ignore",[["all","all"],["index","index"]])}<div data-ns-rows>${fields([select(t("Mapping type","نوع التعيين","Tipo de asignación"),attrs.map(([key])=>key)),field(text.field),field(text.value)])}</div>${btn(t("Add mapping","إضافة تعيين","Añadir asignación"),'data-ns-add-row="mapping"')}`)}${section(t("Indexing APIs and custom records","واجهات الفهرسة والسجلات المخصصة","APIs de indexación y registros personalizados"),fields([field("url"),field("language"),field("sourcePath"),area("content"),area("meta","{}"),area("filters","{}"),area("sort","{}")])+actions(...[["Add HTML","إضافة HTML","Añadir HTML"],["Add directory","إضافة مجلد","Añadir directorio"],["Add custom record","إضافة سجل مخصص","Añadir registro"],["Generate index","إنشاء فهرس","Generar índice"],["Get generated files","الحصول على الملفات","Obtener archivos"],["Write files","كتابة الملفات","Escribir archivos"],["Delete index","حذف الفهرس","Eliminar índice"],["Serve / preview","خدمة / معاينة","Servir / previsualizar"],["Generate playground","إنشاء ساحة التشخيص","Generar entorno de diagnóstico"]].map(x=>dead(t(...x)))))}${section(t("Build status (informational)","حالة البناء (معلومات)","Estado de compilación (informativo)"),table([text.field,text.value],["Indexed pages","Indexed languages","Indexed words","Indexed filters","Indexed sorts","Fragment count","Output files","Log messages"].map(x=>[x,"—"])))}${actions(btn(text.reset,'data-ns-form-reset'),dead(t("Apply indexing configuration","تطبيق تهيئة الفهرسة","Aplicar configuración de índice")))}</div>`);
   const shortcuts=panel("keyboard",t("Keyboard and accessibility reference","مرجع لوحة المفاتيح وإمكانية الوصول","Referencia de teclado y accesibilidad"),`<p class="ns-muted" data-ns-developer-only>${L("Shortcut designs are shown here; engine-related actions will be wired later.","تصاميم الاختصارات معروضة هنا؛ ستُربط عمليات المحرك لاحقاً.","Se muestran los atajos previstos; las acciones del motor se conectarán después.")}</p>${table([t("Key","المفتاح","Tecla"),t("Planned action","الإجراء المخطط","Acción prevista")],[["Ctrl / Cmd + K",t("Open search","فتح البحث","Abrir búsqueda")],["↑ / ↓",t("Navigate results or filters","التنقل بين النتائج والتصفية","Navegar por resultados o filtros")],["Enter",t("Open result / select","فتح نتيجة / تحديد","Abrir resultado / seleccionar")],["Ctrl / Cmd / Shift + Enter",text.newtab],["Esc",t("Clear / close panel / close dialog","مسح / إغلاق اللوحة / إغلاق النافذة","Limpiar / cerrar panel / cerrar ventana")],["Tab / Shift + Tab",t("Focus controls","التنقل بين عناصر التحكم","Enfocar controles")],["Home / End",t("First / last filter option","أول / آخر خيار","Primera / última opción")],["Space",t("Toggle filter","تبديل عامل التصفية","Alternar filtro")],["/",t("Focus input","التركيز على الإدخال","Enfocar entrada")],["Backspace / printable key",t("Return to input","العودة للإدخال","Volver a entrada")]])}${section(t("Accessibility provisions","إمكانية الوصول","Accesibilidad"),table([text.field,text.value],[["ARIA live / atomic / busy",t("Status and announcement regions","مناطق الحالة والإعلان","Regiones de estado y anuncio")],["focus-visible",t("Visible focus outlines","حدود تركيز مرئية","Contornos de enfoque visibles")],["IME / Unicode",t("Composition-safe native input","إدخال أصلي آمن للتركيب","Entrada nativa segura para composición")],["RTL / LTR",t("Logical layout","تخطيط منطقي","Diseño lógico")],["prefers-reduced-motion",t("Reduced animation","حركة مخفضة","Animación reducida")]]))}`);
-  return `<div class="ns-workspace" data-ns-workspace lang="${lang}" dir="${lang==="ar"?"rtl":"ltr"}" data-theme="site"><div class="ns-top"><p class="ns-preview" role="note">${icon("info")}<span>${label("preview")}</span></p><form class="ns-searchbar" id="ns-query-form" role="search"><label class="ns-query-label" for="ns-query">${icon("search")}<span class="ns-sr">${L("Search keyword or phrase","ابحث بكلمة أو عبارة","Buscar palabra o frase")}</span><input id="ns-query" type="search" autocomplete="off" data-native="term" placeholder="${L("Search keywords, phrases or technical terms…","ابحث عن كلمات أو عبارات أو مصطلحات تقنية…","Buscar palabras, frases o términos técnicos…")}"></label><button type="button" data-ns-clear-query aria-label="${L("Clear search input","مسح إدخال البحث","Limpiar búsqueda")}">${icon("close")}</button>${dead(t("Search","بحث","Buscar"),"search")}</form><nav class="ns-toolbar" aria-label="${L("Search tools","أدوات البحث","Herramientas de búsqueda")}">${btn(text.filters,'data-ns-filter-toggle aria-controls="ns-filters" aria-expanded="false"',"filter")}${btn(text.sort+" · "+text.relevance,'data-ns-view="sort"',"sort")}${btn(text.advanced,'data-ns-view="advanced"',"settings")}${btn(text.settings,'data-ns-view="settings"',"settings")}${btn(text.diagnostics,'data-ns-view="diagnostics" data-ns-developer-only')}${btn(text.engine,'data-ns-view="engine" data-ns-developer-only')}${btn(text.index,'data-ns-view="index" data-ns-developer-only')}</nav><div class="ns-selection-bar"><div data-ns-selected aria-live="polite"><span class="ns-muted">${L("No filters selected","لم يتم تحديد عوامل تصفية","Sin filtros seleccionados")}</span></div>${btn(text.reset,'data-ns-reset-filters class="ns-quiet"')}</div></div><div class="ns-body"><div class="ns-main" data-ns-panel="results">${filterPane}${resultArea}</div>${sortPanel}${advanced}${settings}${details}${diagnostics}${engine}${index}${shortcuts}</div><footer class="ns-footer"><span class="ns-keyboard-hints"><kbd>↑ ↓</kbd> ${L("Navigate","تنقل","Navegar")} <kbd>Enter</kbd> ${L("Open","فتح","Abrir")} <kbd>/</kbd> ${L("Search","بحث","Buscar")} <kbd>Esc</kbd> ${L("Close","إغلاق","Cerrar")}</span>${btn(t("Keyboard reference","مرجع لوحة المفاتيح","Referencia de teclado"),'data-ns-view="keyboard" class="ns-quiet"')}<span class="ns-muted">${label("demo")}</span></footer><template data-ns-row-template="weight"><div class="ns-extra-row">${fields([field(text.field),num(text.value,1,0,1000,'step="0.1"')])}${btn(text.remove,'data-ns-remove')}</div></template><template data-ns-row-template="index"><div class="ns-extra-row">${fields([field("bundlePath"),field("baseUrl"),num("indexWeight",1,0,1000,'step="0.1"'),area("mergeFilter","{}")])}${btn(text.remove,'data-ns-remove')}</div></template><template data-ns-row-template="mapping"><div class="ns-extra-row">${fields([select(t("Mapping type","نوع التعيين","Tipo de asignación"),attrs.map(([key])=>key)),field(text.field),field(text.value)])}${btn(text.remove,'data-ns-remove')}</div></template><template data-ns-no-selection><span class="ns-muted">${L("No filters selected","لم يتم تحديد عوامل تصفية","Sin filtros seleccionados")}</span></template></div>`;
+  return `<div class="ns-workspace" data-ns-workspace lang="${lang}" dir="${lang==="ar"?"rtl":"ltr"}" data-theme="site"><div class="ns-top-shell" data-ns-top-shell data-expanded="true"><div class="ns-top-rail"><button type="button" class="ns-top-handle" data-ns-top-handle aria-expanded="true" aria-controls="ns-top-controls" aria-label="${L("Hide search controls","إخفاء أدوات البحث","Ocultar controles de búsqueda")}">${icon("chevron")}</button><button type="button" class="ns-top-pin" data-ns-top-pin aria-pressed="false" aria-label="${L("Pin search controls","تثبيت أدوات البحث","Fijar controles de búsqueda")}">${icon("pinOff")}${icon("pin")}</button></div><div class="ns-top-fold"><div class="ns-top-clip"><div class="ns-top" id="ns-top-controls"><p class="ns-preview" role="note">${icon("info")}<span>${label("preview")}</span></p><form class="ns-searchbar" id="ns-query-form" role="search"><label class="ns-query-label" for="ns-query">${icon("search")}<span class="ns-sr">${L("Search keyword or phrase","ابحث بكلمة أو عبارة","Buscar palabra o frase")}</span><input id="ns-query" type="search" autocomplete="off" data-native="term" placeholder="${L("Search keywords, phrases or technical terms…","ابحث عن كلمات أو عبارات أو مصطلحات تقنية…","Buscar palabras, frases o términos técnicos…")}"></label><button type="button" data-ns-clear-query aria-label="${L("Clear search input","مسح إدخال البحث","Limpiar búsqueda")}">${icon("close")}</button>${dead(t("Search","بحث","Buscar"),"search")}</form><nav class="ns-toolbar" aria-label="${L("Search tools","أدوات البحث","Herramientas de búsqueda")}">${btn(text.filters,'data-ns-filter-toggle aria-controls="ns-filters" aria-expanded="false"',"filter")}${btn(text.sort+" · "+text.relevance,'data-ns-view="sort"',"sort")}${btn(text.advanced,'data-ns-view="advanced"',"settings")}${btn(text.settings,'data-ns-view="settings"',"settings")}${btn(text.diagnostics,'data-ns-view="diagnostics" data-ns-developer-only')}${btn(text.engine,'data-ns-view="engine" data-ns-developer-only')}${btn(text.index,'data-ns-view="index" data-ns-developer-only')}</nav><div class="ns-selection-bar"><div data-ns-selected aria-live="polite"><span class="ns-muted">${L("No filters selected","لم يتم تحديد عوامل تصفية","Sin filtros seleccionados")}</span></div>${btn(text.reset,'data-ns-reset-filters class="ns-quiet"')}</div></div></div></div></div><div class="ns-body"><div class="ns-main" data-ns-panel="results">${filterPane}${resultArea}</div>${sortPanel}${advanced}${settings}${details}${diagnostics}${engine}${index}${shortcuts}</div><footer class="ns-footer"><span class="ns-keyboard-hints"><kbd>↑ ↓</kbd> ${L("Navigate","تنقل","Navegar")} <kbd>Enter</kbd> ${L("Open","فتح","Abrir")} <kbd>/</kbd> ${L("Search","بحث","Buscar")} <kbd>Esc</kbd> ${L("Close","إغلاق","Cerrar")}</span>${btn(t("Keyboard reference","مرجع لوحة المفاتيح","Referencia de teclado"),'data-ns-view="keyboard" class="ns-quiet"')}<span class="ns-muted">${label("demo")}</span></footer><template data-ns-row-template="weight"><div class="ns-extra-row">${fields([field(text.field),num(text.value,1,0,1000,'step="0.1"')])}${btn(text.remove,'data-ns-remove')}</div></template><template data-ns-row-template="index"><div class="ns-extra-row">${fields([field("bundlePath"),field("baseUrl"),num("indexWeight",1,0,1000,'step="0.1"'),area("mergeFilter","{}")])}${btn(text.remove,'data-ns-remove')}</div></template><template data-ns-row-template="mapping"><div class="ns-extra-row">${fields([select(t("Mapping type","نوع التعيين","Tipo de asignación"),attrs.map(([key])=>key)),field(text.field),field(text.value)])}${btn(text.remove,'data-ns-remove')}</div></template><template data-ns-no-selection><span class="ns-muted">${L("No filters selected","لم يتم تحديد عوامل تصفية","Sin filtros seleccionados")}</span></template></div>`;
 }
+
+// Presentation-only toolbar. The preference stores one boolean, never a query,
+// filter, language or developer-mode value.
+function initAdaptiveTopbar(view, dialog, currentPanel, translate) {
+  const key="luxraj.normal-search.toolbar-pinned";
+  let pinned=false;
+  try { pinned=localStorage.getItem(key)==="1"; } catch {}
+  const q=s=>view.querySelector(s);
+  const hoverMedia=window.matchMedia("(any-hover: hover) and (any-pointer: fine)");
+  const shortMedia=window.matchMedia("(max-height: 480px)");
+  const reduced=window.matchMedia("(prefers-reduced-motion: reduce)");
+  const now=()=>performance.now();
+  let shell,top,workspace,body,handle,pin,resizeObserver;
+  let expanded=true,hovered=false,hoverReveal=false,enterTimer=0,leaveTimer=0;
+  let lastScroll=0,distance=0,direction=0,settleUntil=0;
+  let scrollIntentUntil=0,scrollIntentType="",lastTyping=-Infinity;
+  const scrollRoot=()=>shortMedia.matches?workspace:body;
+  const visible=()=>dialog.open&&!view.hidden;
+  const cancelHover=()=>{clearTimeout(enterTimer);clearTimeout(leaveTimer);enterTimer=leaveTimer=0;};
+  const focused=()=>top?.contains(document.activeElement);
+  const editing=()=>document.activeElement?.matches("input,textarea,select,[contenteditable]:not([contenteditable=false])");
+  function mayReleaseFocus(){
+    if(!focused())return true;
+    // The existing dialog autofocuses the query. Deliberate result scrolling
+    // may leave it, but never hide a focused editor during touch-keyboard use
+    // or while the visitor is actively typing.
+    return now()<scrollIntentUntil&&now()-lastTyping>600&&(!editing()||scrollIntentType==="wheel");
+  }
+  function baseline(){
+    lastScroll=Math.max(0,scrollRoot()?.scrollTop||0);
+    distance=0;direction=0;
+  }
+  function syncSize(){
+    if(!workspace||!shell)return;
+    // The short-screen fallback scrolls the workspace, not .ns-body.
+    // Reserve room for results even if the toolbar has many controls.
+    const footer=q(".ns-footer");
+    const available=Math.max(44,workspace.clientHeight-100-shell.querySelector(".ns-top-rail").offsetHeight-(shortMedia.matches?0:footer.offsetHeight));
+    shell.style.setProperty("--ns-top-available",available+"px");
+    baseline();
+  }
+  function setExpanded(next, reason="automatic"){
+    if(!shell)return;
+    if(!next&&(pinned||focused()||currentPanel()!=="results"))return;
+    if(next===expanded&&shell.dataset.expanded===String(next))return;
+    expanded=next;
+    if(reason!=="hover")hoverReveal=false;
+    shell.dataset.expanded=String(next);
+    handle.setAttribute("aria-expanded",String(next));
+    handle.setAttribute("aria-label",next?translate("Hide search controls","إخفاء أدوات البحث","Ocultar controles de búsqueda"):translate("Show search controls","إظهار أدوات البحث","Mostrar controles de búsqueda"));
+    top.inert=!next;
+    settleUntil=now()+(reduced.matches?40:240);
+    baseline();
+  }
+  function syncPin(){
+    shell.dataset.pinned=String(pinned);
+    pin.setAttribute("aria-pressed",String(pinned));
+    // The toggle has a stable accessible name and a pressed state.
+    handle.disabled=pinned;
+    if(pinned)setExpanded(true,"pin");
+  }
+  function reveal(){
+    cancelHover();hoverReveal=false;
+    setExpanded(true,"manual");
+    baseline();
+  }
+  function resetOnOpen(){
+    cancelHover();hovered=false;hoverReveal=false;scrollIntentUntil=0;scrollIntentType="";
+    reveal();syncSize();
+  }
+  function onScroll(event){
+    const root=scrollRoot();
+    // Only the active scroll container can control visibility. Nested filter,
+    // textarea and horizontal toolbar scrolls never count.
+    if(event.target!==root||!visible())return;
+    const position=Math.max(0,root.scrollTop);
+    const delta=position-lastScroll;
+    lastScroll=position;
+    if(now()<settleUntil){distance=direction=0;return;}
+    if(pinned||currentPanel()!=="results"||!mayReleaseFocus()||hovered){
+      distance=direction=0;return;
+    }
+    if(position<=4){setExpanded(true);distance=direction=0;return;}
+    if(Math.abs(delta)<1)return;
+    const sign=Math.sign(delta);
+    if(sign!==direction){direction=sign;distance=0;}
+    distance+=Math.abs(delta);
+    if(sign>0&&position>=64&&distance>=24&&expanded){
+      if(focused())document.activeElement.blur();
+      setExpanded(false);
+    }
+    else if(sign<0&&distance>=12&&!expanded)setExpanded(true);
+  }
+  function bind(){
+    cancelHover();
+    resizeObserver?.disconnect();
+    workspace=q(".ns-workspace");shell=q("[data-ns-top-shell]");top=q("#ns-top-controls");
+    body=q(".ns-body");handle=q("[data-ns-top-handle]");pin=q("[data-ns-top-pin]");
+    expanded=true;hoverReveal=hovered=false;scrollIntentUntil=0;scrollIntentType="";lastTyping=-Infinity;
+    shell.dataset.expanded="true";top.inert=false;
+    handle.setAttribute("aria-expanded","true");
+    syncPin();syncSize();
+    shell.addEventListener("pointerenter",event=>{
+      if(!hoverMedia.matches||event.pointerType==="touch")return;
+      hovered=true;clearTimeout(leaveTimer);
+      if(!expanded)enterTimer=setTimeout(()=>{
+        if(!hovered||!visible()||expanded)return;
+        hoverReveal=true;setExpanded(true,"hover");
+      },100);
+    });
+    shell.addEventListener("pointerleave",event=>{
+      if(event.pointerType==="touch")return;
+      hovered=false;clearTimeout(enterTimer);
+      if(hoverReveal)leaveTimer=setTimeout(()=>{
+        if(!hovered&&!focused()&&!pinned&&visible())setExpanded(false);
+      },250);
+    });
+    handle.addEventListener("click",()=>{
+      cancelHover();
+      // A click after hover expansion makes the reveal intentional.
+      if(hoverReveal||!expanded){reveal();return;}
+      if(!pinned)setExpanded(false,"manual");
+    });
+    pin.addEventListener("click",()=>{
+      pinned=!pinned;
+      try {localStorage.setItem(key,pinned?"1":"0");} catch {}
+      reveal();syncPin();
+    });
+    shell.addEventListener("focusin",event=>{
+      // Keyboard focus on the reveal button must not toggle it behind the user.
+      if(event.target===handle||event.target===pin)return;
+      reveal();
+    });
+    shell.addEventListener("focusout",()=>{
+      baseline();
+    });
+    top.addEventListener("input",()=>{lastTyping=now();});
+    top.addEventListener("keydown",event=>{if(event.key.length===1||event.isComposing||["Backspace","Delete"].includes(event.key))lastTyping=now();});
+    // Record pointer intent only outside the toolbar and nested controls.
+    const isResultScroll=target=>body.contains(target)&&!target.closest(".ns-filters,.ns-table-scroll,textarea,select");
+    workspace.addEventListener("wheel",event=>{
+      if(event.ctrlKey||event.deltaY<=0||!isResultScroll(event.target))return;
+      scrollIntentType="wheel";scrollIntentUntil=now()+500;
+    },{passive:true});
+    workspace.addEventListener("pointerdown",event=>{
+      if(event.pointerType!=="touch"||!isResultScroll(event.target))return;
+      scrollIntentType="touch";scrollIntentUntil=now()+1200;
+    },{passive:true});
+    workspace.addEventListener("scroll",onScroll,{passive:true});
+    body.addEventListener("scroll",onScroll,{passive:true});
+    if(typeof ResizeObserver==="function"){
+      resizeObserver=new ResizeObserver(syncSize);
+      resizeObserver.observe(workspace);
+      resizeObserver.observe(top);
+      resizeObserver.observe(body);
+      resizeObserver.observe(q(".ns-footer"));
+    }
+  }
+  const visibility=new MutationObserver(()=>{
+    if(visible())resetOnOpen();
+    else {cancelHover();hovered=hoverReveal=false;baseline();}
+  });
+  visibility.observe(dialog,{attributes:true,attributeFilter:["open","data-normal-workspace"]});
+  visibility.observe(view,{attributes:true,attributeFilter:["hidden"]});
+  shortMedia.addEventListener("change",()=>{reveal();syncSize();});
+  hoverMedia.addEventListener("change",()=>{cancelHover();hovered=hoverReveal=false;baseline();});
+  bind();
+  return {bind,reveal,baseline};
+}
+
 export function initNormalSearch(view) {
   if (view.dataset.nsReady === "true") return;
   const dialog=view.closest("#search-dialog");
@@ -109,6 +279,7 @@ export function initNormalSearch(view) {
   const parkedOptions=new WeakMap();
   const developerMode=()=>dialog.getAttribute("data-search-ui-mode")==="developer";
   const local=(en,ar,es)=>({en,ar,es}[language]||en);
+  const adaptiveTopbar=initAdaptiveTopbar(view,dialog,()=>activePanel,local);
   const mark=el=>el?.setAttribute("data-ns-developer-only","");
   // Mark whole controls/sections, never just input fields, so no orphan labels or gaps remain.
   function classifyPresentation(){
@@ -219,7 +390,10 @@ export function initNormalSearch(view) {
     if(name!=="results"&&activePanel==="results")previousControl=control;
     qa("[data-ns-panel]").forEach(el=>{el.hidden=el!==target;});
     activePanel=name;
+    adaptiveTopbar.reveal();
     q(".ns-body").scrollTop=0;
+    if(window.matchMedia("(max-height: 480px)").matches)q(".ns-workspace").scrollTop=0;
+    adaptiveTopbar.baseline();
     qa(".ns-toolbar [data-ns-view]").forEach(el=>el.setAttribute("aria-pressed",String(el.dataset.nsView===name)));
     if(name==="results"){if(previousControl?.isConnected&&(developerMode()||!previousControl.closest("[data-ns-developer-only]")))previousControl.focus();else if(dialog.open&&!view.hidden)q("#ns-query").focus();previousControl=null;}
     else target.querySelector("h3[tabindex]")?.focus();
@@ -287,7 +461,7 @@ export function initNormalSearch(view) {
     if("nsSort" in d)updateSortCaption();
     if("nsDensity" in d)q("[data-ns-workspace]").dataset.density=el.value;
     if("nsTheme" in d&&developerMode())q("[data-ns-workspace]").dataset.theme=el.value;
-    if("nsLanguage" in d&&developerMode()&&supported.includes(el.value)){language=el.value;mount();prepare();activePanel="results";showPanel("settings");}
+    if("nsLanguage" in d&&developerMode()&&supported.includes(el.value)){language=el.value;mount();adaptiveTopbar.bind();prepare();activePanel="results";showPanel("settings");}
   });
   view.addEventListener("input",ev=>{if(ev.target.matches("[data-ns-range]"))ev.target.closest("label").querySelector("output").textContent=ev.target.value;});
   view.addEventListener("keydown",ev=>{
