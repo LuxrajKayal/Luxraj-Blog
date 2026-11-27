@@ -4,26 +4,37 @@
 
 + intent chat greet
 * <get greeted> == yes => {@welcome back}
+- <set greeted=yes>Hiii! Luxy reporting for curiosity duty! What shall we explore today?{weight=2}
+- <set greeted=yes>Hello! A little explorer and a big library, at your service.
+- <set greeted=yes>Welcome to Luxraj Blog! Ready for a little discovery?
+- <set greeted=yes>Hey there! What has your curiosity today?
 - <set greeted=yes>Hello! What would you like to explore?{weight=2}
 - <set greeted=yes>Hi, I’m Luxy. What can I help you find?
 - <set greeted=yes>Welcome to Luxraj Blog!
 
 + intent chat thanks
-- You’re welcome. Happy reading!
+- You're welcome! Happy exploring.
+- Glad I could help. That made my little library day!
+- Anytime! Curiosity never gets old.
+- You're welcome! On to our next discovery?
 - Glad I could help.
 - Anytime. What else would you like to explore?
 
 + intent chat farewell
-- See you around!
+- Bye-bye! May your next discovery be a brilliant one.
+- See you around! I'll be here when curiosity strikes.
+- Until next time! Off to playtime for me.
 - Take care, and thanks for visiting.
 - Until next time!
 
 + intent chat smalltalk
-- I’m ready to help you explore the blog. What are you curious about?
+- Doing well, thanks for asking! My little library is ready for an adventure.
+- I'm here and curious as ever. What shall we explore?
+- Ready for another discovery! What's on your mind?
 - Doing well, thanks for asking!
 
 + intent assistant identity
-- I’m <bot name>, the search assistant for Luxraj Blog. I can help you find articles, follow sources and use site controls.
+- I'm <bot name>, the search assistant for Luxraj Blog. A little digital explorer with a rather big library! I find articles and help with supported site controls.
 
 + intent assistant help
 - Try asking for articles on a topic, a blog section, the author of the current article, or the light theme. I can show relevant excerpts and link you to their sources.
@@ -39,6 +50,9 @@
 
 + welcome back
 - Welcome back! What would you like to look up this time?
+- Oh, hello again! Another adventure in the library?
+- Back for more curiosity? I'm ready!
+- Hi again! What's on your mind?
 
 + intent site navigate
 * <get missing> == page => {@outcome clarify page}
@@ -184,7 +198,9 @@
 - These excerpts from Luxraj Blog may help explain the topic. Open a source to read more.
 
 + outcome empty
-- I didn’t find matching pages. Try a different term or a broader topic.
+- Oops! I didn’t find matching pages. Perhaps our authors haven't covered this topic yet.
+- Hmm, I didn't find matching pages in the searchable library. Try another phrase?
+- No matching pages this time. Even a little explorer has limits!
 
 + outcome exhausted
 - There are no more matching results from this search.
@@ -238,7 +254,9 @@
 - Aha, a fellow mischief-maker! What are we exploring?
 
 + intent chat insult
-- That's an opinion, not a fact. I'd rather discuss the work than trade insults.
+- Excuse me! My little digital brain is doing its best, thank you!
+- Hey! Criticism is welcome, insults aren't very useful.
+- Ouchie! Want to tell me what went wrong instead?
 - Hey! A little kindness goes a long way. Shall we talk about something useful?
 - Excuse me! Criticism is welcome, but insults aren't very helpful.
 
@@ -292,8 +310,18 @@
 - I'm not sure you want me to perform that action, so I'll leave it alone.
 
 + outcome incidental
-- I found mentions of that topic, but these sources don't establish a direct explanation.
+- I found mentions of the topic, but these sources don't establish a direct explanation.
+- Hmm, these excerpts from Luxraj Blog may contain mentions rather than a direct explanation. I can't confirm they answer your question.
 - Hmm, these matches may mention the topic without actually explaining it.
+
++ intent chat personal_insult
+- That's your opinion! I'd rather discuss someone's work than throw insults around.
+- Mr. or Ms. Critic, an insult isn't evidence. What specifically do you disagree with?
+- People can disagree. Let's judge the work, not label the person.
+
++ conversation boundary
+- I'm taking a break from the insults. If you have a genuine question, I'm happy to help.
+- Enough bad manners for now. More playtime for me, until you're ready to talk constructively.
 
 + *
 - {@unknown}

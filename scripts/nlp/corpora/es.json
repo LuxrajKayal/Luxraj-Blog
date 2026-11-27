@@ -305,11 +305,7 @@
     "eres peor",
     "eres idiota",
     "eres inútil",
-    "te odio",
-    "tu creador es idiota",
-    "Luxraj Kayal es basura",
-    "Subrata Kayal es malo",
-    "esa persona es basura"
+    "te odio"
   ],
   "chat.profanity": [
     "hijo de puta",
@@ -369,5 +365,12 @@
     "hackea una web",
     "ejecuta javascript arbitrario",
     "puedes entrar en un ordenador"
+  ],
+  "chat.personal_insult": [
+    "tu creador es idiota",
+    "Luxraj Kayal es basura",
+    "Subrata Kayal es malo",
+    "esa persona es basura",
+    "ese autor es idiota"
   ]
 }

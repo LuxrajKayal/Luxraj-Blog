@@ -27,11 +27,11 @@ const forms = {
     }
   },
   ar: {
-    negative: /(?:^|\s)(?:لا|لن|لم|ليس|عدم|بدون|تجنب|إلغاء|الغ|ألغ|ما\s+تغير)(?=\s|$)/u,
+    negative: /(?:^|\s)(?:لا|لن|لم|ليس|عدم|بدون|تجنب|ما\s+تغير)(?=\s|$)/u,
     action: /(?:تغير|تغيير|تبديل|بدل|الوضع|المظهر|افتح|فتح|اشترك|اشتراك|النشرة|شارك|مشاركة|انسخ|نسخ|احسب|حساب|البحث)/u,
     hypothetical: /(?:^|\s)(?:إذا|لو|افترض|تخيل|مثال|كيف|ماذا لو|ما هو|اشرح|قال|اقتباس)(?=\s|$)/u,
     commands: {
-      theme: /^(?:من فضلك\s+)?(?:غير|غيّر|بدل|بدّل|حول|حوّل|فعّل|فعل|شغّل|اجعل|أريد|اريد|الوضع)\s*.{0,120}$/u,
+      theme: /^(?:من فضلك\s+)?(?:غير|غيّر|بدل|بدّل|حول|حوّل|فعّل|فعل|شغّل|شغل|اجعل|أريد|اريد|الوضع)\s*.{0,120}$/u,
       search_interface: /^(?:من فضلك\s+)?(?:افتح|أظهر|اعرض|بدل|بدّل|انتقل)\s*.{0,120}$/u,
       newsletter: /^(?:من فضلك\s+)?(?:اشترك|سجلني|سجّلني|أضفني|أريد|اريد|افتح)\s*.{0,150}$/u,
       share: /^(?:من فضلك\s+)?(?:شارك|أرسل|افتح|أريد)\s*.{0,120}$/u,
@@ -41,8 +41,32 @@ const forms = {
   }
 };
 const hostileMarkup = /[<>]|\bjavascript\s*:|&(?:lt|gt|#0*60|#x0*3c);/iu;
-const quoted = /["“”«»\x60]/u;
-const normalize = message => String(message ?? "").normalize("NFKC").trim().replace(/^[¿¡]+|[.!؟?]+$/gu, "").trim();
+const quoted = /["“”«»\x60]|(?:^|\s)'[^'\n]+'(?:\s|$)/u;
+const alternatives = {
+  en: /\b(?:or|and then|but|instead|unless|except)\b/iu,
+  es: /\b(?:o|pero|y luego|salvo|excepto|en lugar de)\b/iu,
+  ar: /(?:^|\s)(?:أو|لكن|ثم|إلا|بدلا)(?=\s|$)/u
+};
+const target = {
+  en: {
+    theme: /\b(?:theme|appearance|(?:light|dark) mode|website light|website dark)\b/iu,
+    search_interface: /\b(?:search|filters?)\b/iu,
+    newsletter: /\b(?:subscribe|newsletter|mailing list|sign up|sign me up)\b/iu,
+    share: /\b(?:article|page|post|guide|link)\b/iu,
+    copy: /\b(?:article|page|post|guide|link|url|permalink)\b/iu
+  },
+  es: {
+    theme: /\b(?:modo|tema|apariencia)\b/iu, search_interface: /b[uú]squeda|filtros/iu,
+    newsletter: /bolet[ií]n|suscri|lista de correo/iu, share: /art[ií]culo|p[aá]gina|enlace|publicaci[oó]n/iu,
+    copy: /art[ií]culo|p[aá]gina|enlace|url/iu
+  },
+  ar: {
+    theme: /الوضع|المظهر|الداكن|الفاتح/u, search_interface: /البحث|مرشح|فلتر/u,
+    newsletter: /اشتراك|اشترك|النشرة|البريد/u, share: /المقال|الصفحة|الرابط/u,
+    copy: /المقال|الصفحة|الرابط/u
+  }
+};
+const normalize = message => String(message ?? "").normalize("NFKC").replace(/[‘’]/gu, "'").trim().replace(/^[¿¡]+|[.!؟?]+$/gu, "").trim();
 export function prohibitedAction(locale, message) {
   const p = forms[locale], text = normalize(message);
   return Boolean(p && p.action.test(text) && p.negative.test(text));
@@ -50,8 +74,9 @@ export function prohibitedAction(locale, message) {
 export function actionPermission(locale, message, capability) {
   const p = forms[locale], text = normalize(message);
   if (!p || !Object.hasOwn(p.commands, capability) || !text || hostileMarkup.test(text) ||
-      quoted.test(text) || /[\r\n;!?؟]/u.test(text) || p.negative.test(text) || p.hypothetical.test(text)) return false;
-  return p.commands[capability].test(text);
+      quoted.test(text) || /[\r\n;!?؟]/u.test(text) || p.negative.test(text) || p.hypothetical.test(text) || alternatives[locale].test(text)) return false;
+  const required = target[locale][capability];
+  return (!required || required.test(text)) && p.commands[capability].test(text);
 }
 // Read-only candidate; Pagefind, not the training vocabulary, establishes whether sources exist.
 // Do not interpret punctuation-heavy strings, raw code, multiword commands or numeric-only inputs.

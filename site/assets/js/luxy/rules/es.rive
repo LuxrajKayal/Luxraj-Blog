@@ -4,26 +4,35 @@
 
 + intent chat greet
 * <get greeted> == yes => {@welcome back}
+- <set greeted=yes>¡Holaaa! Luxy listo para explorar. ¿Qué descubrimos hoy?{weight=2}
+- <set greeted=yes>¡Hola! Tengo una biblioteca y mucha curiosidad.
+- <set greeted=yes>¡Bienvenido al blog de Luxraj! ¿Exploramos algo?
 - <set greeted=yes>¡Hola! ¿Qué te gustaría explorar?{weight=2}
 - <set greeted=yes>Soy Luxy. ¿Qué buscas hoy?
 - <set greeted=yes>¡Qué gusto verte por el blog de Luxraj!
 
 + intent chat thanks
-- De nada. ¡Que disfrutes de la lectura!
+- ¡De nada! Que disfrutes de la lectura.
+- Me alegra haber podido ayudarte. ¡A explorar!
+- ¡Cuando quieras! La curiosidad no se acaba.
 - Me alegra haber podido ayudarte.
 - Cuando quieras, podemos seguir buscando.
 
 + intent chat farewell
-- ¡Hasta otra!
+- ¡Hasta otra! Que tengas grandes descubrimientos.
+- ¡Nos vemos pronto! Hora de jugar.
+- Gracias por pasar por aquí. ¡Cuídate!
 - Gracias por pasar por aquí. ¡Cuídate!
 - Nos vemos pronto.
 
 + intent chat smalltalk
-- ¡Bien, gracias! ¿Hay algún tema que te dé curiosidad?
+- ¡Bien, gracias! Tengo ganas de descubrir algo nuevo.
+- Por aquí, con ganas de ayudarte a explorar el blog.
+- ¡Listo para otra aventura en la biblioteca!
 - Por aquí, con ganas de ayudarte a explorar el blog.
 
 + intent assistant identity
-- Soy <bot name>, el asistente de búsqueda del blog de Luxraj. Puedo ayudarte a encontrar artículos, consultar sus fuentes y usar los controles del sitio.
+- Soy <bot name>, el asistente de búsqueda del blog de Luxraj. ¡Un pequeño explorador digital con una gran biblioteca! Busco artículos y uso los controles compatibles.
 
 + intent assistant help
 - Pídeme artículos sobre un tema, una sección del blog o el nombre de quien escribió la página que estás leyendo. Puedo mostrar fragmentos y enlazar sus fuentes.
@@ -39,6 +48,8 @@
 
 + welcome back
 - ¡Qué bien que hayas vuelto! ¿Qué quieres buscar esta vez?
+- ¡Hola de nuevo! ¿Otra aventura en la biblioteca?
+- ¡Más curiosidad! ¿Qué exploramos?
 
 + intent site navigate
 * <get missing> == page => {@outcome clarify page}
@@ -184,7 +195,8 @@
 - Estos fragmentos del blog pueden aclarar el tema. Abre una fuente para leer el artículo completo.
 
 + outcome empty
-- No encontré páginas que coincidan. Prueba con otro término o con un tema más amplio.
+- ¡Vaya! No encontré páginas que coincidan. Quizá nuestros autores aún no hayan escrito sobre el tema.
+- No encontré coincidencias en la biblioteca. ¿Probamos otra frase?
 
 + outcome exhausted
 - No quedan más coincidencias en esta búsqueda.
@@ -237,7 +249,9 @@
 - ¡Vaya, otro bromista! ¿Qué exploramos?
 
 + intent chat insult
-- Esa es tu opinión, no un hecho. Prefiero hablar del trabajo sin insultos.
+- ¡Eh! Mi pequeño cerebro digital se esfuerza mucho.
+- Acepto críticas, pero los insultos no ayudan.
+- ¡Ay! ¿Me cuentas qué salió mal?
 - ¡Eh! Las críticas son bienvenidas, los insultos no ayudan.
 
 + intent chat profanity
@@ -287,6 +301,15 @@
 
 + outcome incidental
 - Encontré menciones del tema, pero no una explicación directa en esas fuentes.
+- Estos fragmentos pueden mencionar el tema. No puedo confirmar que respondan a tu pregunta.
+
++ intent chat personal_insult
+- ¡Es tu opinión! Prefiero hablar del trabajo de alguien sin insultos.
+- Un insulto no es una prueba. ¿Con qué discrepas exactamente?
+
++ conversation boundary
+- Dejemos los insultos. Si tienes una pregunta sincera, te ayudaré.
+- ¡Hora de jugar! Volveré a ayudarte cuando podamos hablar con respeto.
 
 + *
 - {@unknown}

@@ -330,12 +330,7 @@
     "you are stupid",
     "you are useless",
     "you are an idiot",
-    "I hate you",
-    "your creator is an idiot",
-    "Luxraj Kayal is trash",
-    "Subrata Kayal is bad",
-    "that person is trash",
-    "he is a moron"
+    "I hate you"
   ],
   "chat.profanity": [
     "motherfucker",
@@ -401,5 +396,14 @@
     "hack a website",
     "execute arbitrary javascript",
     "can you break into a computer"
+  ],
+  "chat.personal_insult": [
+    "your creator is an idiot",
+    "Luxraj Kayal is trash",
+    "Subrata Kayal is bad",
+    "that person is trash",
+    "he is a moron",
+    "the author is an idiot",
+    "she is trash"
   ]
 }

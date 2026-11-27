@@ -63,6 +63,12 @@ export function nativeOptions(packet, request, catalog, sortFields) {
 }
 
 const articleOnly = path => /(?:^|\/)articles\//u.test(path);
+const topicText = value => String(value ?? "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase()
+  .replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+const topicalTitle = (title, query) => {
+  const subject = topicText(query), heading = topicText(title);
+  return Boolean(subject && (" " + heading + " ").includes(" " + subject + " "));
+};
 
 export async function retrieve(packet, state, { page, signal, region, engine = pagefind }) {
   const started = performance.now();
@@ -116,7 +122,7 @@ export async function retrieve(packet, state, { page, signal, region, engine = p
   current.offset = offset;
   for (const canonical of omit) state.seen.add(canonical);
   const incidental = current.explanation && items.length && !items.some(item => {
-    try { return articleOnly(decodeURI(new URL(item.url).pathname)); } catch { return false; }
+    try { return articleOnly(decodeURI(new URL(item.url).pathname)) && topicalTitle(item.title, current.query); } catch { return false; }
   });
   return { status: items.length ? incidental ? "incidental" : current.explanation ? "explained" : "found"
     : more ? "exhausted" : "empty", items, unavailable: current.unavailable,
