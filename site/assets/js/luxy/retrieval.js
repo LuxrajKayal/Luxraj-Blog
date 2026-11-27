@@ -65,6 +65,7 @@ export function nativeOptions(packet, request, catalog, sortFields) {
 const articleOnly = path => /(?:^|\/)articles\//u.test(path);
 
 export async function retrieve(packet, state, { page, signal, region, engine = pagefind }) {
+  const started = performance.now();
   const more = packet.intent === "content.more";
   if (!more || !state.search) {
     const request = packet.search ?? {};
@@ -84,7 +85,8 @@ export async function retrieve(packet, state, { page, signal, region, engine = p
     const response = await engine.search(query || authorText || categoryText || null, config.options);
     signal.check();
     state.search = { refs: response.results, offset: 0, unavailable: config.unavailable,
-      excludedPath: more ? page?.route : undefined, started: start };
+      excludedPath: more ? page?.route : undefined, started: start, query,
+      explanation: packet.intent === "content.explain" };
     if (!request.followUp) state.seen.clear();
   }
   const current = state.search;
@@ -113,7 +115,10 @@ export async function retrieve(packet, state, { page, signal, region, engine = p
   }
   current.offset = offset;
   for (const canonical of omit) state.seen.add(canonical);
-  return { status: items.length ? packet.intent === "content.explain" ? "explained" : "found"
+  const incidental = current.explanation && items.length && !items.some(item => {
+    try { return articleOnly(decodeURI(new URL(item.url).pathname)); } catch { return false; }
+  });
+  return { status: items.length ? incidental ? "incidental" : current.explanation ? "explained" : "found"
     : more ? "exhausted" : "empty", items, unavailable: current.unavailable,
-    more: offset < current.refs.length, elapsedMs: performance.now() - current.started };
+    more: offset < current.refs.length, elapsedMs: performance.now() - started };
 }

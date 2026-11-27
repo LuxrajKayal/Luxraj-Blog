@@ -11,7 +11,7 @@ import { interpret, locales, restoreModel } from "../site/assets/js/nlp/interpre
 const root = fileURLToPath(new URL("../", import.meta.url));
 const cache = path.join(root, "search-dependencies/nlp/.model-cache");
 const inputFiles = ["scripts/build-nlp.mjs", "scripts/nlp/train.mjs", "scripts/nlp/corpora/entities.mjs",
-  "site/assets/js/nlp/interpret.js", "site/assets/js/nlp/entity-text.js", "search-dependencies/nlp/package-lock.json"];
+  "site/assets/js/nlp/interpret.js", "site/assets/js/nlp/request-policy.js", "site/assets/js/nlp/entity-text.js", "search-dependencies/nlp/package-lock.json"];
 const digest = bytes => createHash("sha256").update(bytes).digest("hex");
 const smokeChecks = {
   en: ["What is Luxy?", "Find articles about zeta storage"],

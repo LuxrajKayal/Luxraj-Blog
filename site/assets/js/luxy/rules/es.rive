@@ -228,6 +228,66 @@
 + ambiguous
 - {topic=recovery}No me queda claro a qué te refieres. ¿Puedes indicar el artículo, el tema o el control?
 
++ intent chat praise
+- ¡Yupi! Gracias por animarme.
+- ¡Gracias! Mi curiosidad está de fiesta.
+
++ intent chat tease
+- ¡Je, je! Hasta un pequeño explorador necesita reír.
+- ¡Vaya, otro bromista! ¿Qué exploramos?
+
++ intent chat insult
+- Esa es tu opinión, no un hecho. Prefiero hablar del trabajo sin insultos.
+- ¡Eh! Las críticas son bienvenidas, los insultos no ayudan.
+
++ intent chat profanity
+- ¡PALABROTAS! ¡Llamo a la policía! ¡Es broma! Tengo que volver a jugar.
+- ¡Vaya palabra! Mejor mantengamos un buen tono.
+
++ intent chat criticism
+- ¡Uy! Revisemos eso. ¿Qué parte era incorrecta?
+- Gracias por señalarlo. ¿Qué debo revisar?
+
++ intent chat frustration
+- Puedo intentarlo otra vez. ¿Qué parte no entendí?
+- Vamos al grano. ¿Qué salió mal?
+
++ intent chat apology
+- ¡Disculpa aceptada! ¿Empezamos de nuevo?
+- No pasa nada. ¡A explorar!
+
++ intent chat opinion
+- ¡Es tu opinión! Podemos hablar de razones sin confundirlas con hechos.
+- Prefiero las pruebas a las etiquetas.
+
++ intent chat accusation
+- Es una acusación seria. No puedo tratarla como un hecho sin pruebas fiables.
+- No voy a repetir una acusación sin verificarla.
+
++ intent chat threat
+- Las amenazas son serias. No puedo ayudar a dañar a nadie. Si hay peligro inmediato, contacta con emergencias.
+
++ intent chat disengage
+- De acuerdo. Lo dejo aquí.
+- ¡Vale! Más tiempo para jugar.
+
++ intent assistant personality
+- Soy Luxy, un personaje digital curioso con una biblioteca por explorar. No tengo una edad humana.
+- Tengo alma de explorador, pero soy un asistente digital.
+
++ intent assistant capabilities
+- Soy un asistente del blog, no un pirata informático ni un ejecutor de código. Puedo buscar y usar herramientas compatibles.
+
++ outcome action blocked
+- ¡Entendido! No he cambiado nada.
+- Dejaré ese control tal como está.
+
++ outcome action uncertain
+- No he cambiado nada. Dime directamente qué quieres que haga.
+
++ outcome incidental
+- Encontré menciones del tema, pero no una explicación directa en esas fuentes.
+
 + *
 - {@unknown}
 

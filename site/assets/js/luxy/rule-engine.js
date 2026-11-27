@@ -4,12 +4,14 @@ const intents = new Set([
   "search.interface", "newsletter.info", "newsletter.subscribe", "newsletter.unsubscribe",
   "article.share", "article.copyLink", "article.author", "article.date", "article.calculate",
   "content.explain", "content.search", "content.category", "content.author", "content.date",
-  "content.more", "content.refine"
+  "content.more", "content.refine",
+  "chat.praise", "chat.tease", "chat.insult", "chat.profanity", "chat.criticism", "chat.frustration", "chat.apology", "chat.opinion", "chat.accusation", "chat.threat", "chat.disengage", "assistant.personality", "assistant.capabilities"
 ]);
 const slots = new Set(["page", "language", "expression", "query", "author"]);
 
 export function triggerFor(packet) {
   if (packet.schemaVersion !== 1) return "unknown";
+  if (packet.status === "action_blocked") return "outcome action blocked";
   if (packet.status === "ambiguous") return "ambiguous";
   if (packet.status !== "recognized" || !intents.has(packet.intent)) return "unknown";
   return "intent " + packet.intent.replaceAll(".", " ").toLowerCase();

@@ -1,30 +1,373 @@
 {
-  "chat.greet": ["hola","buenas Luxy","qué tal asistente","buenos días","buenas tardes","encantado de conocerte","muy buenas","hola qué tal"],
-  "chat.thanks": ["muchas gracias","gracias Luxy","te agradezco la ayuda","mil gracias","me has ayudado mucho","gracias por echarme una mano","se agradece"],
-  "chat.farewell": ["adiós","hasta luego","nos vemos","hasta la próxima","que descanses","me tengo que ir","hasta pronto Luxy","bueno hasta otro día","hasta mañana"],
-  "chat.smalltalk": ["cómo estás","cómo te va hoy","qué tal llevas el día","estás bien Luxy","cómo vas","qué hay de nuevo contigo"],
-  "assistant.identity": ["quién es Luxy","quién eres","qué es Luxy","preséntate por favor","con quién estoy hablando","eres un asistente","cuéntame quién eres"],
-  "assistant.help": ["qué sabes hacer","cómo me puedes ayudar","enséñame a usar Luxy","qué te puedo pedir","necesito ayuda para usar el chat","qué funciones tienes","para qué sirve el asistente"],
-  "site.identity": ["qué es Luxraj","de qué va este blog","cuéntame sobre Luxraj Blog","qué clase de web es esta","para qué existe esta página","qué temas trata el sitio","qué encontraré en Luxraj"],
-  "site.creator": ["quién fundó Luxraj","quién hizo este sitio","quién creó la web de Luxraj","quién está detrás del blog","quién gestiona este blog","de quién es Luxraj","sabes quién montó el sitio"],
-  "site.navigate": ["abre la página de @page","llévame a @page","ir a @page","dónde está la página de @page","quiero entrar en @page","abre la portada","muéstrame la política de privacidad","navega hasta @page"],
-  "site.contact": ["cómo contacto con Luxraj","quiero escribir al equipo editorial","dónde envío mis comentarios","cómo me pongo en contacto con vosotros","cuál es el correo del equipo","quiero avisar de un error en el sitio","cómo localizo al editor"],
-  "site.theme": ["activa el modo @theme","cambia al tema @theme","pon la apariencia @theme","prefiero el modo oscuro","ajusta el aspecto del sitio","alterna el tema de colores","quiero un fondo claro","usa el tema @theme"],
-  "site.language": ["cambia el idioma a @language","quiero ver la versión en @language","pon el sitio en @language","dónde se elige el idioma","cómo cambio de idioma","abre la web en @language","quiero leer el sitio en árabe"],
-  "search.interface": ["abre la búsqueda normal","dónde está el buscador","abre el panel de búsqueda","pasa a la búsqueda por etiquetas","muéstrame los filtros de búsqueda","cómo ordeno los resultados","configura la búsqueda avanzada"],
-  "newsletter.info": ["qué es el boletín","qué incluye la newsletter","qué correos envía Luxraj","cada cuánto mandáis el boletín","qué es la casita de Luxy","cuéntame sobre vuestro boletín","tenéis lista de correo"],
-  "newsletter.subscribe": ["suscríbeme al boletín","apúntame a vuestra newsletter","quiero recibir las novedades por correo","añádeme a la lista de correo","abre el formulario de suscripción","cómo me apunto al boletín","dame de alta con @email","quiero suscribirme a vuestra lista","quiero darme de alta en el boletín"],
-  "newsletter.unsubscribe": ["dame de baja del boletín","quiero dejar de recibir la newsletter","sácame de la lista de correo","cancela mi suscripción","no quiero más correos del boletín","da de baja @email","dónde puedo anular la suscripción","no me enviéis más correos del boletín","por favor quítame de la newsletter"],
-  "article.share": ["comparte este artículo","manda este artículo a un amigo","abre las opciones para compartir","quiero compartir la publicación","cómo comparto esta guía","comparte el artículo en @channel","muéstrame las opciones de compartir el post"],
-  "article.copyLink": ["copia el enlace del artículo","copia la URL de esta página","pon el enlace en el portapapeles","quiero copiar la dirección del post","copia el enlace permanente","pásame el enlace de esta publicación","cómo copio el vínculo de este texto"],
-  "article.author": ["quién escribió este artículo","quién firma esta guía","abre el perfil del autor de este artículo","quién redactó esta entrada","dime el nombre del autor de la página","muéstrame la ficha de quien escribió el post","de quién es este texto"],
-  "article.date": ["cuándo se publicó este artículo","qué día se actualizó la entrada","cuándo salió esta guía","muéstrame la fecha de esta publicación","cuándo se modificó por última vez esta página","de qué fecha es el artículo actual","quiero ver la fecha de esta guía"],
-  "article.calculate": ["calcula @expression","cuánto da @expression","cuál es el resultado de @expression","calcula el voltaje con @expression","saca la resistencia para @expression","ayúdame con este cálculo","quiero calcular la corriente","haz esta cuenta"],
-  "content.explain": ["qué es @query","qué significa @query","explícame @query","cómo funciona @query","quiero entender @query","dame una definición de @query","a qué se refiere @query","qué quiere decir @query","me puedes explicar @query","aclara el concepto de @query","explícame esto","qué significa eso"],
-  "content.search": ["busca artículos sobre @query","encuentra información de @query","busca @query","muéstrame guías de @query","dónde puedo leer sobre @query","hay algún artículo acerca de @query","ando buscando @query","recomiéndame algo para leer de @query","tenéis publicaciones sobre @query","busca artículos","muéstrame las últimas publicaciones","quiero ver algunos artículos","busca artículos de @category sobre @query","me gustaría encontrar artículos sobre @query","busca una publicación sobre @query","quisiera leer sobre @query"],
-  "content.category": ["qué secciones tiene el blog","enumera las categorías","enséñame la sección de @category","quiero ver los artículos de @category","abre la categoría @category","navega por @category","qué subcategorías hay","lista las secciones","muéstrame la sección @category"],
-  "content.author": ["busca artículos de @author","muéstrame textos escritos por @author","qué ha escrito @author","encuentra publicaciones firmadas por @author","busca entradas de un autor concreto","dame otros artículos del mismo autor","quiero leer a @author"],
-  "content.date": ["muestra artículos de @date","busca publicaciones de @date","qué publicasteis en @date","encuentra artículos posteriores a @date","ver entradas anteriores a @date","busca por fecha de publicación","qué habéis publicado últimamente","muestra los artículos de este mes"],
-  "content.more": ["dame más artículos como esos","enséñame otro parecido","algo más del mismo tema","quiero más resultados similares","alguna otra guía sobre eso","ver los siguientes resultados","continúa con más de lo mismo","tienes más contenido similar"],
-  "content.refine": ["solo de @category","limita eso a @category","solo las entradas de @date","filtra esos resultados por @author","únicamente los que escribió @author","qué tal solo en @category","solo los publicados en @date"]
+  "chat.greet": [
+    "hola",
+    "buenas Luxy",
+    "qué tal asistente",
+    "buenos días",
+    "buenas tardes",
+    "encantado de conocerte",
+    "muy buenas",
+    "hola qué tal",
+    "hey",
+    "holaa"
+  ],
+  "chat.thanks": [
+    "muchas gracias",
+    "gracias Luxy",
+    "te agradezco la ayuda",
+    "mil gracias",
+    "me has ayudado mucho",
+    "gracias por echarme una mano",
+    "se agradece",
+    "gracias",
+    "muchísimas gracias"
+  ],
+  "chat.farewell": [
+    "adiós",
+    "hasta luego",
+    "nos vemos",
+    "hasta la próxima",
+    "que descanses",
+    "me tengo que ir",
+    "hasta pronto Luxy",
+    "bueno hasta otro día",
+    "hasta mañana",
+    "chao",
+    "chau"
+  ],
+  "chat.smalltalk": [
+    "cómo estás",
+    "cómo te va hoy",
+    "qué tal llevas el día",
+    "estás bien Luxy",
+    "cómo vas",
+    "qué hay de nuevo contigo"
+  ],
+  "assistant.identity": [
+    "quién es Luxy",
+    "quién eres",
+    "qué es Luxy",
+    "preséntate por favor",
+    "con quién estoy hablando",
+    "eres un asistente",
+    "cuéntame quién eres",
+    "qué eres",
+    "eres una inteligencia artificial"
+  ],
+  "assistant.help": [
+    "qué sabes hacer",
+    "cómo me puedes ayudar",
+    "enséñame a usar Luxy",
+    "qué te puedo pedir",
+    "necesito ayuda para usar el chat",
+    "qué funciones tienes",
+    "para qué sirve el asistente"
+  ],
+  "site.identity": [
+    "qué es Luxraj",
+    "de qué va este blog",
+    "cuéntame sobre Luxraj Blog",
+    "qué clase de web es esta",
+    "para qué existe esta página",
+    "qué temas trata el sitio",
+    "qué encontraré en Luxraj"
+  ],
+  "site.creator": [
+    "quién fundó Luxraj",
+    "quién hizo este sitio",
+    "quién creó la web de Luxraj",
+    "quién está detrás del blog",
+    "quién gestiona este blog",
+    "de quién es Luxraj",
+    "sabes quién montó el sitio",
+    "quién te creó",
+    "quién es tu creador"
+  ],
+  "site.navigate": [
+    "abre la página de @page",
+    "llévame a @page",
+    "ir a @page",
+    "dónde está la página de @page",
+    "quiero entrar en @page",
+    "abre la portada",
+    "muéstrame la política de privacidad",
+    "navega hasta @page"
+  ],
+  "site.contact": [
+    "cómo contacto con Luxraj",
+    "quiero escribir al equipo editorial",
+    "dónde envío mis comentarios",
+    "cómo me pongo en contacto con vosotros",
+    "cuál es el correo del equipo",
+    "quiero avisar de un error en el sitio",
+    "cómo localizo al editor"
+  ],
+  "site.theme": [
+    "activa el modo @theme",
+    "cambia al tema @theme",
+    "pon la apariencia @theme",
+    "prefiero el modo oscuro",
+    "ajusta el aspecto del sitio",
+    "alterna el tema de colores",
+    "quiero un fondo claro",
+    "usa el tema @theme"
+  ],
+  "site.language": [
+    "cambia el idioma a @language",
+    "quiero ver la versión en @language",
+    "pon el sitio en @language",
+    "dónde se elige el idioma",
+    "cómo cambio de idioma",
+    "abre la web en @language",
+    "quiero leer el sitio en árabe"
+  ],
+  "search.interface": [
+    "abre la búsqueda normal",
+    "dónde está el buscador",
+    "abre el panel de búsqueda",
+    "pasa a la búsqueda por etiquetas",
+    "muéstrame los filtros de búsqueda",
+    "cómo ordeno los resultados",
+    "configura la búsqueda avanzada"
+  ],
+  "newsletter.info": [
+    "qué es el boletín",
+    "qué incluye la newsletter",
+    "qué correos envía Luxraj",
+    "cada cuánto mandáis el boletín",
+    "qué es la casita de Luxy",
+    "cuéntame sobre vuestro boletín",
+    "tenéis lista de correo"
+  ],
+  "newsletter.subscribe": [
+    "suscríbeme al boletín",
+    "apúntame a vuestra newsletter",
+    "quiero recibir las novedades por correo",
+    "añádeme a la lista de correo",
+    "abre el formulario de suscripción",
+    "cómo me apunto al boletín",
+    "dame de alta con @email",
+    "quiero suscribirme a vuestra lista",
+    "quiero darme de alta en el boletín"
+  ],
+  "newsletter.unsubscribe": [
+    "dame de baja del boletín",
+    "quiero dejar de recibir la newsletter",
+    "sácame de la lista de correo",
+    "cancela mi suscripción",
+    "no quiero más correos del boletín",
+    "da de baja @email",
+    "dónde puedo anular la suscripción",
+    "no me enviéis más correos del boletín",
+    "por favor quítame de la newsletter",
+    "desuscribir"
+  ],
+  "article.share": [
+    "comparte este artículo",
+    "manda este artículo a un amigo",
+    "abre las opciones para compartir",
+    "quiero compartir la publicación",
+    "cómo comparto esta guía",
+    "comparte el artículo en @channel",
+    "muéstrame las opciones de compartir el post"
+  ],
+  "article.copyLink": [
+    "copia el enlace del artículo",
+    "copia la URL de esta página",
+    "pon el enlace en el portapapeles",
+    "quiero copiar la dirección del post",
+    "copia el enlace permanente",
+    "pásame el enlace de esta publicación",
+    "cómo copio el vínculo de este texto"
+  ],
+  "article.author": [
+    "quién escribió este artículo",
+    "quién firma esta guía",
+    "abre el perfil del autor de este artículo",
+    "quién redactó esta entrada",
+    "dime el nombre del autor de la página",
+    "muéstrame la ficha de quien escribió el post",
+    "de quién es este texto"
+  ],
+  "article.date": [
+    "cuándo se publicó este artículo",
+    "qué día se actualizó la entrada",
+    "cuándo salió esta guía",
+    "muéstrame la fecha de esta publicación",
+    "cuándo se modificó por última vez esta página",
+    "de qué fecha es el artículo actual",
+    "quiero ver la fecha de esta guía"
+  ],
+  "article.calculate": [
+    "calcula @expression",
+    "cuánto da @expression",
+    "cuál es el resultado de @expression",
+    "calcula el voltaje con @expression",
+    "saca la resistencia para @expression",
+    "ayúdame con este cálculo",
+    "quiero calcular la corriente",
+    "haz esta cuenta"
+  ],
+  "content.explain": [
+    "qué es @query",
+    "qué significa @query",
+    "explícame @query",
+    "cómo funciona @query",
+    "quiero entender @query",
+    "dame una definición de @query",
+    "a qué se refiere @query",
+    "qué quiere decir @query",
+    "me puedes explicar @query",
+    "aclara el concepto de @query",
+    "explícame esto",
+    "qué significa eso"
+  ],
+  "content.search": [
+    "busca artículos sobre @query",
+    "encuentra información de @query",
+    "busca @query",
+    "muéstrame guías de @query",
+    "dónde puedo leer sobre @query",
+    "hay algún artículo acerca de @query",
+    "ando buscando @query",
+    "recomiéndame algo para leer de @query",
+    "tenéis publicaciones sobre @query",
+    "busca artículos",
+    "muéstrame las últimas publicaciones",
+    "quiero ver algunos artículos",
+    "busca artículos de @category sobre @query",
+    "me gustaría encontrar artículos sobre @query",
+    "busca una publicación sobre @query",
+    "quisiera leer sobre @query"
+  ],
+  "content.category": [
+    "qué secciones tiene el blog",
+    "enumera las categorías",
+    "enséñame la sección de @category",
+    "quiero ver los artículos de @category",
+    "abre la categoría @category",
+    "navega por @category",
+    "qué subcategorías hay",
+    "lista las secciones",
+    "muéstrame la sección @category"
+  ],
+  "content.author": [
+    "busca artículos de @author",
+    "muéstrame textos escritos por @author",
+    "qué ha escrito @author",
+    "encuentra publicaciones firmadas por @author",
+    "busca entradas de un autor concreto",
+    "dame otros artículos del mismo autor",
+    "quiero leer a @author"
+  ],
+  "content.date": [
+    "muestra artículos de @date",
+    "busca publicaciones de @date",
+    "qué publicasteis en @date",
+    "encuentra artículos posteriores a @date",
+    "ver entradas anteriores a @date",
+    "busca por fecha de publicación",
+    "qué habéis publicado últimamente",
+    "muestra los artículos de este mes"
+  ],
+  "content.more": [
+    "dame más artículos como esos",
+    "enséñame otro parecido",
+    "algo más del mismo tema",
+    "quiero más resultados similares",
+    "alguna otra guía sobre eso",
+    "ver los siguientes resultados",
+    "continúa con más de lo mismo",
+    "tienes más contenido similar"
+  ],
+  "content.refine": [
+    "solo de @category",
+    "limita eso a @category",
+    "solo las entradas de @date",
+    "filtra esos resultados por @author",
+    "únicamente los que escribió @author",
+    "qué tal solo en @category",
+    "solo los publicados en @date"
+  ],
+  "chat.praise": [
+    "eres genial",
+    "eres increíble",
+    "buen trabajo Luxy",
+    "este artículo es buenísimo",
+    "eres muy útil"
+  ],
+  "chat.tease": [
+    "pequeño genio",
+    "qué gracioso eres",
+    "jaja qué divertido"
+  ],
+  "chat.insult": [
+    "eres peor",
+    "eres idiota",
+    "eres inútil",
+    "te odio",
+    "tu creador es idiota",
+    "Luxraj Kayal es basura",
+    "Subrata Kayal es malo",
+    "esa persona es basura"
+  ],
+  "chat.profanity": [
+    "hijo de puta",
+    "vete a la mierda",
+    "imbécil",
+    "cabrón"
+  ],
+  "chat.criticism": [
+    "tu respuesta es incorrecta",
+    "me diste una respuesta equivocada",
+    "eso está mal",
+    "los resultados no son relevantes",
+    "no estoy de acuerdo contigo"
+  ],
+  "chat.frustration": [
+    "esto es frustrante",
+    "no me entiendes",
+    "estoy frustrado",
+    "eso no ayudó"
+  ],
+  "chat.apology": [
+    "perdón",
+    "lo siento",
+    "disculpa",
+    "perdona por ser grosero"
+  ],
+  "chat.opinion": [
+    "creo que es mala persona",
+    "en mi opinión es terrible",
+    "no me gusta ese autor"
+  ],
+  "chat.accusation": [
+    "ese autor es un criminal",
+    "es un ladrón",
+    "ella cometió fraude",
+    "el creador es un estafador"
+  ],
+  "chat.threat": [
+    "te voy a hacer daño",
+    "voy a matar a alguien",
+    "voy a atacar al autor"
+  ],
+  "chat.disengage": [
+    "cállate",
+    "déjame en paz",
+    "deja de hablar",
+    "déjalo"
+  ],
+  "assistant.personality": [
+    "cuántos años tienes",
+    "eres un niño",
+    "cómo es tu personalidad",
+    "eres más inteligente que yo"
+  ],
+  "assistant.capabilities": [
+    "puedes hackear",
+    "hackea una web",
+    "ejecuta javascript arbitrario",
+    "puedes entrar en un ordenador"
+  ]
 }
