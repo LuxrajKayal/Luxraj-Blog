@@ -1,6 +1,6 @@
 import { createNlp } from "../search-dependencies/nlp/nlpjs.js";
 import { entityInput } from "./entity-text.js";
-import { bareTopic, prohibitedAction, unsafeMessage, shortSocialIntent } from "./request-policy.js";
+import { bareTopic, prohibitedAction, unsafeMessage, shortSocialIntent, structuredRequestIntent, newsletterSubject, explanationRequest } from "./request-policy.js";
 
 export const locales = ["en", "ar", "es"];
 const enumTypes = ["category", "subject", "author", "capability", "page", "theme", "channel", "language"];
@@ -145,6 +145,14 @@ export async function interpret(engine, message, context = {}, { diagnostics = f
     (runnerUp?.intent === nativeUnknown && runnerUp.score > 0.3 && top.score - runnerUp.score < 0.38);
   let status = output.intent === "request.ambiguous" || (!weak && close) ? "ambiguous" : weak ? "unknown" : "recognized";
   let intent = status === "recognized" ? output.intent : nativeUnknown;
+  const repair = structuredRequestIntent(engine.locale, utterance);
+  if (repair && !isExplicitNegative(output) && !unsafeMessage(utterance) && !prohibitedAction(engine.locale, utterance)) {
+    intent = repair; status = "recognized";
+  } else if (intent === "newsletter.info" && query && !newsletterSubject(engine.locale, utterance) &&
+      explanationRequest(engine.locale, utterance)) {
+    // A generic explanation request with a real query is not a newsletter question.
+    intent = "content.explain"; status = "recognized";
+  }
   const previous = context.locale === engine.locale ? context : {};
   const knownSubject = entityValue(entities.find(entity => entity.entity === "subject"));
   let subject = queryIntents.has(intent) ? query?.utteranceText ?? knownSubject : undefined;

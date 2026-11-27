@@ -110,7 +110,14 @@ try {
   assert.equal(await refusedSignup.response.getByRole("button", { name: "Open newsletter", exact: true }).count(), 0);
   await ask(page, "Calculate 12 V / 4 Ω", /open an article first/iu);
   await ask(page, "Explain this", /which topic/iu);
-  await ask(page, "Edge Computing", /excerpts from Luxraj Blog|didn.t find matching pages/iu);
+  const edge = await ask(page, "Edge Computing", /excerpts from Luxraj Blog|found mentions|didn.t find matching pages|no matching pages/iu);
+  const edgeText = await edge.response.locator(".luxy-message__bubble > p").first().textContent();
+  if (/excerpts|mentions/iu.test(edgeText)) {
+    const links = await edge.response.locator("a").evaluateAll(nodes => nodes.map(anchor => anchor.href));
+    assert(links.length > 0 && links.every(url => url.startsWith(base)), "Evidence outcome must include safe sources");
+    assert(await edge.response.locator("li p").count() > 0, "Evidence outcome must include excerpts");
+    console.log("Edge Computing evidence:", JSON.stringify({ reply: edgeText, links }));
+  } else assert.equal(await edge.response.locator("a").count(), 0, "Empty outcome must not claim results");
   const oldResponses = await replies(page).count();
   await page.locator("[data-luxy-new-chat]").click();
   assert.equal(await replies(page).count(), 0);

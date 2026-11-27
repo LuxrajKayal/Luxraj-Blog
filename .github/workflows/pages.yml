@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feature/luxy-rebuild
+      - feature/luxy-personality-refinement
     paths:
       - "site/**"
       - "scripts/**"

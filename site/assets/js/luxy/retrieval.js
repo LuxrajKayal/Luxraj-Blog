@@ -65,10 +65,29 @@ export function nativeOptions(packet, request, catalog, sortFields) {
 const articleOnly = path => /(?:^|\/)articles\//u.test(path);
 const topicText = value => String(value ?? "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase()
   .replace(/[^\p{L}\p{N}]+/gu, " ").trim();
-const topicalTitle = (title, query) => {
-  const subject = topicText(query), heading = topicText(title);
-  return Boolean(subject && (" " + heading + " ").includes(" " + subject + " "));
-};
+// Match evidence in actual indexed article fields, not a claim of semantic comprehension.
+// A policy or unrelated page mentioning a term is never a direct explanation.
+const ignored = new Set(["a","an","the","of","in","on","to","for","el","la","los","las","de","del","en","un","una","y","و","في","من"]);
+const terms = value => [...new Set(topicText(value).split(" ").filter(word => word && !ignored.has(word)))];
+const usable = value => typeof value === "string" && !/\{\{|\}\}/u.test(value);
+const hasPhrase = (field, query) => usable(field) && (" " + topicText(field) + " ").includes(" " + topicText(query) + " ");
+const covers = (field, words) => usable(field) && words.length > 1 && words.every(word => terms(field).includes(word));
+export function explanationEvidence(row, article, query, route) {
+  if (!articleOnly(route) && !article) return false;
+  const subject = topicText(query);
+  if (!subject) return false;
+  const words = terms(subject);
+  const fields = [article?.title, row.meta?.title, ...(article?.headings ?? []),
+    ...(article?.tags ?? []), article?.description, row.meta?.description];
+  // Native excerpts are evidence only for the retrieved article; a single incidental
+  // keyword in its body is not enough for an explanatory outcome.
+  if (fields.some(field => hasPhrase(field, subject) || covers(field, words))) return true;
+  const excerpt = String(row.plain_excerpt ?? row.excerpt ?? "").replace(/<\/?mark>/giu, "");
+  const headings = (row.sub_results ?? []).map(section => section.title);
+  if (headings.some(field => hasPhrase(field, subject) || covers(field, words))) return true;
+  return words.length > 1 && (hasPhrase(excerpt, subject) || covers(excerpt, words)) &&
+    fields.some(field => usable(field) && words.some(word => terms(field).includes(word)));
+}
 
 export async function retrieve(packet, state, { page, signal, region, engine = pagefind }) {
   const started = performance.now();
@@ -98,6 +117,7 @@ export async function retrieve(packet, state, { page, signal, region, engine = p
   const current = state.search;
   const items = [];
   const omit = new Set();
+  let topical = false;
   let offset = current.offset;
   while (offset < current.refs.length && items.length < batchSize) {
     const batch = current.refs.slice(offset, offset + batchSize - items.length);
@@ -115,15 +135,14 @@ export async function retrieve(packet, state, { page, signal, region, engine = p
           (packet.search?.followUp && state.seen.has(canonical))) continue;
       if (packet.search?.browse && !region.articles[route] && !articleOnly(route)) continue;
       omit.add(canonical);
+      if (current.explanation && explanationEvidence(row, region.articles[route], current.query, route)) topical = true;
       items.push({ title: row.meta?.title || region.articles[route]?.title || route, url: url.href,
         excerpt: String(row.plain_excerpt ?? row.excerpt ?? "").replace(/<\/?mark>/giu, "") });
     }
   }
   current.offset = offset;
   for (const canonical of omit) state.seen.add(canonical);
-  const incidental = current.explanation && items.length && !items.some(item => {
-    try { return articleOnly(decodeURI(new URL(item.url).pathname)) && topicalTitle(item.title, current.query); } catch { return false; }
-  });
+  const incidental = current.explanation && items.length && !topical;
   return { status: items.length ? incidental ? "incidental" : current.explanation ? "explained" : "found"
     : more ? "exhausted" : "empty", items, unavailable: current.unavailable,
     more: offset < current.refs.length, elapsedMs: performance.now() - started };

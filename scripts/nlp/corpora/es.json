@@ -70,7 +70,10 @@
     "qué clase de web es esta",
     "para qué existe esta página",
     "qué temas trata el sitio",
-    "qué encontraré en Luxraj"
+    "qué encontraré en Luxraj",
+    "cuál es el objetivo de esta web",
+    "cuál es el propósito del sitio",
+    "para qué sirve el blog de Luxraj"
   ],
   "site.creator": [
     "quién fundó Luxraj",
@@ -220,7 +223,9 @@
     "me puedes explicar @query",
     "aclara el concepto de @query",
     "explícame esto",
-    "qué significa eso"
+    "qué significa eso",
+    "qué son @query",
+    "qué es la tecnología @query"
   ],
   "content.search": [
     "busca artículos sobre @query",
@@ -278,7 +283,10 @@
     "alguna otra guía sobre eso",
     "ver los siguientes resultados",
     "continúa con más de lo mismo",
-    "tienes más contenido similar"
+    "tienes más contenido similar",
+    "muéstrame otros artículos parecidos",
+    "puedes mostrarme más resultados similares",
+    "quiero ver otros artículos relacionados"
   ],
   "content.refine": [
     "solo de @category",

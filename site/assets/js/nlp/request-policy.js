@@ -33,7 +33,7 @@ const forms = {
     commands: {
       theme: /^(?:من فضلك\s+)?(?:غير|غيّر|بدل|بدّل|حول|حوّل|فعّل|فعل|شغّل|شغل|اجعل|أريد|اريد|الوضع)\s*.{0,120}$/u,
       search_interface: /^(?:من فضلك\s+)?(?:افتح|أظهر|اعرض|بدل|بدّل|انتقل)\s*.{0,120}$/u,
-      newsletter: /^(?:من فضلك\s+)?(?:اشترك|سجلني|سجّلني|أضفني|أريد|اريد|افتح)\s*.{0,150}$/u,
+      newsletter: /^(?:من فضلك\s+)?(?:اشترك|سجلني|سجّلني|أضفني|أريد|اريد|افتح|هل يمكنني الانضمام|هل أستطيع الانضمام|هل يمكنني الاشتراك|هل أستطيع الاشتراك)\s*.{0,150}$/u,
       share: /^(?:من فضلك\s+)?(?:شارك|أرسل|افتح|أريد)\s*.{0,120}$/u,
       copy: /^(?:من فضلك\s+)?(?:انسخ|أعطني|اعطني|ضع|أريد)\s*.{0,120}$/u,
       calculate: /^(?:من فضلك\s+)?(?:احسب|أحسب|حل|ساعدني|هل يمكنك حساب)\s*.{0,150}$/u
@@ -97,7 +97,8 @@ const social = {
   },
   ar: {
     greet: /^(?:مرحبا|مرحباً|أهلا|أهلاً|هلا|السلام عليكم|صباح الخير|مساء الخير)(?:[،\s]+(?:يا\s+)?لوكسي)?$/u,
-    farewell: /^(?:وداعا|وداعاً|مع السلامة|إلى اللقاء|أراك لاحقا|باي)(?:[،\s]+(?:يا\s+)?لوكسي)?$/u
+    thanks: /^(?:مشكور|شكرا|شكراً|أشكرك|تسلم)(?:\s+(?:على\s+(?:مساعدتك|المساعدة|جهدك)|لك|جزيلا|يا\s+لوكسي))?$/u,
+    farewell: /^(?:وداعا|وداعاً|مع السلامة|إلى اللقاء|أراك (?:لاحقا|غدا|غداً|في الغد)|باي)(?:[،\s]+(?:يا\s+)?لوكسي)?$/u
   },
   es: {
     greet: /^(?:hola|buenas|buenos días|buenas tardes|buenas noches|hey)(?:[,\s]+luxy)?$/iu,
@@ -108,4 +109,23 @@ export function shortSocialIntent(locale, message) {
   const text = normalize(message);
   for (const [key, pattern] of Object.entries(social[locale] ?? {})) if (pattern.test(text)) return "chat." + key;
   return null;
+}
+
+// High precision, full-message repair for familiar site questions and follow-ups.
+// These rules never grant permission to execute controls; actions retain the independent gate.
+export function structuredRequestIntent(locale, message) {
+  const text = normalize(message);
+  if (locale === "en" && /^(?:what (?:is|s) the (?:purpose|aim|point) of (?:this|the|luxraj) (?:blog|website|site)|what (?:is|s) (?:this|the) (?:blog|website|site) about)$/iu.test(text)) return "site.identity";
+  if (locale === "es") {
+    if (/^(?:cu[aá]l es (?:la finalidad|el prop[oó]sito|el objetivo) (?:del|de este) (?:blog|sitio|portal)(?: de luxraj)?|para qu[eé] (?:sirve|existe) (?:este|el) (?:blog|sitio))$/iu.test(text)) return "site.identity";
+    if (/^(?:(?:puedes|podr[ií]as) )?(?:ense[nñ]arme|mostrarme|dame|mu[eé]strame|ens[eé][nñ]ame) (?:otros|m[aá]s) (?:art[ií]culos|resultados|gu[ií]as)(?: similares| parecidos| del mismo tema)?$/iu.test(text)) return "content.more";
+  }
+  if (locale === "ar" && /^(?:(?:هل يمكنني|هل أستطيع|أريد|اريد) (?:الانضمام|الاشتراك|التسجيل) (?:إلى|في|بـ?) (?:القائمة البريدية|النشرة البريدية|النشرة))$/u.test(text)) return "newsletter.subscribe";
+  return null;
+}
+export function newsletterSubject(locale, message) {
+  return ({en:/newsletter|mailing list|luxy.s cottage/iu,es:/bolet[ií]n|newsletter|lista de correo|casita de luxy/iu,ar:/النشرة|القائمة البريدية|بيت لوكسي/u})[locale]?.test(message) ?? false;
+}
+export function explanationRequest(locale, message) {
+  return ({en:/^(?:what (?:is|are|does)|explain|how does)\s+/iu,es:/^[¿¡]?\s*(?:qu[eé] (?:es|son|significa)|expl[ií]came|c[oó]mo funciona)\s+/iu,ar:/^(?:ما (?:هو|هي|معنى)|اشرح|ماذا يعني|كيف يعمل)\s+/u})[locale]?.test(message.trim()) ?? false;
 }

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { actionPermission, prohibitedAction, bareTopic, unsafeMessage, shortSocialIntent } from "../../site/assets/js/nlp/request-policy.js";
+import { actionPermission, prohibitedAction, bareTopic, unsafeMessage, shortSocialIntent, structuredRequestIntent, explanationRequest, newsletterSubject } from "../../site/assets/js/nlp/request-policy.js";
 for (const [locale, message, capability] of [
   ["en", "Switch to light theme", "theme"], ["en", "dark mode pls", "theme"],
   ["en", "Open search filters", "search_interface"], ["en", "Switch to tag search", "search_interface"],
@@ -34,3 +34,15 @@ for (const [locale, message, expected] of [
   ["ar", "مساء الخير يا لوكسي", "chat.greet"], ["es", "Hasta pronto, Luxy.", "chat.farewell"]
 ]) assert.equal(shortSocialIntent(locale, message), expected, message);
 assert.equal(shortSocialIntent("en", "Hi Luxy, switch to dark mode"), null);
+
+assert.equal(structuredRequestIntent("en", "What is the aim of this blog?"), "site.identity");
+assert.equal(structuredRequestIntent("es", "¿Cuál es el propósito del blog de Luxraj?"), "site.identity");
+assert.equal(structuredRequestIntent("es", "¿Podrías mostrarme otros artículos parecidos?"), "content.more");
+assert.equal(structuredRequestIntent("ar", "هل أستطيع الاشتراك في النشرة البريدية؟"), "newsletter.subscribe");
+assert.equal(shortSocialIntent("ar", "مشكور على جهدك"), "chat.thanks");
+assert.equal(shortSocialIntent("ar", "أراك غدا يا لوكسي"), "chat.farewell");
+assert(explanationRequest("es", "¿Qué es la memoria de cambio de fase?"));
+assert(!newsletterSubject("es", "¿Qué es la memoria de cambio de fase?"));
+assert(newsletterSubject("es", "¿Qué es el boletín?"));
+assert(actionPermission("ar", "هل يمكنني الانضمام إلى القائمة البريدية؟", "newsletter"));
+assert(!actionPermission("ar", "لا أريد الاشتراك في النشرة البريدية", "newsletter"));
