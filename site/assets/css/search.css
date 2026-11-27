@@ -1,6 +1,7 @@
 @import url("./eyebrows.css");
 @import url("./shared-h1.css");
 @import url("./luxy-assistant.css");
+@import url("./normal-search-ui.css");
 
 /* Three-position sliding mode control. The thumb moves across one continuous track. */
 .search-mode-switch{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:0;width:min(100%,440px);min-width:0;margin:0;grid-column:2;justify-self:center;padding:4px;border:1px solid var(--color-border);border-radius:var(--radius-pill);background:var(--color-page)}
