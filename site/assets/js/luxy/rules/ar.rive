@@ -1,0 +1,237 @@
+// Luxy foundational conversation and execution rules.
+! version = 2.0
+! var name = لوكسي
+
++ intent chat greet
+* <get greeted> == yes => {@welcome back}
+- <set greeted=yes>أهلاً بك! ما الذي تود استكشافه؟{weight=2}
+- <set greeted=yes>مرحباً، أنا لوكسي. عمّ تبحث اليوم؟
+- <set greeted=yes>حللت أهلاً في مدونة لوكسراج!
+
++ intent chat thanks
+- على الرحب والسعة. أتمنى لك قراءة ممتعة!
+- يسرّني أنني ساعدتك.
+- حاضرة للمساعدة إن أردت أن تتابع البحث.
+
++ intent chat farewell
+- إلى اللقاء!
+- أراك لاحقاً، وشكراً على الزيارة.
+- في أمان الله.
+
++ intent chat smalltalk
+- أنا بخير، شكراً لسؤالك! هل من موضوع يثير فضولك؟
+- مستعد للمساعدة في استكشاف المدونة.
+
++ intent assistant identity
+- أنا <bot name>، مساعد البحث في مدونة لوكسراج. أساعدك في العثور على المقالات ومصادرها واستخدام أدوات الموقع.
+
++ intent assistant help
+- يمكنك طلب مقالات عن موضوع معيّن أو فتح قسم من المدونة أو معرفة كاتب المقال الذي تقرؤه. أعرض لك مقتطفات من المصادر وروابطها.
+
++ intent site identity
+- مدونة لوكسراج مطبوعة تحريرية تُعنى بالهندسة والإلكترونيات والحوسبة والتطبيقات العملية للتقنية. <call>about</call>
+
++ intent site creator
+- أنشأ لوكسراج كايال هذه المدونة ويتولى إدارتها. ينشر باسم لوكسراج. <call>about</call>
+
++ intent newsletter info
+- يمكن الاشتراك في نشرة لوكسراج لتلقيها بالبريد الإلكتروني. ستجد نموذج التسجيل في بيت لوكسي، ويمكن إلغاء الاشتراك من صفحته المخصصة.
+
++ welcome back
+- أهلاً بعودتك! عمّ تبحث هذه المرة؟
+
++ intent site navigate
+* <get missing> == page => {@outcome clarify page}
+- <call>navigate</call>
+
++ intent site contact
+- <call>contact</call>
+
++ intent site theme
+- <call>theme</call>
+
++ intent site language
+* <get missing> == language => {@outcome clarify language}
+- <call>language</call>
+
++ intent search interface
+- <call>search_interface</call>
+
++ intent newsletter subscribe
+- <call>newsletter</call>
+
++ intent newsletter unsubscribe
+- <call>unsubscribe</call>
+
++ intent article share
+- <call>share</call>
+
++ intent article copylink
+- <call>copy</call>
+
++ intent article author
+- <call>author</call>
+
++ intent article date
+- <call>article_dates</call>
+
++ intent article calculate
+* <get missing> == expression => {@outcome clarify expression}
+- <call>calculate</call>
+
++ intent content explain
+* <get missing> == query => {@outcome clarify query}
+- <call>retrieve</call>
+
++ intent content search
+- <call>retrieve</call>
+
++ intent content category
+- <call>category</call>
+
++ intent content author
+* <get missing> == author => {@outcome clarify author}
+- <call>retrieve</call>
+
++ intent content date
+- <call>retrieve</call>
+
++ intent content more
+* <get hasrelated> == yes => <call>retrieve</call>
+* <get missing> == query => {@outcome clarify query}
+- <call>retrieve</call>
+
++ intent content refine
+* <get missing> == query => {@outcome clarify query}
+- <call>retrieve</call>
+
++ outcome unavailable
+- لا أستطيع فتح ذلك هنا. يمكنك اختيار قسم آخر أو البحث عن موضوع.
+
++ outcome error
+- حدث خطأ أثناء معالجة طلبك. يرجى المحاولة مرة أخرى.
+
++ outcome destination
+- يمكنك فتح الصفحة من هذا الرابط.
+
++ outcome categories
+- إليك أقسام الموقع المتاحة.
+
++ outcome language unavailable
+- لم أجد صفحة رئيسية منشورة بهذه اللغة.
+
++ outcome theme light
+- أصبح الموقع الآن في الوضع الفاتح.
+
++ outcome theme dark
+- أصبح الموقع الآن في الوضع الداكن.
+
++ outcome opened
+- فُتحت أدوات البحث التي طلبتها.
+
++ outcome offer newsletter
+- افتح نموذج التسجيل للاطّلاع عليه والاشتراك من خلال خدمة النشرة.
+
++ outcome newsletter opened
+- نموذج النشرة مفتوح الآن. اتبع التعليمات الواردة فيه للاشتراك.
+
++ outcome offer share
+- استخدم خيارات المشاركة على جهازك أو انسخ رابط المقال.
+
++ outcome offer copy
+- استخدم الزر لنسخ رابط المقال.
+
++ outcome copy manually
+- تعذّر النسخ التلقائي. يمكنك فتح الرابط ونسخ العنوان من المتصفح.
+
++ outcome copied
+- تم نسخ رابط المقال.
+
++ outcome shared
+- قبِل جهازك طلب المشاركة.
+
++ outcome share cancelled
+- أُلغيت المشاركة.
+
++ outcome article needed
+- افتح أحد المقالات أولاً لأعرف الصفحة التي تقصدها.
+
++ outcome author
+- هذا هو اسم الكاتب الوارد في بيانات المقال.
+
++ outcome author unavailable
+- لم أجد اسم كاتب مؤكداً لهذا المقال.
+
++ outcome article dates
+- هذه التواريخ المسجلة لهذا المقال.
+
++ outcome calculator unavailable
+- لا توجد في هذا المقال حالياً أداة حساب يمكنني استخدامها.
+
++ outcome calculated
+- هذه النتيجة التي أعادتها أداة الحساب في المقال.
+
++ outcome date unavailable
+- معلومات التاريخ المطلوبة غير متوفرة هنا.
+
++ outcome local index unavailable
+- لم أجد فهرس بحث منشوراً بهذه اللغة.
+
++ outcome found
+- وجدت هذه النتائج في مدونة لوكسراج.
+
++ outcome explained
+- قد تساعدك هذه المقتطفات من المدونة في فهم الموضوع. افتح أحد المصادر لقراءة المزيد.
+
++ outcome empty
+- لم أجد صفحات مطابقة. جرّب عبارة مختلفة أو موضوعاً أوسع.
+
++ outcome exhausted
+- لا توجد نتائج أخرى مطابقة لهذا البحث.
+
++ outcome clarify query
+- ما الموضوع الذي تريدني أن أبحث عنه؟
+
++ outcome clarify page
+- أي صفحة تود فتحها؟
+
++ outcome clarify language
+- بأي لغة تود فتح الموقع؟
+
++ outcome clarify author
+- عمّن تريد أن أبحث؟
+
++ outcome clarify expression
+- ما القيم أو التعبير الذي تريد إدخاله في أداة المقال؟
+
++ notice unfiltered
+- بعض المرشحات المطلوبة غير متوفرة في فهرس الموقع.
+
++ label offer newsletter
+- فتح نموذج النشرة
+
++ label offer share
+- مشاركة المقال
+
++ label offer copy
+- نسخ الرابط
+
++ label published
+- تاريخ النشر
+
++ label modified
+- آخر تحديث
+
++ unknown
+- {topic=recovery}لم أفهم الطلب. جرّب ذكر موضوع أو قسم من المدونة أو أداة في الموقع.
+
++ ambiguous
+- {topic=recovery}لم يتضح لي ما الذي تقصده. هل يمكنك تحديد المقال أو الموضوع أو الأداة؟
+
++ *
+- {@unknown}
+
+> topic recovery includes random
++ intent assistant help
+- {topic=random}يمكنك طلب مقالات عن موضوع معيّن أو فتح قسم من المدونة أو معرفة كاتب المقال الذي تقرؤه. أعرض لك مقتطفات من المصادر وروابطها.
+< topic

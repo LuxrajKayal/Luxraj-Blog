@@ -10,6 +10,7 @@ on:
       - "scripts/**"
       - "search-dependencies/pagefind/**"
       - "search-dependencies/nlp/**"
+      - "search-dependencies/rivescript/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -56,6 +57,8 @@ jobs:
           node scripts/nlp/verify-upstream.mjs
           node scripts/build-nlp.mjs
           node scripts/test-nlp.mjs
+          node scripts/build-rivescript.mjs
+          node scripts/test-rivescript.mjs
 
           echo "Prepared public site:"
           find _site -maxdepth 2 -type f | sort | head -80

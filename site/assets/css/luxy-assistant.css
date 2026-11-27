@@ -337,6 +337,20 @@
   margin-bottom: 0;
 }
 
+.luxy-response-sources {
+  padding-inline-start: 1.25rem;
+  margin-block: .75rem;
+}
+
+.luxy-response-sources li + li {
+  margin-block-start: .65rem;
+}
+
+.luxy-loading {
+  align-self: flex-start;
+  font-size: .9rem;
+}
+
 .luxy-message__quote {
   margin: .75rem 0;
   padding: .65rem .85rem;

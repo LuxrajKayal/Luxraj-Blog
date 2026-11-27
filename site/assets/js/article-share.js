@@ -8,7 +8,7 @@
 
 const copyFeedbackTimers = new WeakMap();
 
-function getArticleShareData() {
+export function getArticleShareData() {
     const title = document.querySelector(".article-entry-header h1")?.textContent?.trim()
         || document.title;
     const description = document.querySelector(".article-introduction")?.textContent?.trim()
@@ -78,7 +78,7 @@ function tryLegacyCopy(url) {
     return copied;
 }
 
-async function copyArticleUrl() {
+export async function copyArticleUrl({ check = () => {}, allowManual = true } = {}) {
     const url = window.location.href;
 
     if (navigator.clipboard?.writeText && window.isSecureContext) {
@@ -92,7 +92,9 @@ async function copyArticleUrl() {
         }
     }
 
+    check();
     if (tryLegacyCopy(url)) return "copied";
+    if (!allowManual) return "manual";
 
     // execCommand is deprecated and may be unavailable. Give the visitor
     // one final manual route rather than silently claiming the copy succeeded.

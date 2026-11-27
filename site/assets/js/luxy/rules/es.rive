@@ -1,0 +1,237 @@
+// Luxy foundational conversation and execution rules.
+! version = 2.0
+! var name = Luxy
+
++ intent chat greet
+* <get greeted> == yes => {@welcome back}
+- <set greeted=yes>¡Hola! ¿Qué te gustaría explorar?{weight=2}
+- <set greeted=yes>Soy Luxy. ¿Qué buscas hoy?
+- <set greeted=yes>¡Qué gusto verte por el blog de Luxraj!
+
++ intent chat thanks
+- De nada. ¡Que disfrutes de la lectura!
+- Me alegra haber podido ayudarte.
+- Cuando quieras, podemos seguir buscando.
+
++ intent chat farewell
+- ¡Hasta otra!
+- Gracias por pasar por aquí. ¡Cuídate!
+- Nos vemos pronto.
+
++ intent chat smalltalk
+- ¡Bien, gracias! ¿Hay algún tema que te dé curiosidad?
+- Por aquí, con ganas de ayudarte a explorar el blog.
+
++ intent assistant identity
+- Soy <bot name>, el asistente de búsqueda del blog de Luxraj. Puedo ayudarte a encontrar artículos, consultar sus fuentes y usar los controles del sitio.
+
++ intent assistant help
+- Pídeme artículos sobre un tema, una sección del blog o el nombre de quien escribió la página que estás leyendo. Puedo mostrar fragmentos y enlazar sus fuentes.
+
++ intent site identity
+- El blog de Luxraj es una publicación editorial sobre ingeniería, electrónica, informática y tecnología aplicada. <call>about</call>
+
++ intent site creator
+- Luxraj Kayal creó el blog y se encarga de mantenerlo. Publica con el nombre de Luxraj. <call>about</call>
+
++ intent newsletter info
+- El boletín de Luxraj se recibe por correo. Puedes revisar el formulario de alta en la casita de Luxy o usar la página de baja para dejar de recibirlo.
+
++ welcome back
+- ¡Qué bien que hayas vuelto! ¿Qué quieres buscar esta vez?
+
++ intent site navigate
+* <get missing> == page => {@outcome clarify page}
+- <call>navigate</call>
+
++ intent site contact
+- <call>contact</call>
+
++ intent site theme
+- <call>theme</call>
+
++ intent site language
+* <get missing> == language => {@outcome clarify language}
+- <call>language</call>
+
++ intent search interface
+- <call>search_interface</call>
+
++ intent newsletter subscribe
+- <call>newsletter</call>
+
++ intent newsletter unsubscribe
+- <call>unsubscribe</call>
+
++ intent article share
+- <call>share</call>
+
++ intent article copylink
+- <call>copy</call>
+
++ intent article author
+- <call>author</call>
+
++ intent article date
+- <call>article_dates</call>
+
++ intent article calculate
+* <get missing> == expression => {@outcome clarify expression}
+- <call>calculate</call>
+
++ intent content explain
+* <get missing> == query => {@outcome clarify query}
+- <call>retrieve</call>
+
++ intent content search
+- <call>retrieve</call>
+
++ intent content category
+- <call>category</call>
+
++ intent content author
+* <get missing> == author => {@outcome clarify author}
+- <call>retrieve</call>
+
++ intent content date
+- <call>retrieve</call>
+
++ intent content more
+* <get hasrelated> == yes => <call>retrieve</call>
+* <get missing> == query => {@outcome clarify query}
+- <call>retrieve</call>
+
++ intent content refine
+* <get missing> == query => {@outcome clarify query}
+- <call>retrieve</call>
+
++ outcome unavailable
+- No puedo abrir eso aquí. Prueba con otra sección o busca un tema.
+
++ outcome error
+- Algo falló al tramitar la petición. Inténtalo de nuevo.
+
++ outcome destination
+- Desde aquí puedes abrir la página.
+
++ outcome categories
+- Estas son las secciones disponibles.
+
++ outcome language unavailable
+- No encontré una portada publicada en ese idioma.
+
++ outcome theme light
+- El sitio está ahora en modo claro.
+
++ outcome theme dark
+- El sitio está ahora en modo oscuro.
+
++ outcome opened
+- Abrí los controles de búsqueda solicitados.
+
++ outcome offer newsletter
+- Abre el formulario para revisar las condiciones y darte de alta en el servicio del boletín.
+
++ outcome newsletter opened
+- El formulario del boletín está abierto. Sigue sus indicaciones para suscribirte.
+
++ outcome offer share
+- Usa las opciones de tu dispositivo para compartir el artículo o copiar su enlace.
+
++ outcome offer copy
+- Pulsa el botón para copiar el enlace del artículo.
+
++ outcome copy manually
+- No se pudo copiar automáticamente. Abre el enlace y copia la dirección del navegador.
+
++ outcome copied
+- Se copió el enlace del artículo.
+
++ outcome shared
+- Tu dispositivo aceptó la solicitud de compartir.
+
++ outcome share cancelled
+- Se canceló la acción de compartir.
+
++ outcome article needed
+- Abre primero un artículo para saber a qué página te refieres.
+
++ outcome author
+- Este es el nombre que figura en la firma del artículo.
+
++ outcome author unavailable
+- No encontré una firma confirmada para este artículo.
+
++ outcome article dates
+- Estas son las fechas registradas para el artículo.
+
++ outcome calculator unavailable
+- Este artículo aún no ofrece una herramienta de cálculo que pueda usar.
+
++ outcome calculated
+- La calculadora del artículo devolvió este resultado.
+
++ outcome date unavailable
+- La información de fecha solicitada no está disponible aquí.
+
++ outcome local index unavailable
+- No encontré un índice de búsqueda publicado en ese idioma.
+
++ outcome found
+- Encontré estos resultados en el blog de Luxraj.
+
++ outcome explained
+- Estos fragmentos del blog pueden aclarar el tema. Abre una fuente para leer el artículo completo.
+
++ outcome empty
+- No encontré páginas que coincidan. Prueba con otro término o con un tema más amplio.
+
++ outcome exhausted
+- No quedan más coincidencias en esta búsqueda.
+
++ outcome clarify query
+- ¿Sobre qué tema quieres que busque?
+
++ outcome clarify page
+- ¿Qué página quieres abrir?
+
++ outcome clarify language
+- ¿Qué versión de idioma quieres ver?
+
++ outcome clarify author
+- ¿De qué autor quieres buscar artículos?
+
++ outcome clarify expression
+- ¿Qué valores o expresión debe usar la herramienta del artículo?
+
++ notice unfiltered
+- El índice del sitio no admite algunos de los filtros solicitados.
+
++ label offer newsletter
+- Abrir el boletín
+
++ label offer share
+- Compartir el artículo
+
++ label offer copy
+- Copiar enlace
+
++ label published
+- Publicado
+
++ label modified
+- Actualizado
+
++ unknown
+- {topic=recovery}No entendí esa petición. Prueba a indicar un tema, una sección o un control del sitio.
+
++ ambiguous
+- {topic=recovery}No me queda claro a qué te refieres. ¿Puedes indicar el artículo, el tema o el control?
+
++ *
+- {@unknown}
+
+> topic recovery includes random
++ intent assistant help
+- {topic=random}Pídeme artículos sobre un tema, una sección del blog o el nombre de quien escribió la página que estás leyendo. Puedo mostrar fragmentos y enlazar sus fuentes.
+< topic

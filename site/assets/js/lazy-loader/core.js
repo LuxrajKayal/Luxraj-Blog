@@ -100,7 +100,7 @@ export function createLazyLoader({ root = document } = {}) {
     return state.promise;
   }
 
-  async function activate(profileId, trigger = null, event = null) {
+  async function activate(profileId, trigger = null, event = null, beforeActivate) {
     const profile = profiles.get(profileId);
     if (!profile) throw new Error('Unknown lazy-loading profile "' + profileId + '".');
 
@@ -119,6 +119,7 @@ export function createLazyLoader({ root = document } = {}) {
 
     try {
       const instance = await load(profileId, { trigger, event });
+      beforeActivate?.();
       if (typeof profile.activate === "function") {
         await profile.activate({ instance, trigger, event, root, loader: api });
       }

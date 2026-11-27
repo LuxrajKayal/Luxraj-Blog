@@ -1,0 +1,237 @@
+// Luxy foundational conversation and execution rules.
+! version = 2.0
+! var name = Luxy
+
++ intent chat greet
+* <get greeted> == yes => {@welcome back}
+- <set greeted=yes>Hello! What would you like to explore?{weight=2}
+- <set greeted=yes>Hi, I’m Luxy. What can I help you find?
+- <set greeted=yes>Welcome to Luxraj Blog!
+
++ intent chat thanks
+- You’re welcome. Happy reading!
+- Glad I could help.
+- Anytime. What else would you like to explore?
+
++ intent chat farewell
+- See you around!
+- Take care, and thanks for visiting.
+- Until next time!
+
++ intent chat smalltalk
+- I’m ready to help you explore the blog. What are you curious about?
+- Doing well, thanks for asking!
+
++ intent assistant identity
+- I’m <bot name>, the search assistant for Luxraj Blog. I can help you find articles, follow sources and use site controls.
+
++ intent assistant help
+- Try asking for articles on a topic, a blog section, the author of the current article, or the light theme. I can show relevant excerpts and link you to their sources.
+
++ intent site identity
+- Luxraj Blog is an editorial publication covering engineering, electronics, computing and practical technology. The About page has the full story. <call>about</call>
+
++ intent site creator
+- Luxraj Kayal created and maintains Luxraj Blog. He publishes under the name Luxraj. <call>about</call>
+
++ intent newsletter info
+- The Luxraj Blog newsletter is an email subscription. You can review the signup form in Luxy’s Cottage or use the unsubscribe page to leave the list.
+
++ welcome back
+- Welcome back! What would you like to look up this time?
+
++ intent site navigate
+* <get missing> == page => {@outcome clarify page}
+- <call>navigate</call>
+
++ intent site contact
+- <call>contact</call>
+
++ intent site theme
+- <call>theme</call>
+
++ intent site language
+* <get missing> == language => {@outcome clarify language}
+- <call>language</call>
+
++ intent search interface
+- <call>search_interface</call>
+
++ intent newsletter subscribe
+- <call>newsletter</call>
+
++ intent newsletter unsubscribe
+- <call>unsubscribe</call>
+
++ intent article share
+- <call>share</call>
+
++ intent article copylink
+- <call>copy</call>
+
++ intent article author
+- <call>author</call>
+
++ intent article date
+- <call>article_dates</call>
+
++ intent article calculate
+* <get missing> == expression => {@outcome clarify expression}
+- <call>calculate</call>
+
++ intent content explain
+* <get missing> == query => {@outcome clarify query}
+- <call>retrieve</call>
+
++ intent content search
+- <call>retrieve</call>
+
++ intent content category
+- <call>category</call>
+
++ intent content author
+* <get missing> == author => {@outcome clarify author}
+- <call>retrieve</call>
+
++ intent content date
+- <call>retrieve</call>
+
++ intent content more
+* <get hasrelated> == yes => <call>retrieve</call>
+* <get missing> == query => {@outcome clarify query}
+- <call>retrieve</call>
+
++ intent content refine
+* <get missing> == query => {@outcome clarify query}
+- <call>retrieve</call>
+
++ outcome unavailable
+- I can’t open that here. Try another section or ask for a topic.
+
++ outcome error
+- Something went wrong while I was working on that. Please try again.
+
++ outcome destination
+- Here’s the page you can open.
+
++ outcome categories
+- Here are the available sections.
+
++ outcome language unavailable
+- I couldn’t find a published home page for that language.
+
++ outcome theme light
+- The site is now using the light theme.
+
++ outcome theme dark
+- The site is now using the dark theme.
+
++ outcome opened
+- I opened the requested search controls.
+
++ outcome offer newsletter
+- Open the signup form to review it and subscribe through the newsletter service.
+
++ outcome newsletter opened
+- The newsletter form is open. Follow the instructions there to subscribe.
+
++ outcome offer share
+- Use your device’s share options, or copy the article link.
+
++ outcome offer copy
+- Use the button to copy this article’s link.
+
++ outcome copy manually
+- Automatic copying is unavailable. You can open the link and copy it from the address bar.
+
++ outcome copied
+- The article link was copied.
+
++ outcome shared
+- Your device accepted the share request.
+
++ outcome share cancelled
+- Sharing was cancelled.
+
++ outcome article needed
+- Open an article first so I know which page you mean.
+
++ outcome author
+- Here’s the byline for this article.
+
++ outcome author unavailable
+- I couldn’t find a confirmed byline for this article.
+
++ outcome article dates
+- Here are the dates recorded for this article.
+
++ outcome calculator unavailable
+- This article doesn’t currently have a calculation tool I can use.
+
++ outcome calculated
+- The article’s calculator returned this result.
+
++ outcome date unavailable
+- The requested date information is unavailable here.
+
++ outcome local index unavailable
+- I couldn’t find a published search index for this language.
+
++ outcome found
+- I found these results on Luxraj Blog.
+
++ outcome explained
+- These excerpts from Luxraj Blog may help explain the topic. Open a source to read more.
+
++ outcome empty
+- I didn’t find matching pages. Try a different term or a broader topic.
+
++ outcome exhausted
+- There are no more matching results from this search.
+
++ outcome clarify query
+- Which topic should I look up?
+
++ outcome clarify page
+- Which page would you like to open?
+
++ outcome clarify language
+- Which language version would you like to open?
+
++ outcome clarify author
+- Which author should I look for?
+
++ outcome clarify expression
+- What values or expression should the article tool use?
+
++ notice unfiltered
+- Some requested filters weren’t available in the website index.
+
++ label offer newsletter
+- Open newsletter
+
++ label offer share
+- Share article
+
++ label offer copy
+- Copy link
+
++ label published
+- Published
+
++ label modified
+- Updated
+
++ unknown
+- {topic=recovery}I didn’t understand that request. Try naming a topic, a blog section or a site control.
+
++ ambiguous
+- {topic=recovery}I’m not sure what you’re referring to. Could you name the article, topic or control?
+
++ *
+- {@unknown}
+
+> topic recovery includes random
++ intent assistant help
+- {topic=random}Try asking for articles on a topic, a blog section, the author of the current article, or the light theme. I can show relevant excerpts and link you to their sources.
+< topic

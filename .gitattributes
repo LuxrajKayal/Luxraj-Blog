@@ -1,0 +1,4 @@
+search-dependencies/rivescript/*.tgz -text
+search-dependencies/rivescript/LICENSE -text
+site/assets/js/search-dependencies/rivescript/rivescript.js text eol=lf
+site/assets/js/search-dependencies/rivescript/LICENSE -text

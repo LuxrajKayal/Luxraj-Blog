@@ -26,15 +26,17 @@ export function createNlpConversation({ locale, id = crypto.randomUUID(), page =
   let turn = 0;
 
   return {
-    submit(message, { diagnostics = false, spellCheck = false } = {}) {
+    submit(message, { diagnostics = false, spellCheck = false, signal } = {}) {
       if (typeof message !== "string" || !message.trim()) {
         return Promise.reject(new TypeError("Expected a nonempty Luxy message."));
       }
       const request = pending.then(async () => {
+        signal?.throwIfAborted();
         const { detectLanguage, interpret, resolveLocale } = await engine();
         const language = resolveLocale(locale) ?? context.locale ?? detectLanguage(message) ?? "en";
         const model = await loadNlpModel(language);
         const result = await interpret(model, message, context, { diagnostics, spellCheck });
+        signal?.throwIfAborted();
         const delivered = await forwardNlpResult({
           schemaVersion: 1,
           message,
@@ -42,6 +44,7 @@ export function createNlpConversation({ locale, id = crypto.randomUUID(), page =
           page: structuredClone(page),
           ...structuredClone(result)
         });
+        signal?.throwIfAborted();
         context = result.context;
         turn++;
         return delivered;

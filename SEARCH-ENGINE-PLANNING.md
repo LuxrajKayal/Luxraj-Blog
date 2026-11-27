@@ -16,9 +16,9 @@ Phase 4.2.1 — NLP.js infrastructure and communication. Load build-trained Engl
 
 Phase 4.2.2 — NLP.js training and automated article-based training. Combine independent foundational corpora with lightweight knowledge regenerated from the assembled site, then validate and export the three models in the GitHub build. See [Luxy NLP.js maintenance and contract](documentation/LUXY-NLP.md).
 
-Phase 4.3.1 — RiveScript execution and communication: Retain the original interpreter and connect it to Pagefind and authorized website controls through explicitly registered custom JavaScript functions; prevent arbitrary JavaScript execution from user input.
+Phase 4.3.1 — Implemented. Luxy loads RiveScript.js 2.2.1 on demand. Native rules route structured NLP packets to the shared Pagefind engine and explicitly registered website functions. The response adapter delivers replies and source links to the existing Luxy composer.
 
-Phase 4.3.2 — RiveScript conversation rules: Develop our own language-specific conversation rules for English, Arabic and Spanish, gradually utilizing all native RiveScript features in a controlled manner.
+Phase 4.3.2 — Implemented. English, Arabic and Spanish each handle all 28 foundational NLP intents, with clarification, search follow-ups and execution outcomes. Available destinations, indexes and controls are checked at runtime. See [Luxy RiveScript maintenance, rules and verification](documentation/LUXY-RIVESCRIPT.md).
 
 ## Workflow Architecture
 
@@ -31,6 +31,7 @@ flowchart TD
     LX -->|ui-nlp.js| NLP[NLP.js - Brain]
     NLP -->|nlp-rivescript.js| RS[RiveScript - Nerve]
     RS <-->|rivescript-pagefind.js| PF
+    RS --> WC[Registered website functions]
     RS -->|rivescript-ui.js| LX
 ```
 
