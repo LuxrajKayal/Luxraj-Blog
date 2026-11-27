@@ -10,7 +10,6 @@
  */
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { ensureSeoEligibilityMarker } from './injectors/permanent-element-injector.mjs';
 
@@ -608,15 +607,6 @@ async function main() {
 
   await walkAndBuild(SITE_DIR, '', partialContents, stats);
   await writeLegacyRouteRedirects();
-
-  // Generate the native search bundle once, after assembling all public HTML.
-  // The runtime and generated index are served from the agreed asset directory.
-  execFileSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', [
-    'exec', '--yes', '--package=pagefind@1.6.0', '--', 'pagefind',
-    '--site', '_site', '--output-subdir', 'assets/js/search-dependencies/pagefind'
-  ], { cwd: REPOSITORY_ROOT, stdio: 'inherit', shell: process.platform === 'win32' });
-  await cp(path.join(REPOSITORY_ROOT, 'search-dependencies', 'pagefind', 'LICENSE'),
-    path.join(OUTPUT_DIR, 'assets', 'js', 'search-dependencies', 'pagefind', 'LICENSE'));
   await writeFile(path.join(OUTPUT_DIR, '.nojekyll'), '', 'utf8');
 
   console.log(

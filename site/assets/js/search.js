@@ -1,8 +1,8 @@
 import { ARTICLES } from "./article-index.js";
-import { getArticleIdsByBoxId } from "./tag-indexer.js";
-import { initNormalSearch } from "./normal-search.js";
+import { getArticleIdsByBoxId, getArticleTagNames } from "./tag-indexer.js";
 
 const titleCompare = (a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" });
+const catCompare = (a, b) => a.category.localeCompare(b.category, undefined, { sensitivity: "base" });
 const escapeHTML = value => String(value)
   .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
   .replaceAll('"', "&quot;").replaceAll("'", "&#39;");
@@ -32,14 +32,67 @@ export function initSearch() {
   const modeRadios = modeSwitch
     ? [...modeSwitch.querySelectorAll('input[name="search-mode"]')]
     : [];
+  const form = document.querySelector("#search-form");
+  const input = document.querySelector("#search-query");
+  const category = document.querySelector("#search-category-filter");
+  const sort = document.querySelector("#search-sort");
+  const slider = document.querySelector("#search-reading-time");
+  const output = document.querySelector("#search-reading-output");
+  const results = document.querySelector("#search-results");
+  const count = document.querySelector("#search-result-count");
   const tagResults = document.querySelector("#tag-search-results");
   const tagCount = document.querySelector("#tag-search-result-count");
   const loadMore = document.querySelector("#tag-search-load-more");
 
   if (!dialog || !eyebrow || !title || !dialogHeader || !generalView || !luxyView || !tagView ||
-      !modeSwitch || modeRadios.length !== 3 || !tagResults || !tagCount || !loadMore) return;
+      !modeSwitch || modeRadios.length !== 3 ||
+      !form || !input || !category || !sort || !slider || !output ||
+      !results || !count || !tagResults || !tagCount || !loadMore) return;
 
-  const normal = initNormalSearch(generalView);
+  [...new Set(ARTICLES.map(article => article.category))]
+    .sort((a, b) => a.localeCompare(b))
+    .forEach(name => {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      category.append(option);
+    });
+
+  function matches() {
+    const query = input.value.trim().toLocaleLowerCase();
+    const selectedCategory = category.value;
+    const maxReadingTime = Number(slider.value);
+    const list = ARTICLES.filter(article => {
+      const tagNames = getArticleTagNames(article.id);
+      const searchable = [article.title, article.summary, article.category, article.parentCategory, ...tagNames]
+        .join(" ").toLocaleLowerCase();
+      return (!query || searchable.includes(query)) &&
+        (!selectedCategory || article.category === selectedCategory) &&
+        article.readingMinutes <= maxReadingTime;
+    });
+
+    switch (sort.value) {
+      case "date-asc": list.sort((a, b) => a.published.localeCompare(b.published) || titleCompare(a, b)); break;
+      case "category-asc": list.sort((a, b) => catCompare(a, b) || titleCompare(a, b)); break;
+      case "title-asc": list.sort(titleCompare); break;
+      case "title-desc": list.sort((a, b) => titleCompare(b, a)); break;
+      default: list.sort((a, b) => b.published.localeCompare(a.published) || titleCompare(a, b));
+    }
+    return list;
+  }
+
+  function renderGeneralSearch() {
+    const max = Number(slider.value);
+    output.textContent = (max === 15 ? "15+" : String(max)) + " min max";
+    const list = matches();
+    count.textContent = list.length + " sample article" + (list.length === 1 ? "" : "s");
+    if (!list.length) {
+      results.innerHTML = '<p class="search-empty">No sample articles match those filters. Try a broader term, another category or a longer reading time.</p>';
+      return;
+    }
+    const root = document.body.dataset.siteRoot || "";
+    results.innerHTML = list.map(article => renderArticleCard(article, root)).join("");
+  }
 
   const tagState = {
     boxId: null,
@@ -70,11 +123,9 @@ export function initSearch() {
       eyebrow.textContent = "LUXY SEARCH";
       title.textContent = "Luxy Assistant";
     } else {
-      eyebrow.textContent = normal.labels.library;
-      title.textContent = normal.labels.title;
+      eyebrow.textContent = "LUXRAJ LIBRARY";
+      title.textContent = "Search articles";
     }
-    if (generalMode) normal.activate();
-    else normal.deactivate();
   }
 
   function openDialog() {
@@ -109,8 +160,8 @@ export function initSearch() {
     tagState.boxId = null;
     const requestedMode = button.dataset.searchOpen === "general" ? "general" : "luxy";
     setMode(requestedMode);
+    renderGeneralSearch();
     openDialog();
-    if (requestedMode === "general") normal.focus();
   }));
 
   document.querySelector("[data-search-close]")?.addEventListener("click", () => dialog.close());
@@ -125,9 +176,15 @@ export function initSearch() {
     if (!modeRadios.includes(radio)) return;
 
     setMode(radio.value);
-    if (radio.value === "general") normal.focus();
+    if (radio.value === "general") renderGeneralSearch();
     if (radio.value === "tag") renderTagSearch();
   });
+
+  form.addEventListener("submit", event => { event.preventDefault(); renderGeneralSearch(); });
+  input.addEventListener("input", renderGeneralSearch);
+  category.addEventListener("change", renderGeneralSearch);
+  sort.addEventListener("change", renderGeneralSearch);
+  slider.addEventListener("input", renderGeneralSearch);
 
   loadMore.addEventListener("click", () => {
     tagState.visibleCount = Math.min(tagState.visibleCount + 10, tagState.articles.length);
@@ -152,4 +209,5 @@ export function initSearch() {
     openDialog();
   });
 
+  renderGeneralSearch();
 }
