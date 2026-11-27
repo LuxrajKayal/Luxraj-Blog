@@ -102,22 +102,25 @@
     </div>
   </section>
 
-  <section class="search-dialog__view" id="general-search-view" aria-label="General article search" hidden>
-    <form class="search-form" id="search-form">
-      <label class="search-field search-field--query" for="search-query">Search titles or keywords<input id="search-query" type="search" placeholder="Try “drone”, “AI”, or “Wi-Fi”" autocomplete="off"></label>
-      <div class="search-controls">
-        <label class="search-field" for="search-category-filter">Category<select id="search-category-filter"><option value="">All categories</option></select></label>
-        <label class="search-field" for="search-sort">Sort results<select id="search-sort"><option value="date-desc">Date: newest first</option><option value="date-asc">Date: oldest first</option><option value="category-asc">Category: A–Z</option><option value="title-asc">Article name: A–Z</option><option value="title-desc">Article name: Z–A</option></select></label>
+  <section class="search-dialog__view" id="general-search-view" aria-label="Website search" hidden>
+    <form class="search-form" id="search-form" role="search">
+      <label class="search-field" for="search-query"><span id="search-query-label">Search titles or content</span></label>
+      <div class="search-query-row">
+        <input id="search-query" type="search" placeholder="Search the website…" autocomplete="off" aria-describedby="search-keyboard-hint">
+        <button class="normal-search-button" id="search-clear" type="button" hidden>Clear</button>
       </div>
-      <label class="search-field search-slider" for="search-reading-time">
-        <span class="search-slider__heading">Reading-time filter <output id="search-reading-output" for="search-reading-time">15 min max</output></span>
-        <input id="search-reading-time" type="range" min="1" max="15" step="1" value="15">
-        <span class="search-slider__scale"><span>1 min</span><span>15+ min</span></span>
-      </label>
+      <details id="search-filter-panel" class="normal-search-filters" hidden>
+        <summary id="search-filter-label">Filters</summary>
+        <div id="search-filters"></div>
+      </details>
+      <p id="search-keyboard-hint" class="normal-search-hint">Use ↑ and ↓ to navigate results. Enter to open a focused link.</p>
     </form>
-    <div class="search-results-heading"><p id="search-result-count" aria-live="polite">Browse sample articles</p><span>DEVELOPMENT LIBRARY</span></div>
-    <div class="search-results" id="search-results" tabindex="0" aria-label="Search results"></div>
-    <p class="search-dialog__note">These are development sample stories, ready to be replaced with published editorial content.</p>
+    <div class="search-results-heading"><p id="search-result-count" role="status" aria-live="polite" aria-atomic="true">Enter a search term.</p><span id="search-relevance" hidden>BY RELEVANCE</span></div>
+    <div class="search-results" id="search-results" tabindex="0" aria-label="Search results" aria-busy="false"></div>
+    <div class="normal-search-actions">
+      <button class="normal-search-button" id="search-load-more" type="button" hidden>Load more results</button>
+      <button class="normal-search-button" id="search-retry" type="button" hidden>Retry</button>
+    </div>
   </section>
 
   <section class="search-dialog__view" id="tag-search-view" aria-label="Tag search results" hidden>

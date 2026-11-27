@@ -67,3 +67,7 @@ Luxraj-Blog/
 ```
 
 Preserve the original external libraries and their licenses in the root-level `search-dependencies/` directory. Store browser-compatible working copies in `site/assets/js/search-dependencies/`, and all five communication adapters in `site/assets/js/adapter/search-adapters/`.
+
+## Normal Search UI
+
+Retain the Luxraj design and consume Pagefind's native API and data directly through `ui-pagefind.js`. Support highlighted excerpts, images, section links, dynamic indexed filters, result counts, progressive loading, keyboard navigation, and search states. Use native relevance ordering; remove the legacy reading-time, date and alphabetical controls until supported by indexed fields. Keep the legacy article index and shared Tag Search renderer for Tag Search only. Build the pinned Pagefind 1.6.0 browser bundle and index after assembling the site. The complete offline library backup remains pending.
