@@ -1,0 +1,16 @@
+# Stable Codex baseline
+Verified runtime snapshot: 7630b4311d317edc37415cb9cdad80442ed224f5. Backup branch backup/luxy-before-personality-20261127 points to it. Restored main via history-preserving commit d230c9fc6864f6c2e35678a13b96429918851eec; tree 84ac72e8bf5b468708dafea7ae3ebca4312dab08 exactly matched original. Failed refinement archived on feature/luxy-personality-refinement at 971c9c9e3e52093e9a63dbb9d7bc204b324659b0. Do not reapply its patches blindly.
+
+## Architecture
+Normal Search -> ui-pagefind.js -> native Pagefind.
+Luxy UI -> ui-nlp.js -> NLP.js -> nlp-rivescript.js -> RiveScript -> rivescript-pagefind.js -> Pagefind; RiveScript -> rivescript-ui.js -> UI. Independent Tag Search. Native libraries, minimal adapters, trusted registered callbacks only. No arbitrary JS execution or external AI services. English root, Arabic /ar/, Spanish /es/; manual language selection. Site built in GitHub, eventual Cloudflare hosting. Preserve intentional HTML placeholders and original index inputs. No changes to independent search modes for this research.
+
+Pinned Pagefind v1.6.0 Linux x86_64 musl archive SHA256 004d40c9a644c995dadc42b8031196c6f17e7a6dacf9a6c15c63286dd6ead5f2. NLP.js @nlpjs/nlp 4.27.0 with language cores 4.26.1. RiveScript 2.2.1. Original archives search-dependencies/{pagefind,nlp,rivescript}/; browser copies site/assets/js/search-dependencies/; adapters site/assets/js/adapter/search-adapters/. Read SEARCH-ENGINE-PLANNING.md and documentation/LUXY-RIVESCRIPT.md for implementation details.
+
+## Native training
+scripts/nlp/corpora/{en,ar,es}.json: 239, 223, 223 foundational utterances respectively (685 total). 27 supported functional intents, request.ambiguous and None; 16/15/16 negatives and 6/7/6 ambiguous examples separately in entities.mjs. scripts/nlp/train.mjs registers corpus, article-generated examples, @subject and @category templates, native enum/regex entity rules, mandatory slots and trains separate models. Supplemental article samples capped at 80 per locale, not an article limit; defer changing until evidence of scalability problems. Native classifier selects candidate by evidence and confidence; scores are not calibrated correctness probabilities. Context and permission policy require independent validation. Baseline has 72 RiveScript triggers per language; trusted subroutine registration prevents inline eval.
+
+Original CI 46022613667: 159/162 NLP evaluation, 33/33 negatives, 56/56 entity recall; 84/84 rule tests and browser smoke tests. Holdout cases were used in earlier tuning, so not independent final evaluation. Browser/site corpus at that time: 120 pages, 60 articles, English only, no native filters or sorts. Do not assume Arabic/Spanish content coverage.
+
+## Deployment
+Rollback workflow https://github.com/LuxrajKayal/Luxraj-Blog/actions/runs/46042733741: push attempt 1 passed build and upload but deployment reported zero matching artifacts shortly after upload; manual rerun attempt 2 succeeded for same commit. Likely transient GitHub artifact visibility, exact infrastructure cause unconfirmed. Automatic push triggers remain enabled. No need to modify workflows unless recurring issue warrants separately approved fix. Research-folder-only changes are outside the configured push path filters.
