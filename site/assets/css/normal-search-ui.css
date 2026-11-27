@@ -29,8 +29,8 @@ html:has(#search-dialog[open][data-normal-workspace]),body:has(#search-dialog[op
   display:flex;flex-direction:column;box-sizing:border-box;padding:0 clamp(12px,2.5vw,36px);
   color:var(--ns-ink);font-size:14px;line-height:1.5;overflow:hidden;
 }
-.ns-workspace[data-theme="light"] {--ns-page:#fff;--ns-surface:#faf9f8;--ns-muted:#555;--ns-ink:#202024;--ns-border:#ddd8d6;--ns-hover:#f2eeed;--ns-strong:#aaa3a1}
-.ns-workspace[data-theme="dark"] {--ns-page:#19191c;--ns-surface:#222225;--ns-muted:#b8b8bd;--ns-ink:#f4f4f5;--ns-border:#39393f;--ns-hover:#303037;--ns-strong:#66666e;--ns-mark:#f5e3a3}
+#search-dialog[data-search-ui-mode="developer"] .ns-workspace[data-theme="light"] {--ns-page:#fff;--ns-surface:#faf9f8;--ns-muted:#555;--ns-ink:#202024;--ns-border:#ddd8d6;--ns-hover:#f2eeed;--ns-strong:#aaa3a1}
+#search-dialog[data-search-ui-mode="developer"] .ns-workspace[data-theme="dark"] {--ns-page:#19191c;--ns-surface:#222225;--ns-muted:#b8b8bd;--ns-ink:#f4f4f5;--ns-border:#39393f;--ns-hover:#303037;--ns-strong:#66666e;--ns-mark:#f5e3a3}
 .ns-workspace * {box-sizing:border-box;min-width:0}
 .ns-workspace [hidden] {display:none!important}
 .ns-workspace h3,.ns-workspace h4,.ns-workspace h5,.ns-workspace p {margin:0;overflow-wrap:anywhere}
@@ -168,7 +168,7 @@ html:has(#search-dialog[open][data-normal-workspace]),body:has(#search-dialog[op
 
 /* Keep normal controls legible without shrinking touch targets. */
 .ns-workspace [data-ns-panel="results"] {min-height:100%}
-.ns-workspace[data-theme="light"],.ns-workspace[data-theme="dark"] {background:var(--ns-surface)}
+#search-dialog[data-search-ui-mode="developer"] .ns-workspace[data-theme="light"],#search-dialog[data-search-ui-mode="developer"] .ns-workspace[data-theme="dark"] {background:var(--ns-surface)}
 .ns-filter-group .ns-count {white-space:nowrap}
 .ns-workspace button[aria-pressed="true"] {font-weight:650}
 @media(max-width:767px){.ns-toolbar button,.ns-result-heading .ns-actions button,.ns-footer button{min-height:44px}.ns-workspace button.ns-pill{min-height:34px}}
@@ -180,3 +180,9 @@ html:has(#search-dialog[open][data-normal-workspace]),body:has(#search-dialog[op
 .ns-code{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;padding:12px;border:1px solid var(--ns-border);border-radius:8px;background:var(--ns-hover);font-size:12px;line-height:1.5;margin:0}
 .ns-panel[data-ns-panel="sort"]{max-width:760px;margin-inline-start:0}
 @media(max-height:480px){.ns-workspace{overflow:auto;overscroll-behavior:contain}.ns-body{flex:1 0 auto;min-height:160px;overflow:visible;scrollbar-gutter:auto}.ns-footer{display:flex}.ns-selection-bar [data-ns-selected]{max-height:52px}.ns-workspace .ns-filters{max-height:none}}
+
+/* Presentation mode, independent of panel navigation and the Luxy/Tag switch.
+   Unknown or missing mode values use the public presentation. */
+#search-dialog:not([data-search-ui-mode="developer"]) #general-search-view [data-ns-developer-only] {
+  display:none!important;
+}
