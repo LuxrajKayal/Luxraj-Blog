@@ -1,0 +1,28 @@
+name: Verify unrestricted native Pagefind indexing
+on:
+  push:
+    branches: [pagefind-native-check]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+      - name: Build and verify unchanged HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/build-site.mjs
+          find _site -type f \( -iname '*.html' -o -iname '*.htm' \) -print0 | sort -z | xargs -0 sha256sum > /tmp/html-before.sha256
+          node scripts/build-pagefind.mjs
+          sha256sum -c /tmp/html-before.sha256 --quiet
+          find _site -type f \( -iname '*.html' -o -iname '*.htm' \) -print0 | sort -z | xargs -0 sha256sum > /tmp/html-after.sha256
+          cmp /tmp/html-before.sha256 /tmp/html-after.sha256
+          echo "All assembled HTML files byte-identical after indexing"
+      - name: Native engine and browser verification
+        run: node scripts/test-pagefind.mjs
