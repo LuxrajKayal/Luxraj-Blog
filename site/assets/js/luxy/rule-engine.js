@@ -4,14 +4,12 @@ const intents = new Set([
   "search.interface", "newsletter.info", "newsletter.subscribe", "newsletter.unsubscribe",
   "article.share", "article.copyLink", "article.author", "article.date", "article.calculate",
   "content.explain", "content.search", "content.category", "content.author", "content.date",
-  "content.more", "content.refine",
-  "chat.praise", "chat.tease", "chat.insult", "chat.personal_insult", "chat.profanity", "chat.criticism", "chat.frustration", "chat.apology", "chat.opinion", "chat.accusation", "chat.threat", "chat.disengage", "assistant.personality", "assistant.capabilities"
+  "content.more", "content.refine"
 ]);
 const slots = new Set(["page", "language", "expression", "query", "author"]);
 
 export function triggerFor(packet) {
   if (packet.schemaVersion !== 1) return "unknown";
-  if (packet.status === "action_blocked") return "outcome action blocked";
   if (packet.status === "ambiguous") return "ambiguous";
   if (packet.status !== "recognized" || !intents.has(packet.intent)) return "unknown";
   return "intent " + packet.intent.replaceAll(".", " ").toLowerCase();
@@ -56,13 +54,8 @@ export async function ruleReply(bot, scope) {
   const missing = packet.parameters?.missing?.find(slot => slots.has(slot)) ?? "none";
   await bot.setUservar(user, "missing", missing);
   await bot.setUservar(user, "hasrelated", scope.page || scope.state.search ? "yes" : "no");
-  // Abuse is temporary and isolated to the native conversation. It never authorizes an action.
-  const abusive = packet.status === "recognized" && ["chat.insult", "chat.personal_insult", "chat.profanity"].includes(packet.intent);
-  const previousAbuse = Number(await bot.getUservar(user, "abuse_streak")) || 0;
-  const streak = abusive ? Math.min(3, previousAbuse + 1) : 0;
-  await bot.setUservar(user, "abuse_streak", String(streak));
   signal.check();
-  const text = await bot.reply(user, streak >= 3 ? "conversation boundary" : triggerFor(packet), scope);
+  const text = await bot.reply(user, triggerFor(packet), scope);
   signal.check();
   return text;
 }

@@ -2,7 +2,6 @@ import { AUTHORS_BY_ID } from "../author-library.js";
 import { lazyLoader } from "../lazy-loader/index.js";
 import { keyOf, safeSiteUrl } from "./site-data.js";
 import { retrieve } from "./retrieval.js";
-import { actionPermission, prohibitedAction } from "../nlp/request-policy.js";
 
 const articleCapabilities = new Map(); // Register future article functions here as trusted references.
 const selected = (scope, type) => {
@@ -148,22 +147,14 @@ async function calculate(scope) {
   return result("calculated", { details: [String(await capability.execute(expression, scope.signal))] });
 }
 
-// Independent execution gate, even if the classifier incorrectly recognized an action.
-const guarded = (capability, callback) => scope => {
-  const { locale, message } = scope.packet;
-  if (!actionPermission(locale, message, capability)) return result(prohibitedAction(locale, message) ? "action_blocked" : "action_uncertain");
-  scope.signal.check();
-  return callback(scope);
-};
-
 export const actions = Object.freeze({
   navigate: scope => destination(scope, selected(scope, "page")),
-  language, category, theme: guarded("theme", theme), search_interface: guarded("search_interface", searchInterface), newsletter: guarded("newsletter", newsletter),
+  language, category, theme, search_interface: searchInterface, newsletter,
   contact: scope => destination(scope, "contact"),
   about: scope => scope.region.pages.about ? destination(scope, "about") : undefined,
   unsubscribe: scope => destination(scope, "unsubscribe"),
-  author: publicAuthor, article_dates: articleDates, calculate: guarded("calculate", calculate),
-  share: guarded("share", scope => articleShare(scope, true)),
-  copy: guarded("copy", scope => articleShare(scope, false)),
+  author: publicAuthor, article_dates: articleDates, calculate,
+  share: scope => articleShare(scope, true),
+  copy: scope => articleShare(scope, false),
   retrieve: scope => retrieve(scope.packet, scope.state, scope)
 });

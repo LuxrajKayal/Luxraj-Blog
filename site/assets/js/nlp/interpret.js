@@ -1,6 +1,5 @@
 import { createNlp } from "../search-dependencies/nlp/nlpjs.js";
 import { entityInput } from "./entity-text.js";
-import { bareTopic, prohibitedAction, unsafeMessage, shortSocialIntent, structuredRequestIntent, newsletterSubject, explanationRequest } from "./request-policy.js";
 
 export const locales = ["en", "ar", "es"];
 const enumTypes = ["category", "subject", "author", "capability", "page", "theme", "channel", "language"];
@@ -103,8 +102,7 @@ function buildSearch(intent, entities, subject, previousSearch) {
   if (!searchIntents.has(intent)) return null;
   const inherited = followUps.has(intent) ? previousSearch : undefined;
   const filter = (type, key) => {
-    const values = entityValues(entities.filter(entity => !(type === "category" && subject &&
-      queryIntents.has(intent) && (entity.option ?? entity.utteranceText)?.toLowerCase() === subject.toLowerCase())), type);
+    const values = entityValues(entities, type);
     return values.length ? values : inherited?.[key] ?? [];
   };
   return {
@@ -145,14 +143,6 @@ export async function interpret(engine, message, context = {}, { diagnostics = f
     (runnerUp?.intent === nativeUnknown && runnerUp.score > 0.3 && top.score - runnerUp.score < 0.38);
   let status = output.intent === "request.ambiguous" || (!weak && close) ? "ambiguous" : weak ? "unknown" : "recognized";
   let intent = status === "recognized" ? output.intent : nativeUnknown;
-  const repair = structuredRequestIntent(engine.locale, utterance);
-  if (repair && !isExplicitNegative(output) && !unsafeMessage(utterance) && !prohibitedAction(engine.locale, utterance)) {
-    intent = repair; status = "recognized";
-  } else if (intent === "newsletter.info" && query && !newsletterSubject(engine.locale, utterance) &&
-      explanationRequest(engine.locale, utterance)) {
-    // A generic explanation request with a real query is not a newsletter question.
-    intent = "content.explain"; status = "recognized";
-  }
   const previous = context.locale === engine.locale ? context : {};
   const knownSubject = entityValue(entities.find(entity => entity.entity === "subject"));
   let subject = queryIntents.has(intent) ? query?.utteranceText ?? knownSubject : undefined;
@@ -183,22 +173,6 @@ export async function interpret(engine, message, context = {}, { diagnostics = f
     }
   }
 
-  // Explicitly prohibited control requests override classifier and pending slots.
-  if (unsafeMessage(utterance)) {
-    status = "unknown"; intent = nativeUnknown; subject = undefined;
-  } else if (prohibitedAction(engine.locale, utterance) && (intent.startsWith("site.") ||
-      intent.startsWith("newsletter.") || intent.startsWith("article.") || intent === "search.interface" ||
-      status !== "recognized")) {
-    status = "action_blocked"; intent = nativeUnknown; subject = undefined;
-  } else if (!isExplicitNegative(output) && status !== "recognized" && shortSocialIntent(engine.locale, utterance)) {
-    status = "recognized"; intent = shortSocialIntent(engine.locale, utterance); subject = undefined;
-  } else if (!isExplicitNegative(output) && status !== "recognized" && !previous.slotFill) {
-    const topic = bareSubject ? knownSubject : bareTopic(utterance);
-    if (topic) {
-      status = "recognized"; intent = "content.search"; subject = topic;
-      entities.push(contextualEntity("query", topic));
-    }
-  }
   const nativeResult = { intent, utterance, localeIso2: engine.locale, entities };
   const slotContext = intent === previous.slotFill?.intent && output.intent !== intent
     ? { slotFill: structuredClone(previous.slotFill) }
@@ -211,7 +185,7 @@ export async function interpret(engine, message, context = {}, { diagnostics = f
     locale: engine.locale,
     previousIntent: intent === nativeUnknown ? previous.previousIntent ?? null : intent,
     search: search || previous.search || null,
-    slotFill: status === "action_blocked" || unsafeMessage(utterance) ? null : nativeResult.slotFill ?? (intent === nativeUnknown ? previous.slotFill : null) ?? null
+    slotFill: nativeResult.slotFill ?? (intent === nativeUnknown ? previous.slotFill : null) ?? null
   };
   return {
     locale: output.localeIso2 ?? engine.locale,

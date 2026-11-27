@@ -59,16 +59,8 @@ export async function collectSiteKnowledge(root) {
     }
     if (articleRoute) {
       const bar = nodes.find(node => attr(node, "data-author-id"));
-      const main = nodes.find(node => node.tagName === "article" && (attr(node, "class") ?? "").split(/\s+/u).includes("article-entry"))
-        ?? nodes.find(node => node.tagName === "main");
-      const headings = [...elements(main ?? { childNodes: nodes.filter(node => /^h[23]$/u.test(node.tagName)) })]
-        .filter(node => /^h[23]$/u.test(node.tagName)).map(node => tidy(value(node))).filter(Boolean);
-      const tags = nodes.filter(node => node.tagName === "meta" &&
-        ["article:tag", "keywords"].includes(attr(node, "property") ?? attr(node, "name")))
-        .flatMap(node => tidy(attr(node, "content")).split(/[,;]/u).map(tidy)).filter(Boolean);
       locale.articles[route] = {
-        title, headings: headings.slice(0, 24), tags: tags.slice(0, 24),
-        description: meta("description") || meta("og:description"),
+        title,
         authorId: attr(bar, "data-author-id") || "",
         author: meta("author") || meta("article:author"),
         published: attr(bar, "data-published-date") || meta("article:published_time"),

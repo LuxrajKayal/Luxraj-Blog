@@ -4,7 +4,7 @@ import path from "node:path";
 import os from "node:os";
 import Interpreter from "../../site/assets/js/search-dependencies/rivescript/rivescript.js";
 import { createRuleBot, ruleReply, outcomeReply, triggerFor } from "../../site/assets/js/luxy/rule-engine.js";
-import { nativeOptions, retrieve, explanationEvidence } from "../../site/assets/js/luxy/retrieval.js";
+import { nativeOptions, retrieve } from "../../site/assets/js/luxy/retrieval.js";
 import { safeSiteUrl } from "../../site/assets/js/luxy/site-data.js";
 import { collectSiteKnowledge, verifyLibrary } from "../build-rivescript.mjs";
 
@@ -79,16 +79,6 @@ const catalog = { category: { Engineering: 1 }, author: { Author: 2 }, published
 const configured = nativeOptions(make("en", "content.search"), request, catalog, []);
 assert.deepEqual(configured.options.filters, { category: ["Engineering"], author: ["Author"], published: ["2024-03-01"] });
 assert.deepEqual(nativeOptions(make("en", "content.search"), request, {}, []).unavailable, ["categories", "authors", "dates"]);
-assert(explanationEvidence({ meta: { title: "AI on the Edge" }, excerpt: "Edge computing processes data locally." },
-  { title: "AI on the Edge", headings: ["What inference at the edge means"], tags: ["Edge computing"] }, "Edge Computing", "articles/edge.html"));
-assert(explanationEvidence({ meta: { title: "Electric circuits" }, excerpt: "Learn the fundamentals." },
-  { headings: ["Understanding voltage and current"] }, "voltage", "articles/circuits.html"));
-assert(!explanationEvidence({ meta: { title: "Privacy policy" }, excerpt: "We protect against hacking." },
-  undefined, "hacking", "pages/privacy.html"));
-assert(!explanationEvidence({ meta: { title: "Drone batteries" }, excerpt: "A mention of hacking." },
-  { title: "Drone batteries", headings: ["Battery life"] }, "hacking", "articles/drone.html"));
-assert(!explanationEvidence({ meta: { title: "{{ARTICLE_TITLE}}" }, excerpt: "Placeholder" },
-  { title: "{{ARTICLE_TITLE}}" }, "article title", "articles/placeholder.html"));
 const indexed = Array.from({ length: 14 }, (_, index) => ({
   url: root.href + "articles/" + index + ".html", meta: { title: dangerous }, excerpt: "<mark>source</mark> <script>"
 }));

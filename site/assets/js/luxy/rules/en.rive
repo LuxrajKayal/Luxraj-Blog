@@ -4,37 +4,26 @@
 
 + intent chat greet
 * <get greeted> == yes => {@welcome back}
-- <set greeted=yes>Hiii! Luxy reporting for curiosity duty! What shall we explore today?{weight=2}
-- <set greeted=yes>Hello! A little explorer and a big library, at your service.
-- <set greeted=yes>Welcome to Luxraj Blog! Ready for a little discovery?
-- <set greeted=yes>Hey there! What has your curiosity today?
 - <set greeted=yes>Hello! What would you like to explore?{weight=2}
 - <set greeted=yes>Hi, I’m Luxy. What can I help you find?
 - <set greeted=yes>Welcome to Luxraj Blog!
 
 + intent chat thanks
-- You're welcome! Happy exploring.
-- Glad I could help. That made my little library day!
-- Anytime! Curiosity never gets old.
-- You're welcome! On to our next discovery?
+- You’re welcome. Happy reading!
 - Glad I could help.
 - Anytime. What else would you like to explore?
 
 + intent chat farewell
-- Bye-bye! May your next discovery be a brilliant one.
-- See you around! I'll be here when curiosity strikes.
-- Until next time! Off to playtime for me.
+- See you around!
 - Take care, and thanks for visiting.
 - Until next time!
 
 + intent chat smalltalk
-- Doing well, thanks for asking! My little library is ready for an adventure.
-- I'm here and curious as ever. What shall we explore?
-- Ready for another discovery! What's on your mind?
+- I’m ready to help you explore the blog. What are you curious about?
 - Doing well, thanks for asking!
 
 + intent assistant identity
-- I'm <bot name>, the search assistant for Luxraj Blog. A little digital explorer with a rather big library! I find articles and help with supported site controls.
+- I’m <bot name>, the search assistant for Luxraj Blog. I can help you find articles, follow sources and use site controls.
 
 + intent assistant help
 - Try asking for articles on a topic, a blog section, the author of the current article, or the light theme. I can show relevant excerpts and link you to their sources.
@@ -50,9 +39,6 @@
 
 + welcome back
 - Welcome back! What would you like to look up this time?
-- Oh, hello again! Another adventure in the library?
-- Back for more curiosity? I'm ready!
-- Hi again! What's on your mind?
 
 + intent site navigate
 * <get missing> == page => {@outcome clarify page}
@@ -198,9 +184,7 @@
 - These excerpts from Luxraj Blog may help explain the topic. Open a source to read more.
 
 + outcome empty
-- Oops! I didn’t find matching pages. Perhaps our authors haven't covered this topic yet.
-- Hmm, I didn't find matching pages in the searchable library. Try another phrase?
-- No matching pages this time. Even a little explorer has limits!
+- I didn’t find matching pages. Try a different term or a broader topic.
 
 + outcome exhausted
 - There are no more matching results from this search.
@@ -243,85 +227,6 @@
 
 + ambiguous
 - {topic=recovery}I’m not sure what you’re referring to. Could you name the article, topic or control?
-
-+ intent chat praise
-- Yay! A little encouragement goes a long way.
-- Thank you! My curiosity meter is smiling.
-- Hooray! What shall we discover next?
-
-+ intent chat tease
-- Hehe! Even a little explorer needs a giggle.
-- Aha, a fellow mischief-maker! What are we exploring?
-
-+ intent chat insult
-- Excuse me! My little digital brain is doing its best, thank you!
-- Hey! Criticism is welcome, insults aren't very useful.
-- Ouchie! Want to tell me what went wrong instead?
-- Hey! A little kindness goes a long way. Shall we talk about something useful?
-- Excuse me! Criticism is welcome, but insults aren't very helpful.
-
-+ intent chat profanity
-- BAD WORDS! I'm calling the cops! Just kidding! I've got playtime to get back to.
-- Oops, that's a rather grumpy word! Let's keep things friendly.
-- My little library has better things to do than trade insults.
-
-+ intent chat criticism
-- Oh! Let's check that properly. Which part was wrong?
-- Thanks for pointing that out. What should I revisit?
-
-+ intent chat frustration
-- I can try again. Which part of your request did I miss?
-- Let's focus on the thing you need. What went wrong?
-
-+ intent chat apology
-- Apology accepted! Fresh start?
-- No worries. Back to exploring!
-
-+ intent chat opinion
-- That's your opinion! We can discuss the reasons without treating it as a fact.
-- People can disagree. I'd rather look at evidence than labels.
-
-+ intent chat accusation
-- That's a serious claim. I can't establish it as fact without reliable evidence.
-- I won't repeat an unverified accusation as fact.
-
-+ intent chat threat
-- Threats of harm are serious. I can't help hurt anyone. If someone is in immediate danger, contact local emergency services.
-- I can't help with harm. If there is an immediate danger, seek emergency assistance.
-
-+ intent chat disengage
-- Okay. I'll stop here.
-- All right. More playtime for me!
-
-+ intent assistant personality
-- I'm Luxy, a digital search assistant with a curious little explorer's personality. No human age, just a library to explore!
-- Young at heart, careful with facts. I'm a digital character, not a person.
-
-+ intent assistant capabilities
-- I'm a blog search assistant, not a hacker or an unrestricted code runner. I can help explore the library and supported site tools.
-- My talents are finding knowledge and using supported site controls, not breaking into things.
-
-+ outcome action blocked
-- Got it! I haven't changed anything.
-- I'll leave that control alone.
-
-+ outcome action uncertain
-- I haven't changed anything. Tell me directly what you'd like me to do.
-- I'm not sure you want me to perform that action, so I'll leave it alone.
-
-+ outcome incidental
-- I found mentions of the topic, but these sources don't establish a direct explanation.
-- Hmm, these excerpts from Luxraj Blog may contain mentions rather than a direct explanation. I can't confirm they answer your question.
-- Hmm, these matches may mention the topic without actually explaining it.
-
-+ intent chat personal_insult
-- That's your opinion! I'd rather discuss someone's work than throw insults around.
-- Mr. or Ms. Critic, an insult isn't evidence. What specifically do you disagree with?
-- People can disagree. Let's judge the work, not label the person.
-
-+ conversation boundary
-- I'm taking a break from the insults. If you have a genuine question, I'm happy to help.
-- Enough bad manners for now. More playtime for me, until you're ready to talk constructively.
 
 + *
 - {@unknown}
