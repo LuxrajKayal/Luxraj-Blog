@@ -233,3 +233,13 @@ html:has(#search-dialog[open][data-normal-workspace]),body:has(#search-dialog[op
 @media(prefers-reduced-motion:reduce){
   #general-search-view .ns-top-fold{transition:none}
 }
+
+/* Native result data uses the existing result-card layout. */
+#general-search-view .ns-thumb img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+#general-search-view .ns-result-link{color:inherit;text-decoration:none}
+#general-search-view .ns-result-link:hover{text-decoration:underline}
+#general-search-view .ns-action-link{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:7px 11px;border:1px solid var(--ns-border);border-radius:8px;background:var(--ns-page);color:var(--ns-ink);text-decoration:none;font-size:13px;font-weight:550}
+#general-search-view .ns-action-link:hover{border-color:var(--ns-accent);color:var(--ns-accent)}
+#general-search-view .ns-action-link[aria-disabled="true"]{opacity:.6;pointer-events:none}
+#general-search-view .ns-workspace a:focus-visible{outline:2px solid var(--ns-accent);outline-offset:2px}
+@media(pointer:coarse){#general-search-view .ns-action-link{min-height:44px}}
