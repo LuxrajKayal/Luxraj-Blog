@@ -104,6 +104,10 @@ try {
   await ask(page, "Switch to Spanish", /couldn.t find a published home page/iu);
   await ask(page, "Switch to light theme", /light theme/iu);
   assert.equal(await page.locator("html").getAttribute("data-theme"), "light");
+  await ask(page, "Never switch to dark mode. Do not change my current theme under any circumstances.", /haven.t changed|leave that control alone/iu);
+  assert.equal(await page.locator("html").getAttribute("data-theme"), "light");
+  const refusedSignup = await ask(page, "I don’t want to subscribe", /haven.t changed|leave that control alone/iu);
+  assert.equal(await refusedSignup.response.getByRole("button", { name: "Open newsletter", exact: true }).count(), 0);
   await ask(page, "Calculate 12 V / 4 Ω", /open an article first/iu);
   await ask(page, "Explain this", /which topic/iu);
   await ask(page, "Edge Computing", /excerpts from Luxraj Blog|didn.t find matching pages/iu);

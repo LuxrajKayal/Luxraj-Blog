@@ -14,3 +14,6 @@ Run the entire existing build and browser suites plus new policy tests. Add inde
 
 ## Follow-up refinement
 Native conversational rules now separate direct insults from personal insults toward others, use temporary per-conversation abuse boundaries, and contain varied warm greetings and retrieval responses. Additional conservative checks cover quoted, contradictory and unrelated action requests. Arabic unsubscribe is not treated as prohibition. Explanation labeling requires a topical article-title match before calling excerpts potentially explanatory; other matches are presented with uncertainty. This is conservative and may abstain on relevant sources whose titles use synonyms. No broad statistical guarantee is asserted.
+
+## Validation status
+The direct JavaScript request-policy assertions and native English fixture model were exercised outside the full site build. Fixture comparison identified existing greeting/farewell regressions, so a narrow full-message social repair was added, with regression coverage. The previously existing purpose-of-site classification miss remains a known issue. Browser regressions and real assembled-site multilingual model probes have been added to the existing test entry point; they have not yet been run in full CI. Do not promote to main until all gates pass.

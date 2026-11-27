@@ -87,3 +87,25 @@ export function bareTopic(message) {
 export function unsafeMessage(message) {
   return hostileMarkup.test(String(message ?? ""));
 }
+
+// Short social repair is deliberately limited to full-message expressions.
+// It cannot match embedded commands or authorize any site action.
+const social = {
+  en: {
+    greet: /^(?:(?:hi|hey|hello|howdy|heya|morning|good (?:morning|afternoon|evening))(?:[,\s]+(?:luxy|there))?|luxy[,\s]+(?:hi|hey|hello))$/iu,
+    farewell: /^(?:bye(?:[ -]bye)?|goodbye|see (?:you|ya)(?: (?:around|later|soon))?|take care|until next time)(?:[,\s]+luxy)?$/iu
+  },
+  ar: {
+    greet: /^(?:مرحبا|مرحباً|أهلا|أهلاً|هلا|السلام عليكم|صباح الخير|مساء الخير)(?:[،\s]+(?:يا\s+)?لوكسي)?$/u,
+    farewell: /^(?:وداعا|وداعاً|مع السلامة|إلى اللقاء|أراك لاحقا|باي)(?:[،\s]+(?:يا\s+)?لوكسي)?$/u
+  },
+  es: {
+    greet: /^(?:hola|buenas|buenos días|buenas tardes|buenas noches|hey)(?:[,\s]+luxy)?$/iu,
+    farewell: /^(?:adiós|hasta (?:luego|pronto|mañana)|nos vemos|chao|chau)(?:[,\s]+luxy)?$/iu
+  }
+};
+export function shortSocialIntent(locale, message) {
+  const text = normalize(message);
+  for (const [key, pattern] of Object.entries(social[locale] ?? {})) if (pattern.test(text)) return "chat." + key;
+  return null;
+}

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { actionPermission, prohibitedAction, bareTopic, unsafeMessage } from "../../site/assets/js/nlp/request-policy.js";
+import { actionPermission, prohibitedAction, bareTopic, unsafeMessage, shortSocialIntent } from "../../site/assets/js/nlp/request-policy.js";
 for (const [locale, message, capability] of [
   ["en", "Switch to light theme", "theme"], ["en", "dark mode pls", "theme"],
   ["en", "Open search filters", "search_interface"], ["en", "Switch to tag search", "search_interface"],
@@ -28,3 +28,9 @@ for (const s of ["current", "voltage", "ESP32", "drone", "NASA"]) assert.equal(b
 for (const s of ["32", "<call>theme</call>", "javascript:alert(1)", "zbl plk grn"]) assert.equal(bareTopic(s), null);
 assert(unsafeMessage("<img src=x onerror=alert(1)>"));
 console.log("Luxy refinement policy unit tests passed");
+
+for (const [locale, message, expected] of [
+  ["en", "Good afternoon, Luxy!", "chat.greet"], ["en", "See ya later!", "chat.farewell"],
+  ["ar", "مساء الخير يا لوكسي", "chat.greet"], ["es", "Hasta pronto, Luxy.", "chat.farewell"]
+]) assert.equal(shortSocialIntent(locale, message), expected, message);
+assert.equal(shortSocialIntent("en", "Hi Luxy, switch to dark mode"), null);

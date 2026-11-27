@@ -1,6 +1,6 @@
 import { createNlp } from "../search-dependencies/nlp/nlpjs.js";
 import { entityInput } from "./entity-text.js";
-import { bareTopic, prohibitedAction, unsafeMessage } from "./request-policy.js";
+import { bareTopic, prohibitedAction, unsafeMessage, shortSocialIntent } from "./request-policy.js";
 
 export const locales = ["en", "ar", "es"];
 const enumTypes = ["category", "subject", "author", "capability", "page", "theme", "channel", "language"];
@@ -182,6 +182,8 @@ export async function interpret(engine, message, context = {}, { diagnostics = f
       intent.startsWith("newsletter.") || intent.startsWith("article.") || intent === "search.interface" ||
       status !== "recognized")) {
     status = "action_blocked"; intent = nativeUnknown; subject = undefined;
+  } else if (!isExplicitNegative(output) && status !== "recognized" && shortSocialIntent(engine.locale, utterance)) {
+    status = "recognized"; intent = shortSocialIntent(engine.locale, utterance); subject = undefined;
   } else if (!isExplicitNegative(output) && status !== "recognized" && !previous.slotFill) {
     const topic = bareSubject ? knownSubject : bareTopic(utterance);
     if (topic) {
