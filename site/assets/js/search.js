@@ -1,6 +1,7 @@
 import { ARTICLES } from "./article-index.js";
 import { getArticleIdsByBoxId } from "./tag-indexer.js";
 import { initNormalSearch } from "./normal-search-ui.js";
+import { initLuxyComposer } from "./luxy-nlp-ui.js";
 
 const titleCompare = (a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" });
 const escapeHTML = value => String(value)
@@ -39,6 +40,8 @@ export function initSearch() {
   if (!dialog || !eyebrow || !title || !dialogHeader || !generalView || !luxyView || !tagView ||
       !modeSwitch || modeRadios.length !== 3 ||
       !tagResults || !tagCount || !loadMore) return;
+
+  initLuxyComposer(luxyView);
 
   const tagState = {
     boxId: null,

@@ -1,0 +1,17 @@
+{
+  "name": "luxraj-nlp-build-dependencies",
+  "private": true,
+  "dependencies": {
+    "@nlpjs/core": "4.26.1",
+    "@nlpjs/lang-ar": "4.26.1",
+    "@nlpjs/lang-en-min": "4.26.1",
+    "@nlpjs/lang-es": "4.26.1",
+    "@nlpjs/language-min": "4.25.0",
+    "@nlpjs/nlp": "4.27.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "parse5": "8.1.1",
+    "playwright-core": "1.65.1"
+  }
+}

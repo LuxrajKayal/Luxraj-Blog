@@ -10,15 +10,15 @@ Keep the existing tag system and its association files unchanged; review them se
 
 Phase 3 — Store the pinned, self-hosted browser dependencies and their licenses in site/assets/js/search-dependencies/ (pagefind/, rivescript/, nlp/); keep custom engine logic and build tools separate, with Pagefind indexes generated during the site build.
 
-Phase 4.1 — Use Pagefind's native indexing and search features for all HTML pages, excluding its built-in UI. Maintain three independent language websites with one universal engine, shared libraries and separate language indexes. GitHub remains the working platform; each once-daily Cloudflare production deployment automatically builds all three versions and regenerates their indexes in a single Pagefind run, with no manual index maintenance.
+Phase 4.1 — Completed. Use Pagefind's native indexing and search features for all HTML pages, excluding its built-in UI. Maintain three independent language websites with one universal engine, shared libraries and separate language indexes. GitHub remains the working platform; each once-daily Cloudflare production deployment automatically builds all three versions and regenerates their indexes in a single Pagefind run, with no manual index maintenance.
 
-Phase 4.2.1 — RiveScript execution and communication: Retain the original interpreter and connect it to Pagefind and authorized website controls through explicitly registered custom JavaScript functions; prevent arbitrary JavaScript execution from user input.
+Phase 4.2.1 — NLP.js infrastructure and communication. Load build-trained English, Arabic and Spanish models on demand in the Luxy interface and pass structured understanding through the NLP-to-RiveScript adapter.
 
-Phase 4.2.2 — RiveScript rule setting: Develop our own language-specific conversation rules for English, Arabic and Spanish, gradually utilizing all native RiveScript features in a controlled manner.
+Phase 4.2.2 — NLP.js training and automated article-based training. Combine independent foundational corpora with lightweight knowledge regenerated from the assembled site, then validate and export the three models in the GitHub build. See [Luxy NLP.js maintenance and contract](documentation/LUXY-NLP.md).
 
-Phase 4.3.1 — NLP.js infrastructure: Set up training, model loading, execution and communication, using minimal sample data to verify functionality.
+Phase 4.3.1 — RiveScript execution and communication: Retain the original interpreter and connect it to Pagefind and authorized website controls through explicitly registered custom JavaScript functions; prevent arbitrary JavaScript execution from user input.
 
-Phase 4.3.2 — NLP.js training: Prepare English, Arabic and Spanish training data, train and save the models, and test intent recognition.
+Phase 4.3.2 — RiveScript conversation rules: Develop our own language-specific conversation rules for English, Arabic and Spanish, gradually utilizing all native RiveScript features in a controlled manner.
 
 ## Workflow Architecture
 
