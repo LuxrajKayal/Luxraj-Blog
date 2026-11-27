@@ -8,6 +8,7 @@ on:
     paths:
       - "site/**"
       - "scripts/**"
+      - "search-dependencies/pagefind/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -46,11 +47,13 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/build-site.mjs
+          node scripts/build-pagefind.mjs
+          node scripts/test-pagefind.mjs
 
           echo "Prepared public site:"
           find _site -maxdepth 2 -type f | sort | head -80
 
-      - name: Persist injected SEO eligibility markers to source HTML
+      - name: Persist source SEO markers and pinned Pagefind release
         shell: bash
         run: |
           set -euo pipefail
@@ -60,16 +63,16 @@ jobs:
             exit 0
           fi
 
-          git add -- site
+          git add -- site search-dependencies/pagefind/pagefind-v1.6.0-x86_64-unknown-linux-musl.tar.gz
 
           if git diff --cached --quiet; then
-            echo "No SEO eligibility source changes to commit."
+            echo "No source metadata or Pagefind backup changes to commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: persist SEO eligibility markers in source HTML"
+          git commit -m "chore: persist SEO markers and pinned Pagefind distribution"
           git push origin "HEAD:${GITHUB_REF}"
 
       - name: Upload Pages artifact

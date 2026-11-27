@@ -1,0 +1,31 @@
+name: Verify Pagefind integration before promotion
+on:
+  push:
+    branches: [pagefind-integration-check]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+      - name: Assemble and index public site
+        run: |
+          node scripts/build-site.mjs
+          node scripts/build-pagefind.mjs
+      - name: Test native engine and browser UI
+        run: node scripts/test-pagefind.mjs
+      - name: Preserve original verified Pagefind release
+        run: |
+          git add -- search-dependencies/pagefind/pagefind-v1.6.0-x86_64-unknown-linux-musl.tar.gz
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Preserve verified Pagefind 1.6.0 upstream release archive"
+            git push origin "HEAD:${GITHUB_REF}"
+          fi
