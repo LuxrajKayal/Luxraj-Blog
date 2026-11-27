@@ -153,3 +153,11 @@ No CSS cleanup has been performed yet.
 > - Ensure Googlebot and other legitimate crawlers can crawl and render the website normally; validate the behavior before release.
 >
 > This is a future enhancement only. No decoy field or trap behavior has been implemented.
+
+## Update Priority 05 — NLP Training Scalability
+
+**Status:** Deferred until sufficient real-world performance data is available.
+
+The current supplementary intent training limit is 80 distinct article titles per language (English, Arabic and Spanish). Article-derived entity collection is not subject to this title-sample cap, and Pagefind indexing remains unaffected.
+
+As the website grows, evaluate classification accuracy, training duration, model size and browser inference performance. Based on measured results, increase the limit, improve sample selection or remove the cap entirely. Retain the existing implementation until this review is warranted.
